@@ -5,8 +5,10 @@ import br.com.vercel.emerionloadservice.service.CustomerService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -22,5 +24,11 @@ class CustomerController(private val customerService: CustomerService) {
     @GetMapping("{codCli}")
     fun getCustomerByCodCli(@PathVariable codCli: Long): Customer {
         return this.customerService.getCustomerByCodCli(codCli)
+    }
+
+    @PostMapping("{codCli}/send")
+    fun sendCustomerToIngestion(@PathVariable codCli: Long): ResponseEntity<Void> {
+        this.customerService.sendCustomerToIngestion(codCli)
+        return ResponseEntity.ok().build()
     }
 }
