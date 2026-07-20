@@ -2,6 +2,7 @@ package br.com.vercel.emerionloadservice.service
 
 import br.com.vercel.emerionloadservice.client.IngestionServiceClient
 import br.com.vercel.emerionloadservice.model.Customer
+import br.com.vercel.emerionloadservice.repository.CustomerQueryRepository
 import br.com.vercel.emerionloadservice.repository.CustomerRepository
 import br.com.vercel.emerionloadservice.repository.mapper.CustomerMapper.toModel
 import org.springframework.data.domain.Page
@@ -11,10 +12,11 @@ import org.springframework.stereotype.Service
 @Service
 class CustomerService(
     private val customerRepository: CustomerRepository,
+    private val customerQueryRepository: CustomerQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient
 ) {
     fun getAllCustomers(pageable: Pageable): Page<Customer> {
-        return customerRepository.getAllCustomers(pageable = pageable).toModel()
+        return customerQueryRepository.findAllPaged(pageable).toModel()
     }
 
     fun getCustomerByCodCli(codCli: Long): Customer {
