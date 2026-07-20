@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: emerion-load-service
+
+  datasource:
+    driver-class-name: org.firebirdsql.jdbc.FBDriver
+    hikari:
+      connection-timeout: 2000
+      maximum-pool-size: 5
+    url: jdbc:firebirdsql://127.0.0.1:3050//data//portal_2024_01.fdb
+    username: SYSDBA
+    password: masterkey
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    database-platform: org.hibernate.community.dialect.FirebirdDialect
