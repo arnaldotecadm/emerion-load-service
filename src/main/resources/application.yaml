@@ -27,3 +27,4 @@ ingestion-service:
     customer-address: /api/v1/ingestion/customer-addresses/single
     customer-credit: /api/v1/ingestion/customer-credits/batch
     customer-order: /api/v1/ingestion/customer-orders/single
+    vendedor: /api/v1/ingestion/vendedores/single

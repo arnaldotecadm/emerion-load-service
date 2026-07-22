@@ -5,11 +5,13 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMap
 import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.model.CustomerAddress
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.Product
+import br.com.vercel.emerionloadservice.model.Vendedor
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -24,7 +26,8 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.product}") private val productEndpoint: String,
     @Value("\${ingestion-service.endpoints.customer-address}") private val customerAddressEndpoint: String,
     @Value("\${ingestion-service.endpoints.customer-credit}") private val customerCreditEndpoint: String,
-    @Value("\${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String
+    @Value("\${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String,
+    @Value("\${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -117,6 +120,24 @@ class IngestionServiceClient(
             logger.info("Order {} sent successfully to ingestion service", dto.externalId)
         } catch (e: RestClientException) {
             logger.error("Failed to send order {} to ingestion service", dto.externalId, e)
+            throw e
+        }
+    }
+
+    fun sendVendedor(vendedor: Vendedor) {
+        val url = "$baseUrl$vendedorEndpoint"
+        val dto = vendedor.toIngestionDto()
+
+        logger.info("Sending vendedor {} to ingestion service at {}", dto.externalId, url)
+        try {
+            restClient.post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity()
+            logger.info("Vendedor {} sent successfully to ingestion service", dto.externalId)
+        } catch (e: RestClientException) {
+            logger.error("Failed to send vendedor {} to ingestion service", dto.externalId, e)
             throw e
         }
     }
