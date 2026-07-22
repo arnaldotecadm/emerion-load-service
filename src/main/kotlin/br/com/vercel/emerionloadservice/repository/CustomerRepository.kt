@@ -25,7 +25,8 @@ interface CustomerRepository : PagingAndSortingRepository<DummyEntity, Long> {
                 end as bloqueado
             from fincli cli
             left join finregtrib reg on reg.numregtrib = cli.regtrb
-            where cli.regtrb is not null
+            where 1 = 1
+            --and cli.regtrb is not null
             and cli.codcli = :codCli
         """
     )
