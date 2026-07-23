@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 
 data class CustomerCreditIngestionDto(
     val customerExternalId: Long,
+    val cnpjEmpresa: String,
     val sequencia: String?,
     val data: Instant,
     val dataPedido: LocalDateTime?,

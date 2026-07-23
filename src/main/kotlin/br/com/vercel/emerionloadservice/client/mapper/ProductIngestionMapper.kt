@@ -7,9 +7,10 @@ object ProductIngestionMapper {
 
     // The receiving service generates its own internal id, so the local id
     // is sent as externalId to allow it to be traced back to the source record.
-    fun Product.toIngestionDto(): ProductIngestionDto {
+    fun Product.toIngestionDto(cnpjEmpresa: String): ProductIngestionDto {
         return ProductIngestionDto(
             externalId = this.id,
+            cnpjEmpresa = cnpjEmpresa,
             nome = this.nome,
             preco = this.preco
         )

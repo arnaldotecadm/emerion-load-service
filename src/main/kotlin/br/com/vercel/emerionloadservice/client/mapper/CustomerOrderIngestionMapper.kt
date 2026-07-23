@@ -9,11 +9,11 @@ object CustomerOrderIngestionMapper {
 
     // The receiving service generates its own internal id, so numres is sent as
     // externalId to allow it to be traced back to the source order record.
-    fun CustomerOrder.toIngestionDto(): CustomerOrderIngestionDto {
+    fun CustomerOrder.toIngestionDto(cnpjEmpresa: String): CustomerOrderIngestionDto {
         return CustomerOrderIngestionDto(
             externalId = this.numres,
             codCli = this.codCli,
-            cnpjEmpresa = this.cnpjEmpresa,
+            cnpjEmpresa = cnpjEmpresa,
             nronfe = this.nronfe,
             dteres = this.dteres,
             sitres = this.sitres,

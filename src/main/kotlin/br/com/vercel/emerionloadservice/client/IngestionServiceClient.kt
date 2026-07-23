@@ -12,6 +12,7 @@ import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.Product
 import br.com.vercel.emerionloadservice.model.Vendedor
+import br.com.vercel.emerionloadservice.service.CompanyProvider
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestClientException
 @Component
 class IngestionServiceClient(
     private val restClient: RestClient,
+    private val companyProvider: CompanyProvider,
     @Value("\${ingestion-service.base-url}") private val baseUrl: String,
     @Value("\${ingestion-service.endpoints.customer}") private val customerEndpoint: String,
     @Value("\${ingestion-service.endpoints.product}") private val productEndpoint: String,
@@ -33,7 +35,7 @@ class IngestionServiceClient(
 
     fun sendCustomer(customer: Customer) {
         val url = "$baseUrl$customerEndpoint"
-        val dto = customer.toIngestionDto()
+        val dto = customer.toIngestionDto(companyProvider.getCompanyCnpj())
 
         logger.info("Sending customer {} to ingestion service at {}", dto.externalId, url)
         try {
@@ -51,7 +53,7 @@ class IngestionServiceClient(
 
     fun sendProduct(product: Product) {
         val url = "$baseUrl$productEndpoint"
-        val dto = product.toIngestionDto()
+        val dto = product.toIngestionDto(companyProvider.getCompanyCnpj())
 
         logger.info("Sending product {} to ingestion service at {}", dto.externalId, url)
         try {
@@ -69,7 +71,7 @@ class IngestionServiceClient(
 
     fun sendCustomerAddress(address: CustomerAddress) {
         val url = "$baseUrl$customerAddressEndpoint"
-        val dto = address.toIngestionDto()
+        val dto = address.toIngestionDto(companyProvider.getCompanyCnpj())
 
         logger.info("Sending {} address(es) of customer {} to ingestion service at {}", dto.enderecos.size, dto.externalId, url)
         try {
@@ -89,7 +91,7 @@ class IngestionServiceClient(
         if (credits.isEmpty()) return
 
         val url = "$baseUrl$customerCreditEndpoint"
-        val dtos = credits.toIngestionDto()
+        val dtos = credits.toIngestionDto(companyProvider.getCompanyCnpj())
         val customerExternalId = dtos.first().customerExternalId
 
         logger.info("Sending {} credit(s) of customer {} to ingestion service at {}", dtos.size, customerExternalId, url)
@@ -108,7 +110,7 @@ class IngestionServiceClient(
 
     fun sendCustomerOrder(order: CustomerOrder) {
         val url = "$baseUrl$customerOrderEndpoint"
-        val dto = order.toIngestionDto()
+        val dto = order.toIngestionDto(companyProvider.getCompanyCnpj())
 
         logger.info("Sending order {} ({} item(s)) to ingestion service at {}", dto.externalId, dto.itens.size, url)
         try {
@@ -126,7 +128,7 @@ class IngestionServiceClient(
 
     fun sendVendedor(vendedor: Vendedor) {
         val url = "$baseUrl$vendedorEndpoint"
-        val dto = vendedor.toIngestionDto()
+        val dto = vendedor.toIngestionDto(companyProvider.getCompanyCnpj())
 
         logger.info("Sending vendedor {} to ingestion service at {}", dto.externalId, url)
         try {

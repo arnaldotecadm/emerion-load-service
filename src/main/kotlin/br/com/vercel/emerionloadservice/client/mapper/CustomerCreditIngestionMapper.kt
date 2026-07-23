@@ -7,9 +7,10 @@ object CustomerCreditIngestionMapper {
 
     // The credit entry has no id of its own in the legacy schema, so codCli is sent as
     // customerExternalId to allow the receiving service to associate it with the customer.
-    fun CustomerCredit.toIngestionDto(): CustomerCreditIngestionDto {
+    fun CustomerCredit.toIngestionDto(cnpjEmpresa: String): CustomerCreditIngestionDto {
         return CustomerCreditIngestionDto(
             customerExternalId = this.codCli,
+            cnpjEmpresa = cnpjEmpresa,
             sequencia = this.sequencia,
             data = this.data,
             dataPedido = this.dataPedido,
@@ -21,7 +22,7 @@ object CustomerCreditIngestionMapper {
         )
     }
 
-    fun List<CustomerCredit>.toIngestionDto(): List<CustomerCreditIngestionDto> {
-        return this.map { it.toIngestionDto() }
+    fun List<CustomerCredit>.toIngestionDto(cnpjEmpresa: String): List<CustomerCreditIngestionDto> {
+        return this.map { it.toIngestionDto(cnpjEmpresa) }
     }
 }

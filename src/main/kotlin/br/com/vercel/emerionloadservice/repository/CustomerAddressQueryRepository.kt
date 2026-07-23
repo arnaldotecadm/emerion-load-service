@@ -43,7 +43,6 @@ class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         val baseQuery = """
             select
                 codcli as codCli,
-                (select cgcemp from geremp where codemp = 1) as cnpjEmpresa,
                 cgccli as cpfCnpj
             from fincli
             order by codcli
@@ -54,7 +53,6 @@ class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         return jdbcTemplate.query(pagedQuery) { rs, _ ->
             CustomerAddressHeaderProjectionImpl(
                 codCli = rs.getLong("codCli"),
-                cnpjEmpresa = rs.getString("cnpjEmpresa"),
                 cpfCnpj = rs.getString("cpfCnpj")
             )
         }

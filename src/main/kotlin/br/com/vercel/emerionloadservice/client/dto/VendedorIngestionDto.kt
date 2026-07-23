@@ -5,6 +5,7 @@ import java.time.LocalDate
 
 data class VendedorIngestionDto(
     val externalId: Long,
+    val cnpjEmpresa: String,
     val nome: String,
     val apelido: String?,
     val cpfCnpj: String?,

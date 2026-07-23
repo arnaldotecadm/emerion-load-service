@@ -19,6 +19,12 @@ spring:
       ddl-auto: validate
     database-platform: org.hibernate.community.dialect.FirebirdDialect
 
+# codemp of the GEREMP row identifying this retailer/tenant; its CGCEMP (CNPJ) is resolved
+# once via CompanyProvider and attached as cnpjEmpresa to every record sent to ingestion,
+# distinct from each customer's own cpfCnpj (fincli.cgccli).
+company:
+  codemp: 1
+
 ingestion-service:
   base-url: http://localhost:8080
   endpoints:

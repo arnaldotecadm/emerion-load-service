@@ -5,7 +5,7 @@ import java.time.Instant
 data class CustomerOrderIngestionDto(
     val externalId: String,
     val codCli: Long,
-    val cnpjEmpresa: String?,
+    val cnpjEmpresa: String,
     val nronfe: String?,
     val dteres: Instant,
     val sitres: String?,

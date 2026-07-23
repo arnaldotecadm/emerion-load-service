@@ -9,10 +9,10 @@ object CustomerAddressIngestionMapper {
 
     // The receiving service generates its own internal id, so codCli is sent as
     // externalId to allow it to be traced back to the source customer record.
-    fun CustomerAddress.toIngestionDto(): CustomerAddressIngestionDto {
+    fun CustomerAddress.toIngestionDto(cnpjEmpresa: String): CustomerAddressIngestionDto {
         return CustomerAddressIngestionDto(
             externalId = this.codCli,
-            cnpjEmpresa = this.cnpjEmpresa,
+            cnpjEmpresa = cnpjEmpresa,
             cpfCnpj = this.cpfCnpj,
             enderecos = this.enderecos.map { it.toIngestionDto() }
         )

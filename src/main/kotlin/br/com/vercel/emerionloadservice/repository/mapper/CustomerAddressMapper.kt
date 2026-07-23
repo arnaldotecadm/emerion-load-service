@@ -10,7 +10,6 @@ object CustomerAddressMapper {
     fun CustomerAddressHeaderProjection.toModel(rows: List<CustomerAddressRowProjection>): CustomerAddress {
         return CustomerAddress(
             codCli = this.codCli,
-            cnpjEmpresa = this.cnpjEmpresa,
             cpfCnpj = this.cpfCnpj,
             enderecos = rows.toModel()
         )

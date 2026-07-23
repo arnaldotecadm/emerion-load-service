@@ -15,7 +15,6 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
         value = """
             select
                 p.codcli as codCli,
-                (select cgcemp from geremp where codemp = 1) as cnpjEmpresa,
                 p.numres as numres,
                 fat.nronfs as nronfe,
                 p.dteres as dteres,

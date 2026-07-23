@@ -43,7 +43,6 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         val baseQuery = """
             select
                 p.codcli as codCli,
-                (select cgcemp from geremp where codemp = 1) as cnpjEmpresa,
                 p.numres as numres,
                 fat.nronfs as nronfe,
                 p.dteres as dteres,
@@ -66,7 +65,6 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         return jdbcTemplate.query(pagedQuery) { rs, _ ->
             CustomerOrderHeaderProjectionImpl(
                 codCli = rs.getLong("codCli"),
-                cnpjEmpresa = rs.getString("cnpjEmpresa"),
                 numres = rs.getString("numres"),
                 nronfe = rs.getString("nronfe"),
                 dteres = rs.getTimestamp("dteres").toInstant(),

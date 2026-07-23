@@ -15,7 +15,6 @@ interface CustomerAddressRepository : PagingAndSortingRepository<DummyEntity, Lo
         value = """
             select
                 codcli as codCli,
-                (select cgcemp from geremp where codemp = 1) as cnpjEmpresa,
                 cgccli as cpfCnpj
             from fincli
             where codcli = :codCli

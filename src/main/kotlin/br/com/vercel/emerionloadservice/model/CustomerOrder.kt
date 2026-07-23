@@ -4,7 +4,6 @@ import java.time.Instant
 
 data class CustomerOrder(
     val codCli: Long,
-    val cnpjEmpresa: String?,
     val numres: String,
     val nronfe: String?,
     val dteres: Instant,

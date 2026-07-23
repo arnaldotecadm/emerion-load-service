@@ -7,9 +7,10 @@ object VendedorIngestionMapper {
 
     // The receiving service generates its own internal id, so the local id
     // is sent as externalId to allow it to be traced back to the source record.
-    fun Vendedor.toIngestionDto(): VendedorIngestionDto {
+    fun Vendedor.toIngestionDto(cnpjEmpresa: String): VendedorIngestionDto {
         return VendedorIngestionDto(
             externalId = this.id,
+            cnpjEmpresa = cnpjEmpresa,
             nome = this.nome,
             apelido = this.apelido,
             cpfCnpj = this.cpfCnpj,
