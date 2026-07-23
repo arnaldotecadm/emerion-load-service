@@ -1,6 +1,8 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.model.Product
+import br.com.vercel.emerionloadservice.client.dto.ProductIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.ProductService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -14,16 +16,19 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController()
 @RequestMapping("product")
-class ProductController(private val productService: ProductService) {
+class ProductController(
+    private val productService: ProductService,
+    private val companyProvider: CompanyProvider
+) {
 
     @GetMapping("all")
-    fun getAllProducts(@PageableDefault(size = 40) pageable: Pageable): Page<Product> {
-        return this.productService.getAllProducts(pageable)
+    fun getAllProducts(@PageableDefault(size = 40) pageable: Pageable): Page<ProductIngestionDto> {
+        return this.productService.getAllProducts(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
     }
 
     @GetMapping("{id}")
-    fun getProductById(@PathVariable id: String): Product {
-        return this.productService.getProductById(id)
+    fun getProductById(@PathVariable id: String): ProductIngestionDto {
+        return this.productService.getProductById(id).toIngestionDto(companyProvider.getCompanyCnpj())
     }
 
     @PostMapping("{id}/send")
@@ -32,3 +37,4 @@ class ProductController(private val productService: ProductService) {
         return ResponseEntity.ok().build()
     }
 }
+

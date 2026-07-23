@@ -1,6 +1,8 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.model.Vendedor
+import br.com.vercel.emerionloadservice.client.dto.VendedorIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.VendedorService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -14,16 +16,19 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController()
 @RequestMapping("vendedor")
-class VendedorController(private val vendedorService: VendedorService) {
+class VendedorController(
+    private val vendedorService: VendedorService,
+    private val companyProvider: CompanyProvider
+) {
 
     @GetMapping("all")
-    fun getAllVendedores(@PageableDefault(size = 40) pageable: Pageable): Page<Vendedor> {
-        return this.vendedorService.getAllVendedores(pageable)
+    fun getAllVendedores(@PageableDefault(size = 40) pageable: Pageable): Page<VendedorIngestionDto> {
+        return this.vendedorService.getAllVendedores(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
     }
 
     @GetMapping("{codVen}")
-    fun getVendedorByCodVen(@PathVariable codVen: Long): Vendedor {
-        return this.vendedorService.getVendedorByCodVen(codVen)
+    fun getVendedorByCodVen(@PathVariable codVen: Long): VendedorIngestionDto {
+        return this.vendedorService.getVendedorByCodVen(codVen).toIngestionDto(companyProvider.getCompanyCnpj())
     }
 
     @PostMapping("{codVen}/send")
@@ -32,3 +37,4 @@ class VendedorController(private val vendedorService: VendedorService) {
         return ResponseEntity.ok().build()
     }
 }
+

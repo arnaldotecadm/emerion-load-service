@@ -1,6 +1,8 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.model.CustomerCredit
+import br.com.vercel.emerionloadservice.client.dto.CustomerCreditIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.CustomerCreditService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -14,16 +16,19 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController()
 @RequestMapping("customer-credit")
-class CustomerCreditController(private val customerCreditService: CustomerCreditService) {
+class CustomerCreditController(
+    private val customerCreditService: CustomerCreditService,
+    private val companyProvider: CompanyProvider
+) {
 
     @GetMapping("all")
-    fun getAllCredits(@PageableDefault(size = 40) pageable: Pageable): Page<CustomerCredit> {
-        return this.customerCreditService.getAllCredits(pageable)
+    fun getAllCredits(@PageableDefault(size = 40) pageable: Pageable): Page<CustomerCreditIngestionDto> {
+        return this.customerCreditService.getAllCredits(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
     }
 
     @GetMapping("{codCli}")
-    fun getCreditsByCodCli(@PathVariable codCli: Long): List<CustomerCredit> {
-        return this.customerCreditService.getCreditsByCodCli(codCli)
+    fun getCreditsByCodCli(@PathVariable codCli: Long): List<CustomerCreditIngestionDto> {
+        return this.customerCreditService.getCreditsByCodCli(codCli).toIngestionDto(companyProvider.getCompanyCnpj())
     }
 
     @PostMapping("{codCli}/send")
@@ -32,3 +37,4 @@ class CustomerCreditController(private val customerCreditService: CustomerCredit
         return ResponseEntity.ok().build()
     }
 }
+

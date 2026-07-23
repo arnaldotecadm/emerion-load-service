@@ -1,6 +1,8 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.model.Customer
+import br.com.vercel.emerionloadservice.client.dto.CustomerIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.CustomerService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -14,16 +16,19 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController()
 @RequestMapping("customer")
-class CustomerController(private val customerService: CustomerService) {
+class CustomerController(
+    private val customerService: CustomerService,
+    private val companyProvider: CompanyProvider
+) {
 
     @GetMapping("all")
-    fun getAllCustomers(@PageableDefault(size = 40) pageable: Pageable): Page<Customer> {
-        return this.customerService.getAllCustomers(pageable)
+    fun getAllCustomers(@PageableDefault(size = 40) pageable: Pageable): Page<CustomerIngestionDto> {
+        return this.customerService.getAllCustomers(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
     }
 
     @GetMapping("{codCli}")
-    fun getCustomerByCodCli(@PathVariable codCli: Long): Customer {
-        return this.customerService.getCustomerByCodCli(codCli)
+    fun getCustomerByCodCli(@PathVariable codCli: Long): CustomerIngestionDto {
+        return this.customerService.getCustomerByCodCli(codCli).toIngestionDto(companyProvider.getCompanyCnpj())
     }
 
     @PostMapping("{codCli}/send")
