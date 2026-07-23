@@ -1,12 +1,13 @@
 package br.com.vercel.emerionloadservice.repository.projection
 
-import java.time.Instant
+import java.time.LocalDateTime
 
 data class CustomerOrderHeaderProjectionImpl(
     override val codCli: Long,
+    override val cpfCnpj: String?,
     override val numres: String,
     override val nronfe: String?,
-    override val dteres: Instant,
+    override val dteres: LocalDateTime,
     override val sitres: String?,
     override val totger: Double,
     override val totres: Double,

@@ -15,6 +15,7 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
         value = """
             select
                 p.codcli as codCli,
+                fc.cgccli as cpfCnpj,
                 p.numres as numres,
                 fat.nronfs as nronfe,
                 p.dteres as dteres,
@@ -29,6 +30,8 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
                 on fat.codemp = p.codemp
                 and fat.dteres = p.dteres
                 and fat.numres = p.numres
+            left join fincli fc
+                on fc.codcli = p.codcli
             where p.numres = :numres
         """
     )

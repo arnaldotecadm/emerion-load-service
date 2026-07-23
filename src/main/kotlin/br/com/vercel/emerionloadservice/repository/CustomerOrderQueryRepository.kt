@@ -43,6 +43,7 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         val baseQuery = """
             select
                 p.codcli as codCli,
+                fc.cgccli as cpfCnpj,
                 p.numres as numres,
                 fat.nronfs as nronfe,
                 p.dteres as dteres,
@@ -57,6 +58,8 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 on fat.codemp = p.codemp
                 and fat.dteres = p.dteres
                 and fat.numres = p.numres
+            left join fincli fc
+                on fc.codcli = p.codcli
             order by p.numres
         """.trimIndent()
 
@@ -65,9 +68,10 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         return jdbcTemplate.query(pagedQuery) { rs, _ ->
             CustomerOrderHeaderProjectionImpl(
                 codCli = rs.getLong("codCli"),
+                cpfCnpj = rs.getString("cpfCnpj"),
                 numres = rs.getString("numres"),
                 nronfe = rs.getString("nronfe"),
-                dteres = rs.getTimestamp("dteres").toInstant(),
+                dteres = rs.getTimestamp("dteres").toLocalDateTime(),
                 sitres = rs.getString("sitres"),
                 totger = rs.getDouble("totger"),
                 totres = rs.getDouble("totres"),

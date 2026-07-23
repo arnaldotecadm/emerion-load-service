@@ -1,13 +1,14 @@
 package br.com.vercel.emerionloadservice.client.dto
 
-import java.time.Instant
+import java.time.LocalDate
 
 data class CustomerOrderIngestionDto(
     val externalId: String,
-    val codCli: Long,
+    val customerExternalId: Long,
     val cnpjEmpresa: String,
+    val cpfCnpj: String?,
     val nronfe: String?,
-    val dteres: Instant,
+    val dteres: LocalDate,
     val sitres: String?,
     val totger: Double,
     val totres: Double,

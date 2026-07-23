@@ -12,8 +12,9 @@ object CustomerOrderIngestionMapper {
     fun CustomerOrder.toIngestionDto(cnpjEmpresa: String): CustomerOrderIngestionDto {
         return CustomerOrderIngestionDto(
             externalId = this.numres,
-            codCli = this.codCli,
+            customerExternalId = this.codCli,
             cnpjEmpresa = cnpjEmpresa,
+            cpfCnpj = this.cpfCnpj,
             nronfe = this.nronfe,
             dteres = this.dteres,
             sitres = this.sitres,

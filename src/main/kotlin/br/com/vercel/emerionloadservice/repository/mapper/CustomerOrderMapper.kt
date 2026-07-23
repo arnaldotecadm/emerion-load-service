@@ -10,9 +10,10 @@ object CustomerOrderMapper {
     fun CustomerOrderHeaderProjection.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder {
         return CustomerOrder(
             codCli = this.codCli,
+            cpfCnpj = this.cpfCnpj,
             numres = this.numres,
             nronfe = this.nronfe,
-            dteres = this.dteres,
+            dteres = this.dteres.toLocalDate(),
             sitres = this.sitres,
             totger = this.totger,
             totres = this.totres,
