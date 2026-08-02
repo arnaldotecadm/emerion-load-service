@@ -19,6 +19,20 @@ object CustomerMapper {
             inscricaoEstadual = this.inscricaoEstadual,
             regimeTributario = this.regimeTributario,
             bloqueado = this.bloqueado == 1,
+            dataNascimento = this.dataNascimento?.toLocalDate(),
+            dataCadastro = this.dataCadastro?.toLocalDate(),
+            dataUltimaAtualizacao = this.dataUltimaAtualizacao?.toLocalDate(),
+            email1 = this.email1,
+            email2 = this.email2,
+            website = this.website,
+            limiteCredito = this.limiteCredito,
+            observacoes = this.observacoes,
+            cnae = this.cnae,
+            vendedorExternalId = this.vendedorExternalId,
+            nomeVendedor = this.nomeVendedor,
+            codigoTipoCliente = this.codigoTipoCliente,
+            codigoGrupoCliente = this.codigoGrupoCliente,
+            codigoCategoriaCliente = this.codigoCategoriaCliente,
         )
     }
 }

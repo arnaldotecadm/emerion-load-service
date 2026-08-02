@@ -13,5 +13,18 @@ data class CustomerOrderHeaderProjectionImpl(
     override val totres: Double,
     override val totipi: Double,
     override val totsub: Double,
-    override val totdescinc: Double
+    override val totdescinc: Double,
+    override val totfrt: Double,
+    override val totseg: Double,
+    override val totoutdesp: Double,
+    override val vendedorExternalId: Long?,
+    override val atendenteCod: String?,
+    override val dataEntregaPrevista: LocalDateTime?,
+    override val descontoComercial: Double?,
+    override val descontoRegional: Double?,
+    override val codigoTransportadora: String?,
+    override val linhaReserva: String?,
+    override val pedidoAnterior: String?,
+    override val regimeTributario: String?,
+    override val nomeRegimeTributario: String?
 ) : CustomerOrderHeaderProjection

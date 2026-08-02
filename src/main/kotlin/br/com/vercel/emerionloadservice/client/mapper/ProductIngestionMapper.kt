@@ -9,10 +9,28 @@ object ProductIngestionMapper {
     // is sent as externalId to allow it to be traced back to the source record.
     fun Product.toIngestionDto(cnpjEmpresa: String): ProductIngestionDto {
         return ProductIngestionDto(
-            externalId = this.id,
+            externalId = "${this.codGru.trim()}.${this.codSub.trim()}.${this.codPro.trim()}",
             cnpjEmpresa = cnpjEmpresa,
             nome = this.nome,
-            preco = this.preco
+            descricaoReduzida = this.descricaoReduzida,
+            referenciaInterna = this.referenciaInterna,
+            ncm = this.ncm,
+            cest = this.cest,
+            origemProduto = this.origemProduto,
+            categoria = this.categoria,
+            tipo = this.tipo,
+            marca = this.marca,
+            unidade = this.unidade,
+            pesoLiquido = this.pesoLiquido,
+            pesoBruto = this.pesoBruto,
+            descontinuado = this.descontinuado,
+            codigoBarras = this.codigoBarras,
+            codigoBarrasProprio = this.codigoBarrasProprio,
+            preco = this.preco,
+            preco2 = this.preco2,
+            preco3 = this.preco3,
+            preco4 = this.preco4,
+            preco5 = this.preco5,
         )
     }
 }

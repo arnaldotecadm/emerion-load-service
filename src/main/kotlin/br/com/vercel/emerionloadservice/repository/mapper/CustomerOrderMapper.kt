@@ -20,6 +20,19 @@ object CustomerOrderMapper {
             totipi = this.totipi,
             totsub = this.totsub,
             totdescinc = this.totdescinc,
+            totfrt = this.totfrt,
+            totseg = this.totseg,
+            totoutdesp = this.totoutdesp,
+            vendedorExternalId = this.vendedorExternalId,
+            atendenteCod = this.atendenteCod,
+            dataEntregaPrevista = this.dataEntregaPrevista?.toLocalDate(),
+            descontoComercial = this.descontoComercial,
+            descontoRegional = this.descontoRegional,
+            codigoTransportadora = this.codigoTransportadora,
+            linhaReserva = this.linhaReserva,
+            pedidoAnterior = this.pedidoAnterior,
+            regimeTributario = this.regimeTributario,
+            nomeRegimeTributario = this.nomeRegimeTributario,
             itens = items.toModel()
         )
     }
@@ -80,7 +93,15 @@ object CustomerOrderMapper {
             flgVal = this.flgVal,
             flgPac = this.flgPac,
             flgLib = this.flgLib,
-            codCfo = this.codCfo
+            codCfo = this.codCfo,
+            codcor = this.codcor,
+            codtam = this.codtam,
+            descricaoNFe = this.descricaoNFe,
+            pesoLiquido = this.pesoLiquido,
+            pesoBruto = this.pesoBruto,
+            referencia = this.referencia,
+            quantidadeFaturada = this.quantidadeFaturada,
+            quantidadeSeparada = this.quantidadeSeparada,
         )
     }
 }

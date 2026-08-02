@@ -14,17 +14,30 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
         nativeQuery = true,
         value = """
             select
-                p.codcli as codCli,
-                fc.cgccli as cpfCnpj,
-                p.numres as numres,
-                fat.nronfs as nronfe,
-                p.dteres as dteres,
-                p.sitres as sitres,
-                p.totger as totger,
-                p.totres as totres,
-                p.totipi as totipi,
-                p.totsub as totsub,
-                p.totdescinc as totdescinc
+                p.codcli            as codCli,
+                fc.cgccli           as cpfCnpj,
+                p.numres            as numres,
+                fat.nronfs          as nronfe,
+                p.dteres            as dteres,
+                p.sitres            as sitres,
+                p.totger            as totger,
+                p.totres            as totres,
+                p.totipi            as totipi,
+                p.totsub            as totsub,
+                p.totdescinc        as totdescinc,
+                p.totfrt            as totfrt,
+                p.totseg            as totseg,
+                p.totoutdesp        as totoutdesp,
+                p.codven            as vendedorExternalId,
+                p.codatd            as atendenteCod,
+                p.dtfres            as dataEntregaPrevista,
+                p.dsccom            as descontoComercial,
+                p.dscreg            as descontoRegional,
+                p.codtra            as codigoTransportadora,
+                p.linres            as linhaReserva,
+                p.pedant            as pedidoAnterior,
+                p.regtrb            as regimeTributario,
+                reg.nomregtrib      as nomeRegimeTributario
             from pedres p
             left join fatped fat
                 on fat.codemp = p.codemp
@@ -32,6 +45,8 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
                 and fat.numres = p.numres
             left join fincli fc
                 on fc.codcli = p.codcli
+            left join finregtrib reg
+                on reg.numregtrib = p.regtrb
             where p.numres = :numres
         """
     )
@@ -92,7 +107,15 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
                 re2.flgval as flgVal,
                 re2.flgpac as flgPac,
                 re2.flglib as flgLib,
-                re2.codcfo as codCfo
+                re2.codcfo as codCfo,
+                re2.codcor as codcor,
+                re2.codtam as codtam,
+                re2.dspre2 as descricaoNFe,
+                re2.liqre2 as pesoLiquido,
+                re2.brtre2 as pesoBruto,
+                re2.refre2 as referencia,
+                re2.qtfre2 as quantidadeFaturada,
+                re2.qtsre2 as quantidadeSeparada
             from pedre2 re2
             where re2.numres = :numres
             order by re2.seqre2

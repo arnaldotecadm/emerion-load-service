@@ -20,19 +20,45 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     fun findAllPaged(pageable: Pageable): Page<ProductProjection> {
         val baseQuery = """
             select
-                pro.codgru as codGru,
-                pro.codsub as codSub,
-                pro.codpro as codPro,
-                pro.dscpro as nome,
-                (
-                    select first 1 ite.vb1ite
-                    from estite ite
-                    where ite.codclp = pro.codclp
-                    and ite.codgru = pro.codgru
-                    and ite.codsub = pro.codsub
-                    and ite.codpro = pro.codpro
-                ) as preco
+                pro.codgru          as codGru,
+                pro.codsub          as codSub,
+                pro.codpro          as codPro,
+                pro.dscpro          as nome,
+                pro.dsrpro          as descricaoReduzida,
+                pro.refpro          as referenciaInterna,
+                pro.codncm          as ncm,
+                pro.cest            as cest,
+                pro.codst1          as origemProduto,
+                pro.codcat          as categoria,
+                pro.codtip          as tipo,
+                pro.codmrc          as marca,
+                pro.codune          as unidade,
+                pro.pesliq          as pesoLiquido,
+                pro.pesbrt          as pesoBruto,
+                case pro.flbpro
+                    when 'D' then 1
+                    else 0
+                end                 as descontinuado,
+                pro.cbapro          as codigoBarrasProprio,
+                pro.codbar          as codigoBarras,
+                ite.vb1ite          as preco,
+                ite.vb2ite          as preco2,
+                ite.vb3ite          as preco3,
+                ite.vb4ite          as preco4,
+                ite.vb5ite          as preco5
             from estpro pro
+            left join estite ite on ite.codclp = pro.codclp
+                and ite.codgru = pro.codgru
+                and ite.codsub = pro.codsub
+                and ite.codpro = pro.codpro
+                and ite.codemp = (
+                    select first 1 i2.codemp
+                    from estite i2
+                    where i2.codclp = pro.codclp
+                    and i2.codgru = pro.codgru
+                    and i2.codsub = pro.codsub
+                    and i2.codpro = pro.codpro
+                )
             order by pro.codgru, pro.codsub, pro.codpro
         """.trimIndent()
 
@@ -44,7 +70,25 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 codSub = rs.getString("codSub"),
                 codPro = rs.getString("codPro"),
                 nome = rs.getString("nome"),
-                preco = rs.getBigDecimal("preco")
+                descricaoReduzida = rs.getString("descricaoReduzida"),
+                referenciaInterna = rs.getString("referenciaInterna"),
+                ncm = rs.getString("ncm"),
+                cest = rs.getString("cest"),
+                origemProduto = rs.getString("origemProduto"),
+                categoria = rs.getString("categoria"),
+                tipo = rs.getString("tipo"),
+                marca = rs.getString("marca"),
+                unidade = rs.getString("unidade"),
+                pesoLiquido = rs.getBigDecimal("pesoLiquido"),
+                pesoBruto = rs.getBigDecimal("pesoBruto"),
+                descontinuado = rs.getInt("descontinuado"),
+                codigoBarras = rs.getString("codigoBarras"),
+                codigoBarrasProprio = rs.getString("codigoBarrasProprio"),
+                preco = rs.getBigDecimal("preco"),
+                preco2 = rs.getBigDecimal("preco2"),
+                preco3 = rs.getBigDecimal("preco3"),
+                preco4 = rs.getBigDecimal("preco4"),
+                preco5 = rs.getBigDecimal("preco5"),
             )
         }
 

@@ -10,7 +10,8 @@ spring:
     hikari:
       connection-timeout: 2000
       maximum-pool-size: 5
-    url: jdbc:firebirdsql://127.0.0.1:3050//data//portal_2024_01.fdb
+    #url: jdbc:firebirdsql://127.0.0.1:3050//data//portal_2024_01.fdb
+    url: jdbc:firebirdsql://127.0.0.1:3050//data//portal_25_06_2021.fdb
     username: SYSDBA
     password: masterkey
 

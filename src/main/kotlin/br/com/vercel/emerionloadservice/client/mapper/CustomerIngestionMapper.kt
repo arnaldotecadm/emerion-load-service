@@ -16,7 +16,21 @@ object CustomerIngestionMapper {
             cpfCnpj = this.cpfCnpj,
             inscricaoEstadual = this.inscricaoEstadual,
             regimeTributario = this.regimeTributario,
-            bloqueado = this.bloqueado
+            bloqueado = this.bloqueado,
+            dataNascimento = this.dataNascimento,
+            dataCadastro = this.dataCadastro,
+            dataUltimaAtualizacao = this.dataUltimaAtualizacao,
+            email1 = this.email1,
+            email2 = this.email2,
+            website = this.website,
+            limiteCredito = this.limiteCredito,
+            observacoes = this.observacoes,
+            cnae = this.cnae,
+            vendedorExternalId = this.vendedorExternalId,
+            nomeVendedor = this.nomeVendedor,
+            codigoTipoCliente = this.codigoTipoCliente,
+            codigoGrupoCliente = this.codigoGrupoCliente,
+            codigoCategoriaCliente = this.codigoCategoriaCliente,
         )
     }
 }

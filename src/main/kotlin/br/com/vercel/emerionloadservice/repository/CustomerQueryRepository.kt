@@ -20,19 +20,33 @@ class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     fun findAllPaged(pageable: Pageable): Page<CustomerProjection> {
         val baseQuery = """
             select
-                cli.codcli as id,
-                cli.apecli as nomeFantasia,
-                cli.nomcli as razaoSocial,
-                cli.cgccli as cpfCnpj,
-                cli.inscli as inscricaoEstadual,
-                reg.nomregtrib as regimeTributario,
+                cli.codcli          as id,
+                cli.apecli          as nomeFantasia,
+                cli.nomcli          as razaoSocial,
+                cli.cgccli          as cpfCnpj,
+                cli.inscli          as inscricaoEstadual,
+                reg.nomregtrib      as regimeTributario,
                 case(cli.flbcli)
                     when '*' then 1
                     else 0
-                end as bloqueado
+                end                 as bloqueado,
+                cli.dtncli          as dataNascimento,
+                cli.dcacli          as dataCadastro,
+                cli.dteatu          as dataUltimaAtualizacao,
+                cli.em1cli          as email1,
+                cli.em2cli          as email2,
+                cli.webcli          as website,
+                cli.limcli          as limiteCredito,
+                cli.obscli          as observacoes,
+                cli.cnae            as cnae,
+                cli.codven          as vendedorExternalId,
+                ven.nomven          as nomeVendedor,
+                cli.codtcl          as codigoTipoCliente,
+                cli.codgcl          as codigoGrupoCliente,
+                cli.codccl          as codigoCategoriaCliente
             from fincli cli
             left join finregtrib reg on reg.numregtrib = cli.regtrb
-            where cli.regtrb is not null
+            left join finven ven     on ven.codven = cli.codven
             order by cli.codcli
         """.trimIndent()
 
@@ -46,14 +60,25 @@ class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 cpfCnpj = rs.getString("cpfCnpj"),
                 inscricaoEstadual = rs.getString("inscricaoEstadual"),
                 regimeTributario = rs.getString("regimeTributario"),
-                bloqueado = rs.getInt("bloqueado")
+                bloqueado = rs.getInt("bloqueado"),
+                dataNascimento = rs.getTimestamp("dataNascimento")?.toLocalDateTime(),
+                dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime(),
+                dataUltimaAtualizacao = rs.getTimestamp("dataUltimaAtualizacao")?.toLocalDateTime(),
+                email1 = rs.getString("email1"),
+                email2 = rs.getString("email2"),
+                website = rs.getString("website"),
+                limiteCredito = rs.getBigDecimal("limiteCredito"),
+                observacoes = rs.getString("observacoes"),
+                cnae = rs.getString("cnae"),
+                vendedorExternalId = rs.getLong("vendedorExternalId").takeIf { !rs.wasNull() },
+                nomeVendedor = rs.getString("nomeVendedor"),
+                codigoTipoCliente = rs.getString("codigoTipoCliente"),
+                codigoGrupoCliente = rs.getString("codigoGrupoCliente"),
+                codigoCategoriaCliente = rs.getString("codigoCategoriaCliente"),
             )
         }
 
-        val total = jdbcTemplate.queryForObject(
-            "select count(*) from fincli cli where cli.regtrb is not null",
-            Long::class.java
-        ) ?: 0L
+        val total = jdbcTemplate.queryForObject("select count(*) from fincli", Long::class.java) ?: 0L
 
         return PageImpl(content, pageable, total)
     }

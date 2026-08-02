@@ -42,17 +42,30 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     private fun findHeadersPaged(pageable: Pageable): List<CustomerOrderHeaderProjection> {
         val baseQuery = """
             select
-                p.codcli as codCli,
-                fc.cgccli as cpfCnpj,
-                p.numres as numres,
-                fat.nronfs as nronfe,
-                p.dteres as dteres,
-                p.sitres as sitres,
-                p.totger as totger,
-                p.totres as totres,
-                p.totipi as totipi,
-                p.totsub as totsub,
-                p.totdescinc as totdescinc
+                p.codcli            as codCli,
+                fc.cgccli           as cpfCnpj,
+                p.numres            as numres,
+                fat.nronfs          as nronfe,
+                p.dteres            as dteres,
+                p.sitres            as sitres,
+                p.totger            as totger,
+                p.totres            as totres,
+                p.totipi            as totipi,
+                p.totsub            as totsub,
+                p.totdescinc        as totdescinc,
+                p.totfrt            as totfrt,
+                p.totseg            as totseg,
+                p.totoutdesp        as totoutdesp,
+                p.codven            as vendedorExternalId,
+                p.codatd            as atendenteCod,
+                p.dtfres            as dataEntregaPrevista,
+                p.dsccom            as descontoComercial,
+                p.dscreg            as descontoRegional,
+                p.codtra            as codigoTransportadora,
+                p.linres            as linhaReserva,
+                p.pedant            as pedidoAnterior,
+                p.regtrb            as regimeTributario,
+                reg.nomregtrib      as nomeRegimeTributario
             from pedres p
             left join fatped fat
                 on fat.codemp = p.codemp
@@ -60,6 +73,8 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 and fat.numres = p.numres
             left join fincli fc
                 on fc.codcli = p.codcli
+            left join finregtrib reg
+                on reg.numregtrib = p.regtrb
             order by p.numres
         """.trimIndent()
 
@@ -77,7 +92,20 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 totres = rs.getDouble("totres"),
                 totipi = rs.getDouble("totipi"),
                 totsub = rs.getDouble("totsub"),
-                totdescinc = rs.getDouble("totdescinc")
+                totdescinc = rs.getDouble("totdescinc"),
+                totfrt = rs.getDouble("totfrt"),
+                totseg = rs.getDouble("totseg"),
+                totoutdesp = rs.getDouble("totoutdesp"),
+                vendedorExternalId = rs.getLong("vendedorExternalId").takeIf { !rs.wasNull() },
+                atendenteCod = rs.getString("atendenteCod"),
+                dataEntregaPrevista = rs.getTimestamp("dataEntregaPrevista")?.toLocalDateTime(),
+                descontoComercial = rs.getBigDecimal("descontoComercial")?.toDouble(),
+                descontoRegional = rs.getBigDecimal("descontoRegional")?.toDouble(),
+                codigoTransportadora = rs.getString("codigoTransportadora"),
+                linhaReserva = rs.getString("linhaReserva"),
+                pedidoAnterior = rs.getString("pedidoAnterior"),
+                regimeTributario = rs.getString("regimeTributario"),
+                nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
             )
         }
     }
@@ -140,7 +168,15 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 re2.flgval as flgVal,
                 re2.flgpac as flgPac,
                 re2.flglib as flgLib,
-                re2.codcfo as codCfo
+                re2.codcfo as codCfo,
+                re2.codcor as codcor,
+                re2.codtam as codtam,
+                re2.dspre2 as descricaoNFe,
+                re2.liqre2 as pesoLiquido,
+                re2.brtre2 as pesoBruto,
+                re2.refre2 as referencia,
+                re2.qtfre2 as quantidadeFaturada,
+                re2.qtsre2 as quantidadeSeparada
             from pedre2 re2
             where re2.numres in ($idList)
             order by re2.numres, re2.seqre2
@@ -199,7 +235,15 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 flgVal = rs.getString("flgVal"),
                 flgPac = rs.getString("flgPac"),
                 flgLib = rs.getString("flgLib"),
-                codCfo = rs.getString("codCfo")
+                codCfo = rs.getString("codCfo"),
+                codcor = rs.getString("codcor"),
+                codtam = rs.getString("codtam"),
+                descricaoNFe = rs.getString("descricaoNFe"),
+                pesoLiquido = rs.getBigDecimal("pesoLiquido")?.toDouble(),
+                pesoBruto = rs.getBigDecimal("pesoBruto")?.toDouble(),
+                referencia = rs.getString("referencia"),
+                quantidadeFaturada = rs.getBigDecimal("quantidadeFaturada")?.toDouble(),
+                quantidadeSeparada = rs.getBigDecimal("quantidadeSeparada")?.toDouble(),
             )
         }
     }

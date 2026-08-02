@@ -52,5 +52,13 @@ data class CustomerOrderItemProjectionImpl(
     override val flgVal: String?,
     override val flgPac: String?,
     override val flgLib: String?,
-    override val codCfo: String?
+    override val codCfo: String?,
+    override val codcor: String?,
+    override val codtam: String?,
+    override val descricaoNFe: String?,
+    override val pesoLiquido: Double?,
+    override val pesoBruto: Double?,
+    override val referencia: String?,
+    override val quantidadeFaturada: Double?,
+    override val quantidadeSeparada: Double?
 ) : CustomerOrderItemProjection
