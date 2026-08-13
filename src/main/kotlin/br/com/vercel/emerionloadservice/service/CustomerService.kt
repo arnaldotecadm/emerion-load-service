@@ -5,9 +5,12 @@ import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.repository.CustomerQueryRepository
 import br.com.vercel.emerionloadservice.repository.CustomerRepository
 import br.com.vercel.emerionloadservice.repository.mapper.CustomerMapper.toModel
+import br.com.vercel.emerionloadservice.repository.mapper.VendedorMapper.toModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class CustomerService(
@@ -20,7 +23,8 @@ class CustomerService(
     }
 
     fun getCustomerByCodCli(codCli: Long): Customer {
-        return customerRepository.getCustomerByCodCli(codCli).toModel()
+        return customerRepository.getCustomerByCodCli(codCli)?.toModel()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
     fun sendCustomerToIngestion(codCli: Long) {

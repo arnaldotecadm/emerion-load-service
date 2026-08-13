@@ -5,9 +5,12 @@ import br.com.vercel.emerionloadservice.model.Product
 import br.com.vercel.emerionloadservice.repository.ProductQueryRepository
 import br.com.vercel.emerionloadservice.repository.ProductRepository
 import br.com.vercel.emerionloadservice.repository.mapper.ProductMapper.toModel
+import br.com.vercel.emerionloadservice.repository.mapper.VendedorMapper.toModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class ProductService(
@@ -16,17 +19,14 @@ class ProductService(
     private val ingestionServiceClient: IngestionServiceClient
 ) {
 
-    fun getProducts(): List<Any>{
-        return this.repository.getProducts()
-    }
-
     fun getAllProducts(pageable: Pageable): Page<Product> {
         return productQueryRepository.findAllPaged(pageable).toModel()
     }
 
     fun getProductById(id: String): Product {
         val (codGru, codSub, codPro) = parseId(id)
-        return repository.getProductByCodGruCodSubCodPro(codGru, codSub, codPro).toModel()
+        return repository.getProductByCodGruCodSubCodPro(codGru, codSub, codPro)?.toModel()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
     fun sendProductToIngestion(id: String) {
@@ -36,7 +36,7 @@ class ProductService(
 
     private fun parseId(id: String): Triple<String, String, String> {
         val parts = id.split(".")
-        require(parts.size == 3) { "Product id must be in the format codGru.codSub.codPro" }
+        if(parts.size != 3) throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Product id must be in the format codGru.codSub.codPro")
         val codGru = parts[0].padStart(CODGRU_LENGTH, '0')
         val codSub = parts[1].padStart(CODSUB_LENGTH, '0')
         val codPro = parts[2].padStart(CODPRO_LENGTH, '0')

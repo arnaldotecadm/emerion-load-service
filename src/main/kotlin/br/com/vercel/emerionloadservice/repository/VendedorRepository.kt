@@ -29,5 +29,5 @@ interface VendedorRepository : PagingAndSortingRepository<DummyEntity, Long> {
             where ven.codven = :codVen
         """
     )
-    fun getVendedorByCodVen(codVen: Long): VendedorProjection
+    fun getVendedorByCodVen(codVen: Long): VendedorProjection?
 }

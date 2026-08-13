@@ -50,7 +50,7 @@ interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long
             where p.numres = :numres
         """
     )
-    fun getHeaderByNumres(numres: String): CustomerOrderHeaderProjection
+    fun getHeaderByNumres(numres: String): CustomerOrderHeaderProjection?
 
     @Query(
         nativeQuery = true,

@@ -7,7 +7,9 @@ import br.com.vercel.emerionloadservice.repository.CustomerOrderRepository
 import br.com.vercel.emerionloadservice.repository.mapper.CustomerOrderMapper.toModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class CustomerOrderService(
@@ -20,7 +22,8 @@ class CustomerOrderService(
     }
 
     fun getOrderByNumres(numres: String): CustomerOrder {
-        val header = customerOrderRepository.getHeaderByNumres(numres)
+        val header =
+            customerOrderRepository.getHeaderByNumres(numres) ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
         val items = customerOrderRepository.getItemsByNumres(numres)
         return header.toModel(items)
     }

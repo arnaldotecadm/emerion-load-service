@@ -1,12 +1,15 @@
 package br.com.vercel.emerionloadservice.config
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.SimpleClientHttpRequestFactory
 import org.springframework.web.client.RestClient
 
 @Configuration
-class RestClientConfig {
+class RestClientConfig(
+    @Value("\${ingestion-service.api-key}") private val ingestionApiKey: String
+) {
 
     @Bean
     fun ingestionRestClient(): RestClient {
@@ -16,6 +19,7 @@ class RestClientConfig {
         }
         return RestClient.builder()
             .requestFactory(requestFactory)
+            .defaultHeader("X-API-Key", ingestionApiKey)
             .build()
     }
 }

@@ -7,7 +7,9 @@ import br.com.vercel.emerionloadservice.repository.VendedorRepository
 import br.com.vercel.emerionloadservice.repository.mapper.VendedorMapper.toModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
+import org.springframework.web.server.ResponseStatusException
 
 @Service
 class VendedorService(
@@ -20,7 +22,8 @@ class VendedorService(
     }
 
     fun getVendedorByCodVen(codVen: Long): Vendedor {
-        return vendedorRepository.getVendedorByCodVen(codVen).toModel()
+        return vendedorRepository.getVendedorByCodVen(codVen)?.toModel()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
     }
 
     fun sendVendedorToIngestion(codVen: Long) {

@@ -51,14 +51,7 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 and ite.codgru = pro.codgru
                 and ite.codsub = pro.codsub
                 and ite.codpro = pro.codpro
-                and ite.codemp = (
-                    select first 1 i2.codemp
-                    from estite i2
-                    where i2.codclp = pro.codclp
-                    and i2.codgru = pro.codgru
-                    and i2.codsub = pro.codsub
-                    and i2.codpro = pro.codpro
-                )
+                and ite.codemp = (select first 1 codemp from geremp)
             order by pro.codgru, pro.codsub, pro.codpro
         """.trimIndent()
 

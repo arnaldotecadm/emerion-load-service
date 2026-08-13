@@ -65,5 +65,5 @@ interface ProductRepository : PagingAndSortingRepository<DummyEntity, Long>{
             and pro.codpro = :codPro
         """
     )
-    fun getProductByCodGruCodSubCodPro(codGru: String, codSub: String, codPro: String): ProductProjection
+    fun getProductByCodGruCodSubCodPro(codGru: String, codSub: String, codPro: String): ProductProjection?
 }

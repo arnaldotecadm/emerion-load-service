@@ -43,5 +43,5 @@ interface CustomerRepository : PagingAndSortingRepository<DummyEntity, Long> {
             where cli.codcli = :codCli
         """
     )
-    fun getCustomerByCodCli(codCli: Long): CustomerProjection
+    fun getCustomerByCodCli(codCli: Long): CustomerProjection?
 }
