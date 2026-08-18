@@ -62,7 +62,13 @@ data class CustomerOrderItem(
     val pesoBruto: Double?,
     val referencia: String?,
     val quantidadeFaturada: Double?,
-    val quantidadeSeparada: Double?
+    val quantidadeSeparada: Double?,
+    val custoTotal: Double?,
+    val lucroValor: Double?,
+    val lucroPorcentagem: Double?,
+    val saldoQuantidade: Double?,
+    val descontoItemValor: Double?,
+    val descontoItemTotal: Double?
 ) {
     val produto: String
         get() = "$codGru.$codSub.$codPro"

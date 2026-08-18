@@ -64,4 +64,10 @@ interface CustomerOrderItemProjection {
     val referencia: String?
     val quantidadeFaturada: Double?
     val quantidadeSeparada: Double?
+    val custoTotal: Double?
+    val lucroValor: Double?
+    val lucroPorcentagem: Double?
+    val saldoQuantidade: Double?
+    val descontoItemValor: Double?
+    val descontoItemTotal: Double?
 }

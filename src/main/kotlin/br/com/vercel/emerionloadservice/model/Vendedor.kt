@@ -15,5 +15,6 @@ data class Vendedor(
     val uf: String?,
     val situacao: String?,
     val saldo: BigDecimal?,
-    val dataCadastro: LocalDate?
+    val dataCadastro: LocalDate?,
+    val metaRepresentacao: BigDecimal?
 )

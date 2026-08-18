@@ -8,6 +8,8 @@ data class CustomerOrderIngestionDto(
     val cnpjEmpresa: String,
     val cpfCnpj: String?,
     val nronfe: String?,
+    val dataFaturamento: LocalDate?,
+    val totalFaturado: Double?,
     val dteres: LocalDate,
     val sitres: String?,
     val totger: Double,
@@ -28,5 +30,13 @@ data class CustomerOrderIngestionDto(
     val pedidoAnterior: String?,
     val regimeTributario: String?,
     val nomeRegimeTributario: String?,
+    val dataProcessamentoComercial: LocalDate?,
+    val dataProcessamentoFinanceiro: LocalDate?,
+    val dataRejeicao: LocalDate?,
+    val observacaoRejeicao: String?,
+    val dataEntrega: LocalDate?,
+    val dataFinalizacao: LocalDate?,
+    val codigoPagamento: String?,
+    val descricaoPagamento: String?,
     val itens: List<CustomerOrderItemIngestionDto>
 )

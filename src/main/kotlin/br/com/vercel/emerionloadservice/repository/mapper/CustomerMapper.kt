@@ -33,6 +33,10 @@ object CustomerMapper {
             codigoTipoCliente = this.codigoTipoCliente,
             codigoGrupoCliente = this.codigoGrupoCliente,
             codigoCategoriaCliente = this.codigoCategoriaCliente,
+            uf = this.uf?.trim(),
+            macroRegiao = this.macroRegiao?.trim(),
+            microRegiao = this.microRegiao?.trim(),
+            setor = this.setor?.trim(),
         )
     }
 }

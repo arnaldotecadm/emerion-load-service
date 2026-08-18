@@ -43,7 +43,11 @@ class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 ven.nomven          as nomeVendedor,
                 cli.codtcl          as codigoTipoCliente,
                 cli.codgcl          as codigoGrupoCliente,
-                cli.codccl          as codigoCategoriaCliente
+                cli.codccl          as codigoCategoriaCliente,
+                cli.uffcli          as uf,
+                cli.codmcr          as macroRegiao,
+                cli.codmrg          as microRegiao,
+                cli.codset          as setor
             from fincli cli
             left join finregtrib reg on reg.numregtrib = cli.regtrb
             left join finven ven     on ven.codven = cli.codven
@@ -75,6 +79,10 @@ class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 codigoTipoCliente = rs.getString("codigoTipoCliente"),
                 codigoGrupoCliente = rs.getString("codigoGrupoCliente"),
                 codigoCategoriaCliente = rs.getString("codigoCategoriaCliente"),
+                uf = rs.getString("uf"),
+                macroRegiao = rs.getString("macroRegiao"),
+                microRegiao = rs.getString("microRegiao"),
+                setor = rs.getString("setor"),
             )
         }
 

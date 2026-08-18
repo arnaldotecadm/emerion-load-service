@@ -31,6 +31,10 @@ object CustomerIngestionMapper {
             codigoTipoCliente = this.codigoTipoCliente,
             codigoGrupoCliente = this.codigoGrupoCliente,
             codigoCategoriaCliente = this.codigoCategoriaCliente,
+            uf = this.uf,
+            macroRegiao = this.macroRegiao,
+            microRegiao = this.microRegiao,
+            setor = this.setor,
         )
     }
 }

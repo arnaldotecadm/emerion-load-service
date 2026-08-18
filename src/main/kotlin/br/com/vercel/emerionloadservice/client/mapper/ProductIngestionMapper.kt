@@ -31,6 +31,11 @@ object ProductIngestionMapper {
             preco3 = this.preco3,
             preco4 = this.preco4,
             preco5 = this.preco5,
+            descontoPadrao = this.descontoPadrao,
+            estoqueDisponivel = this.estoqueDisponivel,
+            estoqueMinimo = this.estoqueMinimo,
+            estoqueReservado = this.estoqueReservado,
+            estoqueAdquirido = this.estoqueAdquirido,
         )
     }
 }

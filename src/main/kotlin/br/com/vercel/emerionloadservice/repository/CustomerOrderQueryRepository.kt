@@ -46,6 +46,8 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 fc.cgccli           as cpfCnpj,
                 p.numres            as numres,
                 fat.nronfs          as nronfe,
+                fat.dtafat          as dataFaturamento,
+                fat.totfat          as totalFaturado,
                 p.dteres            as dteres,
                 p.sitres            as sitres,
                 p.totger            as totger,
@@ -65,7 +67,15 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 p.linres            as linhaReserva,
                 p.pedant            as pedidoAnterior,
                 p.regtrb            as regimeTributario,
-                reg.nomregtrib      as nomeRegimeTributario
+                reg.nomregtrib      as nomeRegimeTributario,
+                p.dtecom            as dataProcessamentoComercial,
+                p.dtefin            as dataProcessamentoFinanceiro,
+                p.dterej            as dataRejeicao,
+                p.obsrej            as observacaoRejeicao,
+                p.dtedel            as dataEntrega,
+                p.dtefpe            as dataFinalizacao,
+                p.codpfa            as codigoPagamento,
+                pfa.despfa          as descricaoPagamento
             from pedres p
             left join fatped fat
                 on fat.codemp = p.codemp
@@ -75,6 +85,7 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 on fc.codcli = p.codcli
             left join finregtrib reg
                 on reg.numregtrib = p.regtrb
+            left join estpfa pfa on pfa.codpfa = p.codpfa and pfa.tippfa = p.tippfa
             order by p.numres
         """.trimIndent()
 
@@ -86,6 +97,8 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 cpfCnpj = rs.getString("cpfCnpj"),
                 numres = rs.getString("numres"),
                 nronfe = rs.getString("nronfe"),
+                dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime()?.toLocalDate(),
+                totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
                 dteres = rs.getTimestamp("dteres").toLocalDateTime(),
                 sitres = rs.getString("sitres"),
                 totger = rs.getDouble("totger"),
@@ -106,6 +119,14 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 pedidoAnterior = rs.getString("pedidoAnterior"),
                 regimeTributario = rs.getString("regimeTributario"),
                 nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
+                dataProcessamentoComercial = rs.getTimestamp("dataProcessamentoComercial")?.toLocalDateTime()?.toLocalDate(),
+                dataProcessamentoFinanceiro = rs.getTimestamp("dataProcessamentoFinanceiro")?.toLocalDateTime()?.toLocalDate(),
+                dataRejeicao = rs.getTimestamp("dataRejeicao")?.toLocalDateTime()?.toLocalDate(),
+                observacaoRejeicao = rs.getString("observacaoRejeicao"),
+                dataEntrega = rs.getTimestamp("dataEntrega")?.toLocalDateTime()?.toLocalDate(),
+                dataFinalizacao = rs.getTimestamp("dataFinalizacao")?.toLocalDateTime()?.toLocalDate(),
+                codigoPagamento = rs.getString("codigoPagamento"),
+                descricaoPagamento = rs.getString("descricaoPagamento"),
             )
         }
     }
@@ -176,7 +197,13 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 re2.brtre2 as pesoBruto,
                 re2.refre2 as referencia,
                 re2.qtfre2 as quantidadeFaturada,
-                re2.qtsre2 as quantidadeSeparada
+                re2.qtsre2 as quantidadeSeparada,
+                re2.totcst  as custoTotal,
+                re2.lucrol  as lucroValor,
+                re2.lucrop  as lucroPorcentagem,
+                re2.sldre2  as saldoQuantidade,
+                re2.vdsre2  as descontoItemValor,
+                re2.totdsc  as descontoItemTotal
             from pedre2 re2
             where re2.numres in ($idList)
             order by re2.numres, re2.seqre2
@@ -244,6 +271,12 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 referencia = rs.getString("referencia"),
                 quantidadeFaturada = rs.getBigDecimal("quantidadeFaturada")?.toDouble(),
                 quantidadeSeparada = rs.getBigDecimal("quantidadeSeparada")?.toDouble(),
+                custoTotal = rs.getBigDecimal("custoTotal")?.toDouble(),
+                lucroValor = rs.getBigDecimal("lucroValor")?.toDouble(),
+                lucroPorcentagem = rs.getBigDecimal("lucroPorcentagem")?.toDouble(),
+                saldoQuantidade = rs.getBigDecimal("saldoQuantidade")?.toDouble(),
+                descontoItemValor = rs.getBigDecimal("descontoItemValor")?.toDouble(),
+                descontoItemTotal = rs.getBigDecimal("descontoItemTotal")?.toDouble(),
             )
         }
     }

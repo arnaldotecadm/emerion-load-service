@@ -45,7 +45,12 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 ite.vb2ite          as preco2,
                 ite.vb3ite          as preco3,
                 ite.vb4ite          as preco4,
-                ite.vb5ite          as preco5
+                ite.vb5ite          as preco5,
+                pro.idepro          as descontoPadrao,
+                ite.qtsite          as estoqueDisponivel,
+                ite.qtmite          as estoqueMinimo,
+                ite.qtrite          as estoqueReservado,
+                ite.qtaite          as estoqueAdquirido
             from estpro pro
             left join estite ite on ite.codclp = pro.codclp
                 and ite.codgru = pro.codgru
@@ -82,6 +87,11 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 preco3 = rs.getBigDecimal("preco3"),
                 preco4 = rs.getBigDecimal("preco4"),
                 preco5 = rs.getBigDecimal("preco5"),
+                descontoPadrao = rs.getBigDecimal("descontoPadrao"),
+                estoqueDisponivel = rs.getBigDecimal("estoqueDisponivel"),
+                estoqueMinimo = rs.getBigDecimal("estoqueMinimo"),
+                estoqueReservado = rs.getBigDecimal("estoqueReservado"),
+                estoqueAdquirido = rs.getBigDecimal("estoqueAdquirido"),
             )
         }
 

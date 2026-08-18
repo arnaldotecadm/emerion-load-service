@@ -11,9 +11,9 @@ spring:
       connection-timeout: 2000
       maximum-pool-size: 5
     #url: jdbc:firebirdsql://127.0.0.1:3050//data//portal_2024_01.fdb
-    url: jdbc:firebirdsql://127.0.0.1:3050//data//portal_25_06_2021.fdb
+    url: jdbc:firebirdsql://127.0.0.1:3051//data//portal_25_06_2021.fdb
     username: SYSDBA
-    password: masterkey
+    password: FgB@8165
 
   jpa:
     hibernate:
@@ -27,11 +27,12 @@ company:
   codemp: 1
 
 ingestion-service:
-  base-url: http://localhost:8080
+  api-key: ${INGESTION_API_KEY:}
+  base-url: http://localhost:8080/api/v1/
   endpoints:
-    customer: /api/v1/ingestion/customers/single
-    product: /api/v1/ingestion/products/single
-    customer-address: /api/v1/ingestion/customer-addresses/single
-    customer-credit: /api/v1/ingestion/customer-credits/batch
-    customer-order: /api/v1/ingestion/customer-orders/single
-    vendedor: /api/v1/ingestion/vendedores/single
+    customer: ingestion/customers/single
+    product: ingestion/products/single
+    customer-address: ingestion/customer-addresses/single
+    customer-credit: ingestion/customer-credits/batch
+    customer-order: ingestion/customer-orders/single
+    vendedor: ingestion/vendedores/single

@@ -25,7 +25,12 @@ data class Product(
     val preco2: BigDecimal?,
     val preco3: BigDecimal?,
     val preco4: BigDecimal?,
-    val preco5: BigDecimal?
+    val preco5: BigDecimal?,
+    val descontoPadrao: BigDecimal?,
+    val estoqueDisponivel: BigDecimal?,
+    val estoqueMinimo: BigDecimal?,
+    val estoqueReservado: BigDecimal?,
+    val estoqueAdquirido: BigDecimal?
 ) {
     val id: String
         get() = "$codGru.$codSub.$codPro"

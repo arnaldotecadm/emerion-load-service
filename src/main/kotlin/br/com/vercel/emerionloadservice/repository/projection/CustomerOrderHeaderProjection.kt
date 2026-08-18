@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.repository.projection
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface CustomerOrderHeaderProjection {
@@ -7,6 +8,8 @@ interface CustomerOrderHeaderProjection {
     val cpfCnpj: String?
     val numres: String
     val nronfe: String?
+    val dataFaturamento: LocalDate?
+    val totalFaturado: Double?
     val dteres: LocalDateTime
     val sitres: String?
     val totger: Double
@@ -27,4 +30,12 @@ interface CustomerOrderHeaderProjection {
     val pedidoAnterior: String?
     val regimeTributario: String?
     val nomeRegimeTributario: String?
+    val dataProcessamentoComercial: LocalDate?
+    val dataProcessamentoFinanceiro: LocalDate?
+    val dataRejeicao: LocalDate?
+    val observacaoRejeicao: String?
+    val dataEntrega: LocalDate?
+    val dataFinalizacao: LocalDate?
+    val codigoPagamento: String?
+    val descricaoPagamento: String?
 }

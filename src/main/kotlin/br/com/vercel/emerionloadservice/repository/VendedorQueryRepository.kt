@@ -31,7 +31,8 @@ class VendedorQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 ven.sigufe as uf,
                 ven.flgati as situacao,
                 ven.sldven as saldo,
-                ven.dcaven as dataCadastro
+                ven.dcaven as dataCadastro,
+                ven.metrep as metaRepresentacao
             from finven ven
             order by ven.codven
         """.trimIndent()
@@ -51,7 +52,8 @@ class VendedorQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 uf = rs.getString("uf"),
                 situacao = rs.getString("situacao"),
                 saldo = rs.getBigDecimal("saldo"),
-                dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime()
+                dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime(),
+                metaRepresentacao = rs.getBigDecimal("metaRepresentacao")
             )
         }
 

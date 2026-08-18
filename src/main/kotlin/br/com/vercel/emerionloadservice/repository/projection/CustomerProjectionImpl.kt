@@ -24,5 +24,9 @@ data class CustomerProjectionImpl(
     override val nomeVendedor: String?,
     override val codigoTipoCliente: String?,
     override val codigoGrupoCliente: String?,
-    override val codigoCategoriaCliente: String?
+    override val codigoCategoriaCliente: String?,
+    override val uf: String?,
+    override val macroRegiao: String?,
+    override val microRegiao: String?,
+    override val setor: String?
 ) : CustomerProjection

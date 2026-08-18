@@ -16,4 +16,5 @@ interface VendedorProjection {
     val situacao: String?
     val saldo: BigDecimal?
     val dataCadastro: LocalDateTime?
+    val metaRepresentacao: BigDecimal?
 }

@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.repository.projection
 
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CustomerOrderHeaderProjectionImpl(
@@ -7,6 +8,8 @@ data class CustomerOrderHeaderProjectionImpl(
     override val cpfCnpj: String?,
     override val numres: String,
     override val nronfe: String?,
+    override val dataFaturamento: LocalDate?,
+    override val totalFaturado: Double?,
     override val dteres: LocalDateTime,
     override val sitres: String?,
     override val totger: Double,
@@ -26,5 +29,13 @@ data class CustomerOrderHeaderProjectionImpl(
     override val linhaReserva: String?,
     override val pedidoAnterior: String?,
     override val regimeTributario: String?,
-    override val nomeRegimeTributario: String?
+    override val nomeRegimeTributario: String?,
+    override val dataProcessamentoComercial: LocalDate?,
+    override val dataProcessamentoFinanceiro: LocalDate?,
+    override val dataRejeicao: LocalDate?,
+    override val observacaoRejeicao: String?,
+    override val dataEntrega: LocalDate?,
+    override val dataFinalizacao: LocalDate?,
+    override val codigoPagamento: String?,
+    override val descricaoPagamento: String?
 ) : CustomerOrderHeaderProjection

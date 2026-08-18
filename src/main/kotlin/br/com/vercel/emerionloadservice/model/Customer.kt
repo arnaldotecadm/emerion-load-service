@@ -24,5 +24,9 @@ data class Customer(
     val nomeVendedor: String?,
     val codigoTipoCliente: String?,
     val codigoGrupoCliente: String?,
-    val codigoCategoriaCliente: String?
+    val codigoCategoriaCliente: String?,
+    val uf: String?,
+    val macroRegiao: String?,
+    val microRegiao: String?,
+    val setor: String?
 )

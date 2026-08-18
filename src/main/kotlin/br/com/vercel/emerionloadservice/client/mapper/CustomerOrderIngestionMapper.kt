@@ -16,6 +16,8 @@ object CustomerOrderIngestionMapper {
             cnpjEmpresa = cnpjEmpresa,
             cpfCnpj = this.cpfCnpj,
             nronfe = this.nronfe,
+            dataFaturamento = this.dataFaturamento,
+            totalFaturado = this.totalFaturado,
             dteres = this.dteres,
             sitres = this.sitres,
             totger = this.totger,
@@ -36,6 +38,14 @@ object CustomerOrderIngestionMapper {
             pedidoAnterior = this.pedidoAnterior,
             regimeTributario = this.regimeTributario,
             nomeRegimeTributario = this.nomeRegimeTributario,
+            dataProcessamentoComercial = this.dataProcessamentoComercial,
+            dataProcessamentoFinanceiro = this.dataProcessamentoFinanceiro,
+            dataRejeicao = this.dataRejeicao,
+            observacaoRejeicao = this.observacaoRejeicao,
+            dataEntrega = this.dataEntrega,
+            dataFinalizacao = this.dataFinalizacao,
+            codigoPagamento = this.codigoPagamento,
+            descricaoPagamento = this.descricaoPagamento,
             itens = this.itens.map { it.toIngestionDto() }
         )
     }
@@ -99,6 +109,12 @@ object CustomerOrderIngestionMapper {
             referencia = this.referencia,
             quantidadeFaturada = this.quantidadeFaturada,
             quantidadeSeparada = this.quantidadeSeparada,
+            custoTotal = this.custoTotal,
+            lucroValor = this.lucroValor,
+            lucroPorcentagem = this.lucroPorcentagem,
+            saldoQuantidade = this.saldoQuantidade,
+            descontoItemValor = this.descontoItemValor,
+            descontoItemTotal = this.descontoItemTotal,
         )
     }
 }

@@ -25,5 +25,10 @@ data class ProductProjectionImpl(
     override val preco2: BigDecimal?,
     override val preco3: BigDecimal?,
     override val preco4: BigDecimal?,
-    override val preco5: BigDecimal?
+    override val preco5: BigDecimal?,
+    override val descontoPadrao: BigDecimal?,
+    override val estoqueDisponivel: BigDecimal?,
+    override val estoqueMinimo: BigDecimal?,
+    override val estoqueReservado: BigDecimal?,
+    override val estoqueAdquirido: BigDecimal?
 ) : ProductProjection

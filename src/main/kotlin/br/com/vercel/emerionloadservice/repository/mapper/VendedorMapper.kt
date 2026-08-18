@@ -23,7 +23,8 @@ object VendedorMapper {
             uf = this.uf?.trim(),
             situacao = this.situacao?.trim(),
             saldo = this.saldo,
-            dataCadastro = this.dataCadastro?.toLocalDate()
+            dataCadastro = this.dataCadastro?.toLocalDate(),
+            metaRepresentacao = this.metaRepresentacao
         )
     }
 }

@@ -13,6 +13,8 @@ object CustomerOrderMapper {
             cpfCnpj = this.cpfCnpj,
             numres = this.numres,
             nronfe = this.nronfe,
+            dataFaturamento = this.dataFaturamento,
+            totalFaturado = this.totalFaturado,
             dteres = this.dteres.toLocalDate(),
             sitres = this.sitres,
             totger = this.totger,
@@ -33,6 +35,14 @@ object CustomerOrderMapper {
             pedidoAnterior = this.pedidoAnterior,
             regimeTributario = this.regimeTributario,
             nomeRegimeTributario = this.nomeRegimeTributario,
+            dataProcessamentoComercial = this.dataProcessamentoComercial,
+            dataProcessamentoFinanceiro = this.dataProcessamentoFinanceiro,
+            dataRejeicao = this.dataRejeicao,
+            observacaoRejeicao = this.observacaoRejeicao,
+            dataEntrega = this.dataEntrega,
+            dataFinalizacao = this.dataFinalizacao,
+            codigoPagamento = this.codigoPagamento,
+            descricaoPagamento = this.descricaoPagamento,
             itens = items.toModel()
         )
     }
@@ -102,6 +112,12 @@ object CustomerOrderMapper {
             referencia = this.referencia,
             quantidadeFaturada = this.quantidadeFaturada,
             quantidadeSeparada = this.quantidadeSeparada,
+            custoTotal = this.custoTotal,
+            lucroValor = this.lucroValor,
+            lucroPorcentagem = this.lucroPorcentagem,
+            saldoQuantidade = this.saldoQuantidade,
+            descontoItemValor = this.descontoItemValor,
+            descontoItemTotal = this.descontoItemTotal,
         )
     }
 }

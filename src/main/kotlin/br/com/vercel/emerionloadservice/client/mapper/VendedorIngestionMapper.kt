@@ -21,7 +21,8 @@ object VendedorIngestionMapper {
             uf = this.uf,
             situacao = this.situacao,
             saldo = this.saldo,
-            dataCadastro = this.dataCadastro
+            dataCadastro = this.dataCadastro,
+            metaRepresentacao = this.metaRepresentacao
         )
     }
 }

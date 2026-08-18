@@ -26,4 +26,9 @@ interface ProductProjection {
     val preco3: BigDecimal?
     val preco4: BigDecimal?
     val preco5: BigDecimal?
+    val descontoPadrao: BigDecimal?
+    val estoqueDisponivel: BigDecimal?
+    val estoqueMinimo: BigDecimal?
+    val estoqueReservado: BigDecimal?
+    val estoqueAdquirido: BigDecimal?
 }
