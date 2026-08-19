@@ -3,6 +3,7 @@ package br.com.vercel.emerionloadservice.model
 import java.time.LocalDate
 
 data class CustomerOrder(
+    val codEmp: Int,
     val codCli: Long,
     val cpfCnpj: String?,
     val numres: String,

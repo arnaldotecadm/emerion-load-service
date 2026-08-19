@@ -36,3 +36,6 @@ ingestion-service:
     customer-credit: ingestion/customer-credits/batch
     customer-order: ingestion/customer-orders/single
     vendedor: ingestion/vendedores/single
+    invoice: ingestion/invoices/batch
+    invoice-item-link: ingestion/invoice-item-links/batch
+    receivable: ingestion/receivables/batch

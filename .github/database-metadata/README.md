@@ -1,250 +1,171 @@
-# Database Metadata Reference
+PEDRES represents information at the order level and should not be treated
+as an individual order item.
 
-This folder contains comprehensive metadata and documentation about the Firebird database used in the emerion-load-service project.
+PEDRE2 — Order Details
 
-## Files in This Folder
+PEDRE2 contains the details of an order.
 
-### 1. `REACT_API_CONTRACTS.md` ⭐ **START HERE**
-Exact JSON schemas for all 11 API endpoints needed by the React dashboard.
+Each record represents an item associated with an order and contains information
+such as:
 
-**Contains**:
-- Response shapes for each endpoint (customer, orders, sales summary, etc.)
-- Which fields are used on the dashboard
-- Which Firebird tables map to each response
-- Implementation roadmap (Phase 1, 2, 3)
-- Field-by-field rationale for what data is needed
+item quantities
+item values
+product information
+item characteristics
+other item-level information
 
-**When to use**: 
-- Planning API development for Phase 1/2/3
-- Understanding what the React app actually needs
-- Writing REST endpoint contracts
-- Validating query results match expected response shape
+PEDRE2 is associated with PEDRES through the order's composite business
+key:
 
-**Key insight**: Only 2 endpoints are live (customer), everything else still mocked. **Phase 1 (orders)** = 70% of dashboard value.
+(CODEMP, DTERES, NUMRES)
 
----
+Because multiple PEDRE2 records can belong to the same PEDRES record,
+order-level metrics and item-level metrics must be treated separately.
 
-### 2. `firebird-schema-portal_2024_01.md`
-Complete reference for the `portal_2024_01.fdb` Firebird database.
+FINCLI — Customer
 
-**Contains**:
-- Connection details (SYSDBA user, Dialect 1)
-- All custom domains and data types
-- Key tables (FINCLI, ESTPRO, PEDRES, etc.)
-- Generators (sequences) for auto-increment
-- External functions available in UdfSade.dll
-- Character set information
-- Data type mapping (Firebird → PostgreSQL → Kotlin)
-- Common query patterns
-- Migration path dependencies
-- Important considerations for queries
+FINCLI is the main customer entity.
 
-**When to use**: 
-- Planning which tables to migrate
-- Understanding data types for entity creation
-- Creating native SQL queries
-- Mapping Firebird data to Kotlin models
+It stores the information required to identify and describe a customer,
+including the customer's identifying and registration information.
 
-**How Copilot uses it**:
-- Reference when creating SQL queries
-- Look up table structures and field names
-- Understand domain/custom type definitions
-- Validate NULL handling patterns
-- Check data type conversions
+The primary customer identifier is:
 
----
+CODCLI
+ESTPRO — Product
 
-### 3. `ESSENTIAL_FIELDS_FOR_REACT_APP.md` ⭐ **NEW**
-Minimum viable field set for Phase 1 implementation (orders).
+ESTPRO contains the information related to products.
 
-**Contains**:
-- 6 essential PEDRES fields (vs 50+ total)
-- 7 essential PEDRE2 fields (vs 40+ total)  
-- 4 essential FATPED fields (vs 40+ total)
-- SQL template showing exact query structure
-- Field exclusion rationale (why certain fields are excluded)
-- Implementation roadmap (which fields to add in Phase 2/3)
+A product is identified by the composite business key:
 
-**When to use**:
-- Writing queries for orders, order items, and invoices
-- Creating Order/OrderItem/Invoice entities
-- Validating your query results against dashboard needs
-- Understanding what NOT to include (to reduce payload size)
+(CODCLP, CODGRU, CODSUB, CODPRO)
 
-**Key insight**: 87% field reduction achieved by excluding tax, cost, GL, and audit fields.
+The product entity is associated with product classifications, groups,
+subgroups, categories, brands, types, and units through relationships with
+other EST* tables.
 
----
+Documentation Files
+relationships.md
 
-### 4. `TABLE_NAMING_CONVENTION.md` ⭐ **NEW**
-Guide to Firebird's "2" suffix detail table pattern (critical for orders).
+Contains the foreign-key relationships extracted from the migrated PostgreSQL
+database.
 
-**Contains**:
-- Explanation of parent-child relationships (PEDRES ↔ PEDRE2, FATPED ↔ FATPE2)
-- Migration order requirements (always parent before child)
-- Composite primary key patterns
-- FLGEXC soft-delete flag handling
-- SQL examples for parent-child queries
-- Kotlin entity relationship examples
-- Testing patterns for detail tables
+This describes how tables and columns are technically related.
 
-**When to use**:
-- Understanding why PEDRE2 exists and how it relates to PEDRES
-- Writing queries that join parent + child tables
-- Creating entity relationships in Kotlin
-- Debugging missing order items
+pedres.md
 
-**Key insight**: All tables ending with "2" follow same pattern; migrate parent first to maintain referential integrity.
+Documents the business meaning, important fields, relationships, and
+dashboard relevance of PEDRES.
 
+pedre2.md
 
+Documents the business meaning, important fields, relationships, and
+dashboard relevance of PEDRE2.
 
-## Quick Reference: Key Tables
+fincli.md
 
-⚠️ **Remember**: Tables ending with "2" are detail/item tables for the main table!
+Documents the customer entity represented by FINCLI.
 
-| Main Table | Detail Table | Purpose | Primary Key | Notes |
-|-----------|-------------|---------|-------------|-------|
-| **FINCLI** | - | Customers | CODCLI | Most important, filter FLGEXC=0 |
-| **ESTPRO** | - | Products | CODPRO | Use TRIM() on names |
-| **PEDRES** | **PEDRE2** | Orders & Items | CODPED | Migrate PEDRES before PEDRE2 |
-| - | **PEDRE2** | Order Items (detail) | CODPED + SEQITEM | Always migrate parent first |
-| **FINFOR** | - | Suppliers | CODFOR | Reference table |
-| **CMPAEN** | - | Supplier Receipts | CODEMP + DTEENT + NUMENT | Complex key |
-| **CFOP** | - | Tax Codes | CODCFO | Reference table |
+estpro.md
 
----
+Documents the product entity represented by ESTPRO.
 
-## Important Patterns (Copy-Paste)
+business-concepts.md
 
-### Filter Active Records
-```sql
-WHERE TABLE.FLGEXC = 0
-```
+Describes higher-level business concepts that span multiple database tables.
 
-### Trim String Fields
-```sql
-SELECT TRIM(NOMCLI) FROM FINCLI
-```
+business-rules.md
 
-### Pagination (Firebird No LIMIT)
-```sql
-SELECT FIRST 100 SKIP 0 * FROM TABLE ORDER BY ID
-```
+Contains business rules discovered from the legacy Delphi application,
+database structure, reports, and other verified sources.
 
-### NULL Handling
-```sql
-WHERE EMAIL IS NOT NULL
-COALESCE(FIELD, '') as field_default
-```
+Only verified business rules should be documented here. Assumptions must be
+clearly identified as assumptions.
 
-### Date Conversion
-```sql
-SELECT DATETOSTR(DTACAD) FROM TABLE
-```
+dashboard-opportunities.md
 
----
+Contains potential dashboard insights and features derived from the documented
+data model and business concepts.
 
-## Data Type Quick Reference
+These are suggestions, not necessarily requirements.
 
-| Firebird Domain | Firebird Type | PostgreSQL | Kotlin | Notes |
-|-----------------|---------------|-----------|--------|-------|
-| BOOLEAN | SMALLINT | SMALLINT | Boolean | 0=false, 1=true |
-| NUMERIC_15_2 | NUMERIC(15,2) | NUMERIC(15,2) | BigDecimal | Currency, prices |
-| NUMERIC_15_4 | NUMERIC(15,4) | NUMERIC(15,4) | BigDecimal | Quantities |
-| NUMERIC_15_6 | NUMERIC(15,6) | NUMERIC(15,6) | BigDecimal | Precision |
-| DOM_STROBS | VARCHAR(600) | VARCHAR(600) | String | Observations |
-| DOM_DATE | TIMESTAMP | TIMESTAMP | LocalDateTime | With time |
-| SIG_UF | CHAR(2) | CHAR(2) | String | State code, trim |
+How to Use This Documentation
 
----
+When working on the Emerion Dashboard:
 
-## Migration Checklist
+Use the entity-specific documentation to understand the meaning of the
+relevant tables and columns.
+Use relationships.md to understand how entities are connected.
+Use business-rules.md when implementing calculations, filters, statuses,
+or other business logic.
+Use business-concepts.md to understand how multiple tables represent a
+business concept.
+Use dashboard-opportunities.md for potential analytical and UI ideas.
 
-Before migrating a table, ensure:
-- [ ] **Start with `REACT_API_CONTRACTS.md`** - understand what endpoint you're building
-- [ ] Reference `ESSENTIAL_FIELDS_FOR_REACT_APP.md` - know which fields are actually needed
-- [ ] Check `TABLE_NAMING_CONVENTION.md` (if detail table like PEDRE2, FATPE2)
-- [ ] Look up table in `firebird-schema-portal_2024_01.md`
-- [ ] All domains/fields mapped to Kotlin types
-- [ ] FLGEXC filter applied (if applicable)
-- [ ] TRIM() applied to CHAR fields
-- [ ] NULL handling defined
-- [ ] Projection interface created (matches query result)
-- [ ] Mapper created (projection → model)
-- [ ] Entity created in PostgreSQL package
-- [ ] Repository created for PostgreSQL
-- [ ] Tests written for mapper
-- [ ] Migration service created
-- [ ] REST endpoint created (matching `REACT_API_CONTRACTS.md` shape)
+Database structure alone should not be interpreted as business logic.
 
----
+When the business meaning of a field or relationship is unknown, do not invent
+an interpretation. Mark it as unknown or ask for clarification.
 
-## Common Gotchas
+Source of Information
 
-### 1. CHAR Fields Are Padded
-```kotlin
-// WRONG
-val name = rs.getString("name")  // Has trailing spaces
+The information in this directory is derived from:
 
-// CORRECT
-val name = rs.getString("name")?.trim() ?: ""
-```
+the migrated PostgreSQL schema
+the legacy Firebird database structure
+the legacy Delphi application
+Delphi screens and reports inspected by the developer
+verified observations about existing application behavior
 
-### 2. No LIMIT in Firebird
-```sql
--- WRONG
-SELECT * FROM TABLE LIMIT 10
+The legacy Delphi application is an important source of business semantics
+because the database schema alone does not fully describe the meaning of the
+data.
 
--- CORRECT
-SELECT FIRST 10 FROM TABLE
-SELECT FIRST 10 SKIP 20 FROM TABLE  -- For pagination
-```
+Important Conventions
+Composite Business Keys
 
-### 3. NULL Comparisons
-```sql
--- WRONG
-WHERE EMAIL = NULL
+Some important entities use composite keys rather than a single identifier.
 
--- CORRECT
-WHERE EMAIL IS NULL
-WHERE EMAIL IS NOT NULL
-```
+PEDRES:
 
-### 4. Firebird Uses WIN1252 by Default
-Be aware of encoding when migrating text data. May need normalization.
+(CODEMP, DTERES, NUMRES)
 
-### 5. Transactions Span Multiple DBs
-- Firebird: Read-only, no transactional boundary needed
-- PostgreSQL: Wrap saves in @Transactional
-- API calls: Handle separately
+ESTPRO:
 
----
+(CODCLP, CODGRU, CODSUB, CODPRO)
 
-## Using This with Skills
+These keys must be treated as a unit when joining or identifying records.
 
-The database metadata integrates with the project's skills:
+Relationship Notation
 
-### With `firebird-query-skill.md`
-Use the table/field names from here when writing native queries.
+Single-column relationships:
 
-### With `data-mapper-skill.md`
-Use the data type mappings from here when creating mappers.
+TABLE.COLUMN -> OTHER_TABLE.COLUMN
 
-**Example flow**:
-1. Look up table in `firebird-schema-portal_2024_01.md`
-2. Write query using `firebird-query-skill.md` patterns
-3. Create projection matching query result
-4. Map to model using `data-mapper-skill.md` patterns
+Composite relationships:
 
----
+TABLE.(COLUMN1, COLUMN2) -> OTHER_TABLE.(COLUMN1, COLUMN2)
+Order-Level vs Item-Level Data
 
-## Updating This Metadata
+PEDRES contains order-level information.
 
-As you discover new information about the database:
-1. Add new domains or fields to `firebird-schema-portal_2024_01.md`
-2. Document any gotchas or special handling needed
-3. Add new query patterns as examples
-4. Update this README if structure changes
+PEDRE2 contains item-level information.
 
----
+Multiple PEDRE2 records may belong to a single PEDRES record.
 
-**Next Step**: Start with the FINCLI table using the skills and this metadata.
+When calculating metrics, aggregations, totals, counts, or KPIs, this distinction
+must be preserved.
+
+For example, the number of PEDRE2 records must not automatically be
+interpreted as the number of orders.
+
+Information Certainty
+
+Information should be distinguished between:
+
+Verified — directly confirmed from the application, database, or code.
+Inferred — strongly suggested by the available evidence but not directly
+confirmed.
+Unknown — the meaning has not yet been established.
+
+Do not treat inferred or unknown information as verified business logic.

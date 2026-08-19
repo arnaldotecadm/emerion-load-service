@@ -46,7 +46,12 @@ interface ProductRepository : PagingAndSortingRepository<DummyEntity, Long>{
                 ite.vb2ite          as preco2,
                 ite.vb3ite          as preco3,
                 ite.vb4ite          as preco4,
-                ite.vb5ite          as preco5
+                ite.vb5ite          as preco5,
+                pro.idepro          as descontoPadrao,
+                ite.qtsite          as estoqueDisponivel,
+                ite.qtmite          as estoqueMinimo,
+                ite.qtrite          as estoqueReservado,
+                ite.qtaite          as estoqueAdquirido
             from estpro pro
             left join estite ite on ite.codclp = pro.codclp
                 and ite.codgru = pro.codgru

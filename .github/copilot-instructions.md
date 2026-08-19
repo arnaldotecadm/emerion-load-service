@@ -1,234 +1,517 @@
-# Emerion Load Service — Token-Optimized Copilot Context
+# GitHub Copilot Instructions — Emerion Dashboard
 
-## Purpose
-Kotlin/Spring Boot loader that reads legacy Firebird data and sends normalized payloads to the ingestion API.
+## Project Overview
 
-Core flow: **Query → Projection → Mapper → Model → Ingestion DTO → Send**.
+This repository contains the React frontend for the Emerion Dashboard.
 
-## High-Value Rules (Repository Contract)
-1. **Multi-tenant segregation is mandatory.**
-   - Retailer identifier: `geremp.cgcemp` → `cnpjEmpresa`.
-   - Resolve once via `CompanyProvider`, configured by `company.codemp` (default `1`).
-   - Stamp `cnpjEmpresa` on every ingestion DTO.
+The application provides a modern customer-facing interface over business data originating from a legacy ERP system.
 
-2. **Do not conflate identifiers.**
-   - Retailer: `cnpjEmpresa` (from `geremp`).
-   - Customer identity: `cpfCnpj` (from `fincli.cgccli`).
-   - Customer external key in relationships: `customerExternalId` (legacy `codCli`).
+The legacy system was originally implemented in Delphi and uses a Firebird database. A new PostgreSQL-based backend is being developed to expose the relevant data to the React application.
 
-3. **Customer order payload must carry both retailer and customer identifiers.**
-   - `CustomerOrderIngestionDto` includes:
-     - `cnpjEmpresa`
-     - `cpfCnpj`
-     - `customerExternalId`
-     - order key `externalId` (`numres`)
+The React application should not reproduce the legacy application's screens literally. Instead, it should use the available business data to provide a modern, clear, useful, and visually effective dashboard experience.
 
-4. **`pedres.dteres` is DATE semantics.**
-   - In projection: use `LocalDateTime` for JDBC/projection compatibility.
-   - In model/DTO: map to `LocalDate`.
+---
 
-5. **Firebird/Jaybird compatibility constraints.**
-   - Avoid direct projection `TIMESTAMP -> LocalDate` in Spring Data native interface projections.
-   - On old Jaybird drivers, avoid `getObject(column, Class)`; prefer `getInt + wasNull` or `getBigDecimal`.
+## Primary Goal
 
-## Endpoint Intent
-- This service is ingestion-oriented.
-- Current GET endpoints are for testing/inspection and may return ingestion-shaped DTOs so `cnpjEmpresa` is visible.
+The primary goal of this project is to transform existing Emerion business data into useful dashboard functionality.
 
-## Implementation Anchors
-- `service/CompanyProvider.kt`
-- `client/IngestionServiceClient.kt`
-- `client/dto/*IngestionDto.kt`
-- `repository/*QueryRepository.kt` + `repository/mapper/*Mapper.kt`
+When implementing or proposing functionality, prioritize:
 
-## Preferred Working Style for Changes
-- Keep SQL native for Firebird extraction.
-- Keep transformations in mappers.
-- Reuse existing DTO/mapper patterns before adding new abstractions.
-- Make field semantics explicit in names (`customerExternalId`, `cpfCnpj`, `cnpjEmpresa`).
+- Business value
+- Clear information hierarchy
+- Actionable information
+- Useful KPIs
+- Trends and comparisons
+- Customer insights
+- Order insights
+- Product insights
+- Financial/commercial insights
+- Operational visibility
+- Good UX
 
-## fincli Key Fields (Customer Table)
-Full reference: `.github/database-metadata/FINCLI_CUSTOMER_TABLE.md`
+Do not simply expose database tables as CRUD screens unless there is a clear business requirement for doing so.
 
-| Column    | Meaning                       |
-|-----------|-------------------------------|
-| `CODCLI`  | Customer PK → `customerExternalId` |
-| `NOMCLI`  | Nome/Razão social             |
-| `CGCCLI`  | CNPJ/CPF → `cpfCnpj`         |
-| `APECLI`  | Apelido/Fantasia (trade name) |
-| `DTNCLI`  | Data de nascimento/fundação   |
-| `INSCLI`  | Inscrição Estadual/RG         |
-| `FLBCLI`  | Bloqueado (`'*'` = blocked)   |
-| `CODVEN`  | Vendedor FK                   |
-| `CODATD`  | Atendente FK                  |
-| `REGTRB`  | Regime tributário → join `FINREGTRIB` on `NUMREGTRIB` |
-| `LIMCLI`  | Limite de crédito             |
-| `OBSCLI`  | Observações do cliente        |
-| `DCACLI`  | Data do cadastro              |
+---
 
-### fincli Address Columns Convention
-Four address types share the same structure; column name position 3 = address type:
-- **F** → Faturamento (billing)
-- **C** → Cobrança (collection)
-- **A** → Compras (purchase)
-- **E** → Entrega (delivery)
+## Business Context
 
-Pattern: `CE<x>CLI`=CEP, `EN<x>CLI`=Endereço, `NR<x>CLI`=Número, `BA<x>CLI`=Bairro,
-`CI<x>CLI`=Cidade key, `UF<x>CLI`=UF, `TE<x>CLI`=Telefone, `CO<x>CLI`=Contato,
-`RF<x>CLI`=Complemento/Ref, `PT<x>CLI`=Ponto, `FO<x>CLI`=Fone, `FA<x>CLI`=Fax,
-`PF<x>CLI`=Celular.
+The main business entities currently understood are:
 
-## finven Key Fields (Salesperson Table)
-Full reference: `.github/database-metadata/FINVEN_SALESPERSON_TABLE.md`
+### FINCLI
 
-| Column      | Display Label             | Notes                                  |
-|-------------|---------------------------|----------------------------------------|
-| `CODVEN`    | Código                    | PK; FK from `fincli.CODVEN`            |
-| `NOMVEN`    | Nome/Razão social         | Salesperson name                       |
-| `CGCVEN`    | CNPJ/CPF                  | Tax document                           |
-| `APEVEN`    | Apelido/Fantasia          | Trade name                             |
-| `INSVEN`    | Inscrição Estadual/RG     |                                        |
-| `FLGATI`    | Ativo?                    | Active flag                            |
-| `DCAVEN`    | Cadastrado em             | Registration date                      |
-| `CODGVE`    | Grupo                     | FK → `NOMGVE`                          |
-| `CODCVE`    | Categoria                 | FK → `NOMCVE`                          |
-| `CODTVE`    | Tipo                      | FK → `NOMTVE`                          |
-| `CODCOM`    | Comissão                  | FK → `PERCOM` (commission %)           |
-| `CODBAN`    | Banco                     | FK → `NOMBAN`                          |
-| `CODAGB`    | Agência                   | Bank agency code                       |
-| `CODCNB`    | No. da conta              | Bank account number                    |
-| `NOMCNB`    | Titular                   | Account holder name                    |
-| `CEPVEN`    | Cep                       | Postal code                            |
-| `ENDVEN`    | Endereço                  |                                        |
-| `NUMVEN`    | No.                       | Street number                          |
-| `BAIVEN`    | Bairro                    |                                        |
-| `CIDVEN`    | Cidade                    | City name (text)                       |
-| `SIGUFE`    | UF                        | State abbreviation                     |
-| `FONVEN`    | Telefone                  |                                        |
-| `PRFVEN`    | Prefixo (tel)             | Phone area code                        |
-| `FAXVEN`    | Fax                       |                                        |
-| `CELVEN`    | Celular                   |                                        |
-| `EMAVEN`    | E-mail                    |                                        |
-| `WEBVEN`    | Web-site                  |                                        |
-| `ID_FINUFE` | UF (NFe)                  | FK to UF lookup                        |
-| `ID_FINCIE` | Município (NFe)           | FK to city lookup                      |
-| `ID_FINPAI` | País                      | FK to country lookup                   |
+Customer master.
 
-Join pattern: `JOIN finven ven ON ven.codven = cli.codven`
+Primary key:
 
-## estpro Key Fields (Product/Item Table)
-Full reference: `.github/database-metadata/ESTPRO_PRODUCT_TABLE.md`
+`codcli`
 
-> DataSources: `DsPro` = product master; `DsIte` = per-company costs/prices/stock; `DsQte` = stock by colour/size.
+Represents customers and contains customer identity, fiscal information, addresses, credit information, commercial relationships, and other customer attributes.
 
-| Column      | Display Label          | Notes                                         |
-|-------------|------------------------|-----------------------------------------------|
-| `CODPRO`    | Item                   | Product PK → `externalId`                     |
-| `DSCPRO`    | Descrição Principal    | Main description                              |
-| `DSRPRO`    | Descrição Reduzida     | Short description                             |
-| `REFPRO`    | Referência Interna     | Internal reference                            |
-| `SIMPRO`    | Similar                | Substitute product                            |
-| `NUMPRO`    | Part number            |                                               |
-| `FLBPRO`    | Descontinuado          | `'D'` = discontinued                          |
-| `DTCPRO`    | Data de cadastro       |                                               |
-| `CODGRU`    | Grupo                  | FK → `NOMGRU`                                 |
-| `CODSUB`    | Sub-Grupo              | FK → `NOMSUB`                                 |
-| `CODCAT`    | Categoria              | FK → `NOMCAT`                                 |
-| `CODCLP`    | Classificação          | FK → `NOMCLP`                                 |
-| `CODTIP`    | Tipo                   | FK → `NOMTIP`                                 |
-| `CODMRC`    | Marca                  | FK → `NOMMRC`                                 |
-| `CODUNE`    | Unidade de Saída       | Unit of measure FK                            |
-| `CODNCM`    | NCM                    | Nomenclatura Comum Mercosul                   |
-| `CEST`      | CEST                   | Subst. tributária code                        |
-| `CODST1`    | Origem do Produto      | Origin/CST code FK                            |
-| `PESLIQ`    | Peso Líquido           |                                               |
-| `PESBRT`    | Peso Bruto             |                                               |
-| `CODBAR`    | Cód. de barras         | Primary EAN barcode                           |
-| `CBAPRO`    | Cod. Barras Próprio    | Own barcode                                   |
-| `LOCPRO`    | Localização            | Storage location                              |
-| `WEBPRO`    | Web-Site               |                                               |
+### PEDRES
 
-### estpro Costs & Prices (DsIte — per company)
-| Column        | Display Label          |
-|---------------|------------------------|
-| `CSTITE`      | Último Preço           |
-| `VCHITE`      | Custo Histórico        |
-| `VCPITE`      | Custo Ponderado        |
-| `VCRITE`      | Custo Reposição        |
-| `VB1ITE`–`VB5ITE` | Unitário 1–5      |
-| `VP1ITE`–`VP5ITE` | Promocional 1–5   |
-| `CUSTOFOB`    | Último Custo (FOB)     |
-| `CUSTOCIF`    | Último Custo (CIF)     |
-| `QTDCMP`      | Qtd. Última Compra     |
+Order master/header.
 
-### estpro Stock (DsQte — per colour/size)
-`QTAQTE`=Adquirido, `QTRQTE`=Reservado, `QTSQTE`=Disponível, `QTMQTE`=Mínimo, `QMAQTE`=Máximo, `QTDRMA`=RMA
+Primary key:
 
-## PEDRES / PEDRE2 Key Fields (Order Header & Items)
-Full reference: `.github/database-metadata/PEDRES_PEDRE2_ORDER_TABLES.md`
+`(codemp, dteres, numres)`
 
-> **DATE rule**: `PEDRES.DTERES` is DATE semantics — read as `LocalDateTime` in JDBC projections, map to `LocalDate` in DTOs.  
-> DataSources: `DsRes` = PEDRES (header); `DsRe2` = PEDRE2 (items, FK: `NUMRES`+`SEQRE2`).
+Represents the general information about an order, including:
 
-### PEDRES — Order Header
+- Customer
+- Seller
+- Order date
+- Delivery information
+- Order status
+- Order totals
+- Tax totals
+- Freight
+- Insurance
+- Other expenses
+- Discounts
 
-| Column        | Display Label       | Notes                                  |
-|---------------|---------------------|----------------------------------------|
-| `NUMRES`      | Nro. do Pedido      | Order PK → `externalId`                |
-| `DTERES`      | Emissão             | Order date (DATE semantics)            |
-| `DTFRES`      | Entregar Em         | Requested delivery date                |
-| `CODEMP`      | Empresa             | Company FK                             |
-| `CODCLI`      | Cliente             | Customer FK → `fincli.CODCLI`          |
-| `CGCCLI`      | CPF/CNPJ            | Denorm. customer tax doc               |
-| `INSCLI`      | IE                  | Denorm. customer state registration    |
-| `CODVEN`      | Vendedor            | Salesperson FK → `finven.CODVEN`       |
-| `CODATD`      | Atendente           | Attendant FK                           |
-| `CODPFA`      | Padrao Fat.         | Billing pattern FK                     |
-| `CODTCL`      | Tipo Cliente        | Customer type FK                       |
-| `CODTRA`      | —                   | Carrier FK                             |
-| `ID_FRETE`    | Frete               | Freight FK / amount                    |
-| `DSCCOM`      | (%) Desc. Comercial | Commercial discount %                  |
-| `DSCREG`      | (%) Desc. ICMS Reg. | Regional ICMS discount %               |
-| `TOTRES`      | Total do Pedido     | Order net total (no taxes)             |
-| `TOTGER`      | Total Geral         | Grand total (all taxes)                |
-| `TOTICM`      | Total ICMS          |                                        |
-| `TOTIPI`      | IPI                 |                                        |
-| `TOTSUB`      | ICMS Subs.          |                                        |
-| `TOTPIS`      | —                   |                                        |
-| `TOTCOF`      | —                   |                                        |
-| `TOTFRT`      | Frete               |                                        |
-| `TOTSEG`      | Seguro              |                                        |
-| `TOTOUTDESP`  | Outras Desp.        |                                        |
-| `REGTRB`      | —                   | Tax regime on order                    |
-| `SITRES`      | —                   | Order status code                      |
-| `PEDANT`      | Pedido Anterior     | Previous/linked order                  |
+The customer relationship is:
 
-### PEDRE2 — Order Items (FK: NUMRES + SEQRE2)
+`PEDRES.codcli -> FINCLI.codcli`
 
-| Column    | Display Label    | Notes                                      |
-|-----------|------------------|--------------------------------------------|
-| `SEQRE2`  | —                | Item sequence PK (1, 2, 3…)                |
-| `NUMRES`  | —                | FK to `PEDRES.NUMRES`                      |
-| `CODPRO`  | Item             | Product FK → `estpro.CODPRO`               |
-| `DSCRE2`  | Descrição        | Item description on order                  |
-| `CODUND`  | Unidade          | Unit of measure                            |
-| `CODCOR`  | Cor              | Colour FK                                  |
-| `CODTAM`  | Tamanho          | Size FK                                    |
-| `QTPRE2`  | Qtd.             | Ordered quantity                           |
-| `VLURE2`  | Valor Unitário   | Unit price applied                         |
-| `TOTRE2`  | Valor Produtos   | Item line total                            |
-| `DESRE2`  | (%) Desc.        | Item discount %                            |
-| `VDSRE2`  | —                | Item discount value                        |
-| `BASICM`  | Base ICMS        | ICMS base on item                          |
-| `TOTICM`  | Total ICMS       |                                            |
-| `ICMRE2`  | (%) ICMS         |                                            |
-| `BASIPI`  | B.Calc.          | IPI base                                   |
-| `TOTIPI`  | IPI              |                                            |
-| `BASSUB`  | Base St.         | ICMS-ST base                               |
-| `TOTSUB`  | ICMS Subs.       |                                            |
-| `BASPIS`  | —                | PIS base                                   |
-| `TOTPIS`  | Valor PIS        |                                            |
-| `BASCOF`  | —                | COFINS base                                |
-| `TOTCOF`  | Valor COFINS     |                                            |
-| `NUMPEDCOMPRA` | Pedido Compra | Linked purchase order number             |
-| `OBSRE2`  | Observação       | Item-level notes                           |
+An order always has a customer.
+
+### PEDRE2
+
+Order item/detail.
+
+Represents individual products/items belonging to an order.
+
+The order relationship is:
+
+`PEDRE2 (codemp, dteres, numres) -> PEDRES (codemp, dteres, numres)`
+
+`seqre2` identifies the item/line within the order.
+
+An order can have many items.
+
+### ESTPRO
+
+Product master.
+
+Primary key:
+
+`(codclp, codgru, codsub, codpro)`
+
+The product relationship from `PEDRE2` is:
+
+`PEDRE2 (codclp, codgru, codsub, codpro) -> ESTPRO (codclp, codgru, codsub, codpro)`
+
+Size (`codtam`) and colour (`codcor`) are attributes of an order item but are **not business-relevant dimensions and do not identify a different product**.
+
+Do not create dashboard concepts around product size or colour unless explicitly requested.
+
+---
+
+## Order Status
+
+For dashboard purposes, `PEDRES.sitres` is the authoritative order lifecycle/status field.
+
+Known statuses include:
+
+- `Nao Concluido`
+- `Processo de Alteracao`
+- `Rejeitado`
+- `Aguardando Periodo de Programacao`
+- `Aguardando Liberacao do Depto de Compras`
+- `Aguardando Liberacao do Depto Comercial`
+- `Aguardando Consultas de Cadastro`
+- `Aguardando Liberacao do Depto Financeiro`
+- `Aguardando Separacao de Estoque`
+- `Aguardando Complemento`
+- `Aguardando Liberacao para Faturamento`
+- `Aguardando Separacao dos Itens a Faturar`
+- `Aguardando Confirmacao do Pagamento`
+- `Pronto para Faturar`
+- `Parcialmente Faturado`
+- `Faturado`
+- `Cancelado`
+- `Faturado com Saldo nao Atendido`
+
+Do not infer order status from undocumented flags when `sitres` is available.
+
+Other legacy flags such as `flgres`, `flgfin`, `flgpro`, `flgfec`, etc. should not be assigned business meanings unless their semantics are explicitly documented.
+
+---
+
+## Source of Truth
+
+Use the files under `.github/database-metadata/` as the primary source of business and database knowledge.
+
+Before making assumptions about a table or column:
+
+1. Check the relevant metadata file.
+2. Check `dashboard-business-metrics.md`.
+3. Check the documented relationships.
+4. Check the actual application/backend code when relevant.
+
+Do not invent business meanings for undocumented fields.
+
+If the metadata explicitly defines a field, prefer that definition over assumptions based on the field name.
+
+---
+
+## Dashboard Design Philosophy
+
+The application should favor analytical and decision-support functionality over simple data presentation.
+
+Good dashboard functionality includes:
+
+- KPI cards
+- Trends
+- Rankings
+- Comparisons
+- Distribution charts
+- Customer segmentation
+- Order status monitoring
+- Product performance
+- Sales performance
+- Revenue analysis
+- Margin/profitability analysis when reliable data exists
+- Customer purchasing behavior
+- Order pipeline visibility
+- Drill-down from summary information to underlying records
+
+Avoid creating large numbers of decorative charts that do not provide meaningful information.
+
+Every visualization should answer a recognizable business question.
+
+Examples:
+
+- How much did we sell?
+- How is sales evolving?
+- Which customers generate the most revenue?
+- Which customers have stopped buying?
+- Which products sell the most?
+- Which products generate the most profit?
+- How many orders are waiting for action?
+- What is the distribution of orders by status?
+- What is the average order value?
+- Which sellers generate the most business?
+- How concentrated are sales among customers?
+- How is the customer base evolving?
+
+---
+
+## KPI Guidelines
+
+When proposing a KPI:
+
+1. Identify the business entity.
+2. Identify the source table.
+3. Identify the source fields.
+4. Define the calculation.
+5. Define the relevant filters.
+6. Define the time period.
+7. Consider whether the metric can be reliably calculated from the available data.
+
+Do not create KPIs merely because a numeric column exists.
+
+For example, the existence of a numeric tax field does not automatically mean that it should become a dashboard KPI.
+
+---
+
+## Financial Metrics
+
+Be careful when interpreting monetary fields.
+
+Distinguish between:
+
+- Item value
+- Net value
+- Gross value
+- Taxes
+- Discounts
+- Freight
+- Insurance
+- Other expenses
+- Cost
+- Profit
+- Margin
+
+Do not blindly add monetary columns together.
+
+Use documented total fields where available.
+
+For order-level financial metrics, `PEDRES` should generally be the primary source.
+
+For item-level financial metrics, `PEDRE2` should generally be the primary source.
+
+---
+
+## Customer Analytics
+
+Customer analytics should use `FINCLI` as the customer master and `PEDRES` / `PEDRE2` for transactional information.
+
+Potential customer metrics include:
+
+- Total sales
+- Number of orders
+- Average order value
+- Last order date
+- Purchase frequency
+- Number of products purchased
+- Total quantity purchased
+- Customer sales trend
+- Credit limit
+- Customer status
+- Order status distribution
+
+Do not assume that current customer master information is identical to historical information stored on an order.
+
+`PEDRES` may contain historical customer fiscal information captured at the time of the order.
+
+---
+
+## Product Analytics
+
+Product analytics should use:
+
+- `ESTPRO` for product master information
+- `PEDRE2` for transactional information
+
+The product identity is:
+
+`(codclp, codgru, codsub, codpro)`
+
+Potential metrics include:
+
+- Quantity sold
+- Revenue
+- Net sales
+- Number of orders
+- Number of customers
+- Average selling price
+- Cost
+- Profit
+- Margin
+- Sales trend
+
+Do not treat size or colour as separate products.
+
+Do not create size/colour dashboards unless explicitly requested.
+
+---
+
+## Order Analytics
+
+Order analytics should primarily use `PEDRES`.
+
+Potential metrics include:
+
+- Total orders
+- Order value
+- Average order value
+- Orders by status
+- Orders over time
+- Orders by customer
+- Orders by seller
+- Orders awaiting action
+- Orders ready for invoicing
+- Partially invoiced orders
+- Cancelled orders
+- Invoiced orders
+
+The authoritative status field is:
+
+`PEDRES.sitres`
+
+---
+
+## UI / UX Principles
+
+The dashboard should be modern and professional.
+
+Prefer:
+
+- Clear visual hierarchy
+- Consistent spacing
+- Responsive layouts
+- Meaningful empty states
+- Loading states
+- Error states
+- Accessible controls
+- Consistent typography
+- Consistent number formatting
+- Consistent currency formatting
+- Appropriate date formatting
+- Useful filtering
+- Drill-down navigation where appropriate
+
+Avoid:
+
+- Excessive visual decoration
+- Unnecessary animations
+- Dense tables without hierarchy
+- Huge numbers of simultaneous charts
+- Technical database terminology in user-facing UI
+- Exposing internal IDs unless useful to the user
+
+---
+
+## Existing Application Architecture
+
+Before creating a new component or page:
+
+1. Inspect existing pages.
+2. Inspect existing components.
+3. Reuse established patterns.
+4. Reuse existing API/service conventions.
+5. Reuse existing hooks and types where appropriate.
+6. Follow the existing styling and component library.
+7. Avoid introducing a new pattern when an established project pattern already exists.
+
+The application already contains customer-related functionality and API integration.
+
+Do not rewrite working authentication, API integration, or established components without a clear reason.
+
+---
+
+## Backend/API Assumptions
+
+The React application consumes data through the backend API.
+
+Do not make the frontend directly access the legacy Firebird database.
+
+Do not introduce database-specific logic into React components when the backend is responsible for data access and business logic.
+
+Prefer:
+
+`React component -> hook/service -> API -> backend -> PostgreSQL`
+
+rather than embedding business/database queries in frontend code.
+
+---
+
+## Existing Functionality
+
+Before proposing or implementing new functionality, inspect the existing application to avoid duplicating features that already exist.
+
+Existing customer functionality includes:
+
+- Customer listing
+- Customer KPIs
+- Customer rankings
+- Customer risk information
+- Customer region information
+- Credit utilization information
+- Customer growth information
+- Customer directory
+- Customer detail view
+
+New functionality should complement the existing dashboard rather than duplicate it.
+
+---
+
+## AI-Assisted Dashboard Suggestions
+
+When asked to suggest improvements to the dashboard, do not limit suggestions to fields already displayed by the application.
+
+Use the database metadata and business metrics documentation to identify potentially valuable information that is not currently being displayed.
+
+Suggestions should be prioritized according to:
+
+### High priority
+
+Information that:
+
+- Supports business decisions
+- Reveals important trends
+- Identifies problems
+- Helps users take action
+- Uses reliable data already available
+
+### Medium priority
+
+Information that:
+
+- Improves understanding
+- Provides useful segmentation
+- Adds context to existing KPIs
+- Enables useful drill-downs
+
+### Low priority
+
+Information that:
+
+- Is mainly decorative
+- Adds little business value
+- Requires complex implementation for limited benefit
+- Exposes technical database details
+
+When suggesting a new dashboard feature, explain:
+
+- What business question it answers
+- Why it is useful
+- Which entities/tables provide the data
+- Which fields are involved
+- How the metric should be calculated
+- Where it would fit in the existing UI
+
+---
+
+## Handling Uncertainty
+
+The legacy database contains many fields whose business meaning is not yet fully understood.
+
+Never invent a meaning for an undocumented field.
+
+If a potentially valuable dashboard feature depends on an ambiguous field:
+
+1. Identify the field.
+2. Explain what information is missing.
+3. Ask for clarification.
+4. Do not implement the assumption as fact.
+
+It is acceptable to recommend investigating a field before using it.
+
+---
+
+## Legacy System Context
+
+The source system is a legacy Delphi/Firebird ERP.
+
+The database contains historical naming conventions and many abbreviated field names.
+
+Examples:
+
+- `tot` often refers to a total
+- `bas` often refers to a tax base
+- `aliq` often refers to an aliquot/rate
+- `dsc` often refers to discount
+- `cod` often refers to a code/identifier
+- `flg` often refers to a flag
+- `qtd` often refers to quantity
+
+These naming patterns can help with investigation, but they must not override explicit business documentation.
+
+---
+
+## Important Rule
+
+The goal is not to reproduce the legacy database.
+
+The goal is to use the legacy business data to create a better modern dashboard.
+
+When there is a choice between:
+
+1. faithfully exposing a legacy database concept, and
+2. presenting a clearer business concept derived from the same data,
+
+prefer the business-oriented presentation.
+
+When analyzing the legacy database, do not limit recommendations to direct column-to-column mappings. Consider how combinations of fields, relationships between entities, historical records, aggregations, trends, ratios and derived metrics can produce meaningful business insights.
+
+When suggesting data for the dashboard API, distinguish between:
+
+raw data that should be extracted from the legacy system;
+derived data that can be calculated by the loader;
+business metrics that should be calculated by the API;
+presentation concerns that belong exclusively to the React dashboard.
+
+Prefer preserving sufficiently granular data in the API when doing so enables multiple future insights, rather than prematurely extracting only one pre-calculated metric.

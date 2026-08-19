@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 data class CustomerOrderHeaderProjectionImpl(
+    override val codEmp: Int,
     override val codCli: Long,
     override val cpfCnpj: String?,
     override val numres: String,

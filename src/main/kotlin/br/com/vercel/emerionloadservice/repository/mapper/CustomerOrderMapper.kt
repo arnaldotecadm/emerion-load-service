@@ -9,6 +9,7 @@ object CustomerOrderMapper {
 
     fun CustomerOrderHeaderProjection.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder {
         return CustomerOrder(
+            codEmp = this.codEmp,
             codCli = this.codCli,
             cpfCnpj = this.cpfCnpj,
             numres = this.numres,
@@ -53,6 +54,9 @@ object CustomerOrderMapper {
 
     fun CustomerOrderItemProjection.toModel(): CustomerOrderItem {
         return CustomerOrderItem(
+            codEmp = this.codEmp,
+            dteres = this.dteres.toLocalDate(),
+            numres = this.numres,
             codGru = this.codGru,
             codSub = this.codSub,
             codPro = this.codPro,

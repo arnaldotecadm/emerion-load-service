@@ -1,6 +1,10 @@
 package br.com.vercel.emerionloadservice.repository.projection
 
+import java.time.LocalDateTime
+
 interface CustomerOrderItemProjection {
+    val codEmp: Int
+    val dteres: LocalDateTime
     val numres: String
     val codGru: String
     val codSub: String

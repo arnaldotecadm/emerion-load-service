@@ -4,6 +4,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 interface CustomerOrderHeaderProjection {
+    val codEmp: Int
     val codCli: Long
     val cpfCnpj: String?
     val numres: String

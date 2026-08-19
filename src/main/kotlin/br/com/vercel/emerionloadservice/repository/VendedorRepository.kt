@@ -24,7 +24,8 @@ interface VendedorRepository : PagingAndSortingRepository<DummyEntity, Long> {
                 ven.sigufe as uf,
                 ven.flgati as situacao,
                 ven.sldven as saldo,
-                ven.dcaven as dataCadastro
+                ven.dcaven as dataCadastro,
+                ven.metrep as metaRepresentacao
             from finven ven
             where ven.codven = :codVen
         """

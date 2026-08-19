@@ -1,6 +1,11 @@
 package br.com.vercel.emerionloadservice.client.dto
 
+import java.time.LocalDate
+
 data class CustomerOrderItemIngestionDto(
+    val codEmp: Int,
+    val dteres: LocalDate,
+    val numres: String,
     val produto: String,
     val descricao: String?,
     val quantidade: Double,

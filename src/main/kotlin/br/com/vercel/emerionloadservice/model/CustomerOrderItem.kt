@@ -1,6 +1,11 @@
 package br.com.vercel.emerionloadservice.model
 
+import java.time.LocalDate
+
 data class CustomerOrderItem(
+    val codEmp: Int,
+    val dteres: LocalDate,
+    val numres: String,
     val codGru: String,
     val codSub: String,
     val codPro: String,

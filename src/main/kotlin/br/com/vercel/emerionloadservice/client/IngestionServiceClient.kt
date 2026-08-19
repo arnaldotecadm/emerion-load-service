@@ -4,13 +4,19 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerAddressIngestionMa
 import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.InvoiceItemLinkIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.ReceivableIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.model.CustomerAddress
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
+import br.com.vercel.emerionloadservice.model.Invoice
+import br.com.vercel.emerionloadservice.model.InvoiceItemLink
 import br.com.vercel.emerionloadservice.model.Product
+import br.com.vercel.emerionloadservice.model.Receivable
 import br.com.vercel.emerionloadservice.model.Vendedor
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import org.slf4j.LoggerFactory
@@ -32,7 +38,10 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.customer-address}") private val customerAddressEndpoint: String,
     @Value("\${ingestion-service.endpoints.customer-credit}") private val customerCreditEndpoint: String,
     @Value("\${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String,
-    @Value("\${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String
+    @Value("\${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String,
+    @Value("\${ingestion-service.endpoints.invoice}") private val invoiceEndpoint: String,
+    @Value("\${ingestion-service.endpoints.invoice-item-link}") private val invoiceItemLinkEndpoint: String,
+    @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -144,5 +153,59 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Vendedor {} sent successfully to ingestion service", dto.externalId)
+    }
+
+    fun sendInvoices(invoices: List<Invoice>) {
+        if (invoices.isEmpty()) return
+
+        val url = "$baseUrl$invoiceEndpoint"
+        val dtos = invoices.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
+        val orderExternalId = dtos.first().run { "$codEmp-$dteres-$numres" }
+
+        logger.info("Sending {} invoice(s) of order {} to ingestion service at {}", dtos.size, orderExternalId, url)
+        sendToIngestion("invoice", orderExternalId) {
+            restClient.post()
+                .uri(url)
+                .body(dtos)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Invoice(s) of order {} sent successfully to ingestion service", orderExternalId)
+    }
+
+    fun sendInvoiceItemLinks(links: List<InvoiceItemLink>) {
+        if (links.isEmpty()) return
+
+        val url = "$baseUrl$invoiceItemLinkEndpoint"
+        val dtos = links.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
+        val orderItemExternalId = dtos.first().run { "$codEmp-$dteres-$numres-$seqRe2" }
+
+        logger.info("Sending {} invoice item link(s) of order item {} to ingestion service at {}", dtos.size, orderItemExternalId, url)
+        sendToIngestion("invoice item link", orderItemExternalId) {
+            restClient.post()
+                .uri(url)
+                .body(dtos)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Invoice item link(s) of order item {} sent successfully to ingestion service", orderItemExternalId)
+    }
+
+    fun sendReceivables(receivables: List<Receivable>) {
+        if (receivables.isEmpty()) return
+
+        val url = "$baseUrl$receivableEndpoint"
+        val dtos = receivables.toIngestionDto(companyProvider.getCompanyCnpj())
+        val customerExternalId = dtos.first().customerExternalId
+
+        logger.info("Sending {} receivable(s) of customer {} to ingestion service at {}", dtos.size, customerExternalId, url)
+        sendToIngestion("receivable", customerExternalId) {
+            restClient.post()
+                .uri(url)
+                .body(dtos)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Receivable(s) of customer {} sent successfully to ingestion service", customerExternalId)
     }
 }

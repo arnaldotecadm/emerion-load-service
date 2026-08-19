@@ -26,6 +26,8 @@ import java.sql.ResultSet
 @Repository
 class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
 
+    private data class OrderBusinessKey(val codEmp: Int, val dteres: java.time.LocalDate, val numres: String)
+
     fun findAllPaged(pageable: Pageable): Page<CustomerOrder> {
         val total = jdbcTemplate.queryForObject("select count(*) from pedres", Long::class.java) ?: 0L
         val headers = findHeadersPaged(pageable)
@@ -33,8 +35,13 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             return PageImpl(emptyList(), pageable, total)
         }
 
-        val itemsByNumres = findItems(headers.map { it.numres }).groupBy { it.numres }
-        val content = headers.map { header -> header.toModel(itemsByNumres[header.numres].orEmpty()) }
+        val headerKeys = headers.map { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }.toSet()
+        val itemsByOrderKey = findItems(headers.map { it.numres }, headerKeys)
+            .groupBy { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }
+        val content = headers.map { header ->
+            val orderKey = OrderBusinessKey(header.codEmp, header.dteres.toLocalDate(), header.numres)
+            header.toModel(itemsByOrderKey[orderKey].orEmpty())
+        }
 
         return PageImpl(content, pageable, total)
     }
@@ -42,6 +49,7 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     private fun findHeadersPaged(pageable: Pageable): List<CustomerOrderHeaderProjection> {
         val baseQuery = """
             select
+                p.codemp            as codEmp,
                 p.codcli            as codCli,
                 fc.cgccli           as cpfCnpj,
                 p.numres            as numres,
@@ -86,13 +94,14 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             left join finregtrib reg
                 on reg.numregtrib = p.regtrb
             left join estpfa pfa on pfa.codpfa = p.codpfa and pfa.tippfa = p.tippfa
-            order by p.numres
+            order by p.codemp, p.dteres, p.numres
         """.trimIndent()
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
         return jdbcTemplate.query(pagedQuery) { rs, _ ->
             CustomerOrderHeaderProjectionImpl(
+                codEmp = rs.getInt("codEmp"),
                 codCli = rs.getLong("codCli"),
                 cpfCnpj = rs.getString("cpfCnpj"),
                 numres = rs.getString("numres"),
@@ -131,13 +140,18 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         }
     }
 
-    private fun findItems(numresList: List<String>): List<CustomerOrderItemProjection> {
+    private fun findItems(
+        numresList: List<String>,
+        headerKeys: Set<OrderBusinessKey>
+    ): List<CustomerOrderItemProjection> {
         // Values come from a prior query result (never user input), so they are safe to
         // inline as a literal IN list; Firebird 1.5 native queries can't bind IN (:list).
         val idList = numresList.joinToString(",") { "'$it'" }
 
         val query = """
             select
+                re2.codemp as codEmp,
+                re2.dteres as dteres,
                 re2.numres as numres,
                 re2.codgru as codGru,
                 re2.codsub as codSub,
@@ -211,6 +225,8 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
 
         return jdbcTemplate.query(query) { rs, _ ->
             CustomerOrderItemProjectionImpl(
+                codEmp = rs.getInt("codEmp"),
+                dteres = rs.getTimestamp("dteres").toLocalDateTime(),
                 numres = rs.getString("numres"),
                 codGru = rs.getString("codGru"),
                 codSub = rs.getString("codSub"),
@@ -278,7 +294,7 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 descontoItemValor = rs.getBigDecimal("descontoItemValor")?.toDouble(),
                 descontoItemTotal = rs.getBigDecimal("descontoItemTotal")?.toDouble(),
             )
-        }
+        }.filter { headerKeys.contains(OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres)) }
     }
 
     // The bundled Jaybird driver (2.2.15) predates JDBC 4.1's getObject(column, Class),

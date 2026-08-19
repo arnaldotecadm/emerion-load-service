@@ -4,6 +4,8 @@ import java.time.LocalDate
 
 data class CustomerOrderIngestionDto(
     val externalId: String,
+    val codEmp: Int,
+    val numres: String,
     val customerExternalId: Long,
     val cnpjEmpresa: String,
     val cpfCnpj: String?,
