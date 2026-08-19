@@ -32,7 +32,8 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 pro.codcat          as categoria,
                 pro.codtip          as tipo,
                 pro.codmrc          as marca,
-                pro.codune          as unidade,
+                pro.codune          as unidadeEntrada,
+                pro.coduns          as unidadeSaida,
                 pro.pesliq          as pesoLiquido,
                 pro.pesbrt          as pesoBruto,
                 case pro.flbpro
@@ -47,16 +48,46 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 ite.vb4ite          as preco4,
                 ite.vb5ite          as preco5,
                 pro.idepro          as descontoPadrao,
-                ite.qtsite          as estoqueDisponivel,
-                ite.qtmite          as estoqueMinimo,
-                ite.qtrite          as estoqueReservado,
-                ite.qtaite          as estoqueAdquirido
+                Round(qte.QtdQte-((SELECT QTD_RESERVADA FROM RESERVAS(QTE.CODEMP,QTE.CODCLP,QTE.CODGRU,QTE.CODSUB,QTE.CODPRO))+qte.QtdRma),4) as estoqueDisponivel,
+                qte.qtmqte          as estoqueMinimo,
+                qte.qmaqte          as estoqueMaximo,
+                qte.qtrqte          as estoqueReservado,
+                qte.qtaqte          as estoqueAdquirido,
+                qte.qtdqte          as estoqueAtual,
+                qte.qtdrma          as estoqueRMA,
+                
+                pro.simpro,
+                pro.qtdvol,
+                pro.qtdemb,
+                pro.locpro,
+                pro.pescub,
+                pro.cbaemb,
+                pro.IBSCBS_C_CLASS_TRIB,
+                pro.COD_FCP_ENTRADA,
+                pro.COD_FCP_SAIDA,
+                pro.IBSCBS_CST,
+                pro.ipisai,
+                pro.ipient,
+                pro.icmsai,
+                pro.icment,
+                pro.codsts,
+                pro.codste,
+                pro.saiicm,
+                pro.enticm,
+                pro.codst2,
+                pro.obspro
+                
             from estpro pro
             left join estite ite on ite.codclp = pro.codclp
                 and ite.codgru = pro.codgru
                 and ite.codsub = pro.codsub
                 and ite.codpro = pro.codpro
                 and ite.codemp = (select first 1 codemp from geremp)
+            left join estqte qte on ite.codclp = pro.codclp
+                and qte.codgru = pro.codgru
+                and qte.codsub = pro.codsub
+                and qte.codpro = pro.codpro
+                and qte.codemp = (select first 1 codemp from geremp)            
             order by pro.codgru, pro.codsub, pro.codpro
         """.trimIndent()
 
@@ -76,7 +107,7 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 categoria = rs.getString("categoria"),
                 tipo = rs.getString("tipo"),
                 marca = rs.getString("marca"),
-                unidade = rs.getString("unidade"),
+                unidade = rs.getString("unidadeSaida"),
                 pesoLiquido = rs.getBigDecimal("pesoLiquido"),
                 pesoBruto = rs.getBigDecimal("pesoBruto"),
                 descontinuado = rs.getInt("descontinuado"),

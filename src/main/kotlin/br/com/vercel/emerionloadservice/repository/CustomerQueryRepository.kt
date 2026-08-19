@@ -47,7 +47,58 @@ class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 cli.uffcli          as uf,
                 cli.codmcr          as macroRegiao,
                 cli.codmrg          as microRegiao,
-                cli.codset          as setor
+                cli.codset          as setor,
+                
+                -- Endereco de Faturamento
+                cli.cefcli,
+                cli.tefcli,
+                cli.enfcli,
+                cli.nrfcli,
+                cli.rffcli,
+                cli.bafcli,
+                cli.cifcli,
+                cli.uffcli,
+                cli.pt1cli,
+                cli.fo1cli,
+                cli.pf1cli,
+                cli.fa1cli,
+                cli.cofcli,
+                cli.pc1cli,
+                cli.fc1cli,
+                
+                -- Endereco de Cobranca
+                cli.ceccli,
+                cli.teccli,
+                cli.enccli,
+                cli.nrccli,
+                cli.rfccli,
+                cli.baccli,
+                cli.ciccli,
+                cli.ufccli,
+                cli.pt2cli,
+                cli.fo2cli,
+                cli.pf2cli,
+                cli.fa2cli,
+                cli.coccli,
+                cli.pc2cli,
+                cli.fc2cli,
+                
+                -- Endereco de Entrega
+                cli.ceecli,
+                cli.teecli,
+                cli.enecli,
+                cli.nrecli,
+                cli.rfecli,
+                cli.baecli,
+                cli.ciecli,
+                cli.ufecli,
+                cli.pt4cli,
+                cli.fo4cli,
+                cli.pf4cli,
+                cli.fa4cli,
+                cli.coecli,
+                cli.pc4cli,
+                cli.fc4cli
             from fincli cli
             left join finregtrib reg on reg.numregtrib = cli.regtrb
             left join finven ven     on ven.codven = cli.codven
