@@ -45,12 +45,12 @@ object ProductMapper {
 
             estoqueAtual = this.estoqueAtual,
             estoqueRMA = this.estoqueRMA,
-            simpro = this.simpro,
+            similar = this.similar,
             quantidadeVolumes = this.quantidadeVolumes,
             quantidadeEmbalagem = this.quantidadeEmbalagem,
-            locpro = this.locpro,
-            pescub = this.pescub,
-            cbaemb = this.cbaemb,
+            localizacao = this.localizacao,
+            cubagem = this.cubagem,
+            codigoBarrasEmbalagem = this.codigoBarrasEmbalagem,
             ibsCClassTrib = this.ibsCClassTrib,
             ibsCst = this.ibsCst,
             fcpEntrada = this.fcpEntrada,
@@ -61,9 +61,6 @@ object ProductMapper {
             icmEntrada = this.icmEntrada,
             icmStSaida = this.icmStSaida,
             icmStEntrada = this.icmStEntrada,
-            saiicm = this.saiicm,
-            enticm = this.enticm,
-            codst2 = this.codst2,
             observacao = this.observacao,
         )
     }

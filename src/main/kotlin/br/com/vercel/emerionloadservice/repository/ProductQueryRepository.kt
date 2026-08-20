@@ -47,12 +47,12 @@ const val BASE_QUERY_ESTPRO = """
                 qte.qtdqte          as estoqueAtual,
                 qte.qtdrma          as estoqueRMA,
                 
-                pro.simpro,
+                pro.simpro          as similar,
                 pro.qtdvol          as quantidadeVolumes,
                 pro.qtdemb          as quantidadeEmbalagem,
-                pro.locpro,
-                pro.pescub,
-                pro.cbaemb,
+                pro.locpro          as localizacao,
+                pro.pescub          as cubagem,
+                pro.cbaemb          as codigoBarrasEmbalagem,
                 pro.IBSCBS_C_CLASS_TRIB as ibsCClassTrib,
                 pro.IBSCBS_CST          as ibsCst,
                 pro.COD_FCP_ENTRADA     as fcpEntrada,
@@ -63,9 +63,6 @@ const val BASE_QUERY_ESTPRO = """
                 pro.icment          as icmEntrada,
                 pro.codsts          as icmStSaida,
                 pro.codste          as icmStEntrada,
-                pro.saiicm,
-                pro.enticm,
-                pro.codst2,
                 pro.obspro          as observacao
                 
             from estpro pro
@@ -79,7 +76,6 @@ const val BASE_QUERY_ESTPRO = """
                 and qte.codsub = pro.codsub
                 and qte.codpro = pro.codpro
                 and qte.codemp = (select first 1 codemp from geremp)            
-            order by pro.codgru, pro.codsub, pro.codpro
         """
 
 /**
@@ -125,12 +121,12 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             estoqueAtual = rs.getBigDecimal("estoqueAtual"),
             estoqueRMA = rs.getBigDecimal("estoqueRMA"),
 
-            simpro = rs.getString("simpro"),
+            similar = rs.getString("similar"),
             quantidadeVolumes = rs.getBigDecimal("quantidadeVolumes"),
             quantidadeEmbalagem = rs.getBigDecimal("quantidadeEmbalagem"),
-            locpro = rs.getString("locpro"),
-            pescub = rs.getBigDecimal("pescub"),
-            cbaemb = rs.getString("cbaemb"),
+            localizacao = rs.getString("localizacao"),
+            cubagem = rs.getBigDecimal("cubagem"),
+            codigoBarrasEmbalagem = rs.getString("codigoBarrasEmbalagem"),
             ibsCClassTrib = rs.getString("ibsCClassTrib"),
             ibsCst = rs.getString("ibsCst"),
             fcpEntrada = rs.getString("fcpEntrada"),
@@ -141,14 +137,11 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             icmEntrada = rs.getString("icmEntrada"),
             icmStSaida = rs.getString("icmStSaida"),
             icmStEntrada = rs.getString("icmStEntrada"),
-            saiicm = rs.getString("saiicm"),
-            enticm = rs.getString("enticm"),
-            codst2 = rs.getString("codst2"),
             observacao = rs.getString("observacao"),
         )
 
     fun findAllPaged(pageable: Pageable): Page<ProductProjectionImpl> {
-        val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY_ESTPRO, pageable)
+        val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY_ESTPRO.plus(" order by pro.codgru, pro.codsub, pro.codpro"), pageable)
         val content: List<ProductProjectionImpl> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
         val total = jdbcTemplate.queryForObject("select count(*) from estpro", Long::class.java) ?: 0L
         return PageImpl(content, pageable, total)
