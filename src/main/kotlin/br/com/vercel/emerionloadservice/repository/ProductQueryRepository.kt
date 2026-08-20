@@ -1,6 +1,5 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.ProductProjection
 import br.com.vercel.emerionloadservice.repository.projection.ProductProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
@@ -8,17 +7,9 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 
-/**
- * Handles paginated product queries using JdbcTemplate directly, since Firebird 1.5
- * only supports pagination via literal `FIRST`/`SKIP` values (see FirebirdPagination),
- * which Spring Data JPA's Pageable-based native queries cannot generate.
- */
-@Repository
-class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
-    fun findAllPaged(pageable: Pageable): Page<ProductProjection> {
-        val baseQuery = """
+const val BASE_QUERY_ESTPRO = """
             select
                 pro.codgru          as codGru,
                 pro.codsub          as codSub,
@@ -57,25 +48,25 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 qte.qtdrma          as estoqueRMA,
                 
                 pro.simpro,
-                pro.qtdvol,
-                pro.qtdemb,
+                pro.qtdvol          as quantidadeVolumes,
+                pro.qtdemb          as quantidadeEmbalagem,
                 pro.locpro,
                 pro.pescub,
                 pro.cbaemb,
-                pro.IBSCBS_C_CLASS_TRIB,
-                pro.COD_FCP_ENTRADA,
-                pro.COD_FCP_SAIDA,
-                pro.IBSCBS_CST,
-                pro.ipisai,
-                pro.ipient,
-                pro.icmsai,
-                pro.icment,
-                pro.codsts,
-                pro.codste,
+                pro.IBSCBS_C_CLASS_TRIB as ibsCClassTrib,
+                pro.IBSCBS_CST          as ibsCst,
+                pro.COD_FCP_ENTRADA     as fcpEntrada,
+                pro.COD_FCP_SAIDA       as fcpSaida,
+                pro.ipisai          as ipiSaida,
+                pro.ipient          as ipiEntrada,
+                pro.icmsai          as icmSaida,
+                pro.icment          as icmEntrada,
+                pro.codsts          as icmStSaida,
+                pro.codste          as icmStEntrada,
                 pro.saiicm,
                 pro.enticm,
                 pro.codst2,
-                pro.obspro
+                pro.obspro          as observacao
                 
             from estpro pro
             left join estite ite on ite.codclp = pro.codclp
@@ -89,45 +80,94 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 and qte.codpro = pro.codpro
                 and qte.codemp = (select first 1 codemp from geremp)            
             order by pro.codgru, pro.codsub, pro.codpro
-        """.trimIndent()
+        """
 
-        val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
+/**
+ * Handles paginated product queries using JdbcTemplate directly, since Firebird 1.5
+ * only supports pagination via literal `FIRST`/`SKIP` values (see FirebirdPagination),
+ * which Spring Data JPA's Pageable-based native queries cannot generate.
+ */
+@Repository
+class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
 
-        val content: List<ProductProjection> = jdbcTemplate.query(pagedQuery) { rs, _ ->
-            ProductProjectionImpl(
-                codGru = rs.getString("codGru"),
-                codSub = rs.getString("codSub"),
-                codPro = rs.getString("codPro"),
-                nome = rs.getString("nome"),
-                descricaoReduzida = rs.getString("descricaoReduzida"),
-                referenciaInterna = rs.getString("referenciaInterna"),
-                ncm = rs.getString("ncm"),
-                cest = rs.getString("cest"),
-                origemProduto = rs.getString("origemProduto"),
-                categoria = rs.getString("categoria"),
-                tipo = rs.getString("tipo"),
-                marca = rs.getString("marca"),
-                unidade = rs.getString("unidadeSaida"),
-                pesoLiquido = rs.getBigDecimal("pesoLiquido"),
-                pesoBruto = rs.getBigDecimal("pesoBruto"),
-                descontinuado = rs.getInt("descontinuado"),
-                codigoBarras = rs.getString("codigoBarras"),
-                codigoBarrasProprio = rs.getString("codigoBarrasProprio"),
-                preco = rs.getBigDecimal("preco"),
-                preco2 = rs.getBigDecimal("preco2"),
-                preco3 = rs.getBigDecimal("preco3"),
-                preco4 = rs.getBigDecimal("preco4"),
-                preco5 = rs.getBigDecimal("preco5"),
-                descontoPadrao = rs.getBigDecimal("descontoPadrao"),
-                estoqueDisponivel = rs.getBigDecimal("estoqueDisponivel"),
-                estoqueMinimo = rs.getBigDecimal("estoqueMinimo"),
-                estoqueReservado = rs.getBigDecimal("estoqueReservado"),
-                estoqueAdquirido = rs.getBigDecimal("estoqueAdquirido"),
-            )
-        }
+    private fun resultSetToModel(rs: ResultSet) =
+        ProductProjectionImpl(
+            codGru = rs.getString("codGru"),
+            codSub = rs.getString("codSub"),
+            codPro = rs.getString("codPro"),
+            nome = rs.getString("nome"),
+            descricaoReduzida = rs.getString("descricaoReduzida"),
+            referenciaInterna = rs.getString("referenciaInterna"),
+            ncm = rs.getString("ncm"),
+            cest = rs.getString("cest"),
+            origemProduto = rs.getString("origemProduto"),
+            categoria = rs.getString("categoria"),
+            tipo = rs.getString("tipo"),
+            marca = rs.getString("marca"),
+            unidadeSaida = rs.getString("unidadeSaida"),
+            unidadeEntrada = rs.getString("unidadeEntrada"),
+            pesoLiquido = rs.getBigDecimal("pesoLiquido"),
+            pesoBruto = rs.getBigDecimal("pesoBruto"),
+            descontinuado = rs.getInt("descontinuado"),
+            codigoBarras = rs.getString("codigoBarras"),
+            codigoBarrasProprio = rs.getString("codigoBarrasProprio"),
+            preco = rs.getBigDecimal("preco"),
+            preco2 = rs.getBigDecimal("preco2"),
+            preco3 = rs.getBigDecimal("preco3"),
+            preco4 = rs.getBigDecimal("preco4"),
+            preco5 = rs.getBigDecimal("preco5"),
+            descontoPadrao = rs.getBigDecimal("descontoPadrao"),
+            estoqueDisponivel = rs.getBigDecimal("estoqueDisponivel"),
+            estoqueMinimo = rs.getBigDecimal("estoqueMinimo"),
+            estoqueMaximo = rs.getBigDecimal("estoqueMaximo"),
+            estoqueReservado = rs.getBigDecimal("estoqueReservado"),
+            estoqueAdquirido = rs.getBigDecimal("estoqueAdquirido"),
+            estoqueAtual = rs.getBigDecimal("estoqueAtual"),
+            estoqueRMA = rs.getBigDecimal("estoqueRMA"),
 
+            simpro = rs.getString("simpro"),
+            quantidadeVolumes = rs.getBigDecimal("quantidadeVolumes"),
+            quantidadeEmbalagem = rs.getBigDecimal("quantidadeEmbalagem"),
+            locpro = rs.getString("locpro"),
+            pescub = rs.getBigDecimal("pescub"),
+            cbaemb = rs.getString("cbaemb"),
+            ibsCClassTrib = rs.getString("ibsCClassTrib"),
+            ibsCst = rs.getString("ibsCst"),
+            fcpEntrada = rs.getString("fcpEntrada"),
+            fcpSaida = rs.getString("fcpSaida"),
+            ipiSaida = rs.getString("ipiSaida"),
+            ipiEntrada = rs.getString("ipiEntrada"),
+            icmSaida = rs.getString("icmSaida"),
+            icmEntrada = rs.getString("icmEntrada"),
+            icmStSaida = rs.getString("icmStSaida"),
+            icmStEntrada = rs.getString("icmStEntrada"),
+            saiicm = rs.getString("saiicm"),
+            enticm = rs.getString("enticm"),
+            codst2 = rs.getString("codst2"),
+            observacao = rs.getString("observacao"),
+        )
+
+    fun findAllPaged(pageable: Pageable): Page<ProductProjectionImpl> {
+        val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY_ESTPRO, pageable)
+        val content: List<ProductProjectionImpl> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
         val total = jdbcTemplate.queryForObject("select count(*) from estpro", Long::class.java) ?: 0L
-
         return PageImpl(content, pageable, total)
+    }
+
+    fun getProductByCodGruCodSubCodPro(codGru: String, codSub: String, codPro: String): ProductProjectionImpl? {
+        val query = """
+            $BASE_QUERY_ESTPRO
+            where pro.codgru = ?
+            and pro.codsub = ?
+            and pro.codpro = ?
+        """.trimIndent()
+        return jdbcTemplate.query(
+            query,
+            { ps ->
+                ps.setString(1, codGru)
+                ps.setString(2, codSub)
+                ps.setString(3, codPro)
+            }
+        ) { rs, _ -> resultSetToModel(rs) }.firstOrNull()
     }
 }

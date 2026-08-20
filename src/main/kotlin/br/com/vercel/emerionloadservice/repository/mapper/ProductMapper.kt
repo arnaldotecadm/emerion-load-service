@@ -1,16 +1,16 @@
 package br.com.vercel.emerionloadservice.repository.mapper
 
 import br.com.vercel.emerionloadservice.model.Product
-import br.com.vercel.emerionloadservice.repository.projection.ProductProjection
+import br.com.vercel.emerionloadservice.repository.projection.ProductProjectionImpl
 import org.springframework.data.domain.Page
 
 object ProductMapper {
 
-    fun Page<ProductProjection>.toModel(): Page<Product> {
+    fun Page<ProductProjectionImpl>.toModel(): Page<Product> {
         return this.map { it.toModel() }
     }
 
-    fun ProductProjection.toModel(): Product {
+    fun ProductProjectionImpl.toModel(): Product {
         return Product(
             codGru = this.codGru.trim(),
             codSub = this.codSub.trim(),
@@ -24,7 +24,8 @@ object ProductMapper {
             categoria = this.categoria?.trim(),
             tipo = this.tipo?.trim(),
             marca = this.marca?.trim(),
-            unidade = this.unidade?.trim(),
+            unidadeSaida = this.unidadeSaida?.trim(),
+            unidadeEntrada = this.unidadeEntrada?.trim(),
             pesoLiquido = this.pesoLiquido,
             pesoBruto = this.pesoBruto,
             descontinuado = this.descontinuado == 1,
@@ -38,8 +39,32 @@ object ProductMapper {
             descontoPadrao = this.descontoPadrao,
             estoqueDisponivel = this.estoqueDisponivel,
             estoqueMinimo = this.estoqueMinimo,
+            estoqueMaximo = this.estoqueMaximo,
             estoqueReservado = this.estoqueReservado,
             estoqueAdquirido = this.estoqueAdquirido,
+
+            estoqueAtual = this.estoqueAtual,
+            estoqueRMA = this.estoqueRMA,
+            simpro = this.simpro,
+            quantidadeVolumes = this.quantidadeVolumes,
+            quantidadeEmbalagem = this.quantidadeEmbalagem,
+            locpro = this.locpro,
+            pescub = this.pescub,
+            cbaemb = this.cbaemb,
+            ibsCClassTrib = this.ibsCClassTrib,
+            ibsCst = this.ibsCst,
+            fcpEntrada = this.fcpEntrada,
+            fcpSaida = this.fcpSaida,
+            ipiSaida = this.ipiSaida,
+            ipiEntrada = this.ipiEntrada,
+            icmSaida = this.icmSaida,
+            icmEntrada = this.icmEntrada,
+            icmStSaida = this.icmStSaida,
+            icmStEntrada = this.icmStEntrada,
+            saiicm = this.saiicm,
+            enticm = this.enticm,
+            codst2 = this.codst2,
+            observacao = this.observacao,
         )
     }
 }
