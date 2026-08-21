@@ -20,7 +20,7 @@ const val BASE_QUERY = """
                 case(cli.flbcli)
                     when '*' then 1
                     else 0
-                end                 as bloqueado,
+                end                 as bloqueado,   
                 cli.dtncli          as dataNascimento,
                 cli.dcacli          as dataCadastro,
                 cli.dteatu          as dataUltimaAtualizacao,
