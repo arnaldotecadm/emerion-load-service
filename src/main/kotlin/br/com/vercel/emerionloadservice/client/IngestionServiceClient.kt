@@ -5,6 +5,7 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMap
 import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceItemLinkIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
@@ -15,6 +16,7 @@ import br.com.vercel.emerionloadservice.model.CustomerAddress
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.Icms
+import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Invoice
 import br.com.vercel.emerionloadservice.model.InvoiceItemLink
 import br.com.vercel.emerionloadservice.model.Product
@@ -44,7 +46,8 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.invoice}") private val invoiceEndpoint: String,
     @Value("\${ingestion-service.endpoints.invoice-item-link}") private val invoiceItemLinkEndpoint: String,
     @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
-    @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String
+    @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
+    @Value("\${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -225,5 +228,21 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Icms {} sent successfully to ingestion service", dto.codigoIcms)
+    }
+
+    fun sendIpi(ipi: Ipi) {
+        val url = "$baseUrl$ipiEndpoint"
+        val dto = ipi.toIngestionDto(companyProvider.getCompanyCnpj())
+        val key = "${dto.codigoIpi}/${dto.tipoIpi}"
+
+        logger.info("Sending ipi {} to ingestion service at {}", key, url)
+        sendToIngestion("ipi", key) {
+            restClient.post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Ipi {} sent successfully to ingestion service", key)
     }
 }
