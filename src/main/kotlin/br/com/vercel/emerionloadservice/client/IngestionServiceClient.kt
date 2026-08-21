@@ -4,6 +4,7 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerAddressIngestionMa
 import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.FinCreIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
@@ -15,6 +16,7 @@ import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.model.CustomerAddress
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
+import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Invoice
@@ -47,7 +49,8 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.invoice-item-link}") private val invoiceItemLinkEndpoint: String,
     @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
     @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
-    @Value("\${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String
+    @Value("\${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
+    @Value("\${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -244,5 +247,21 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Ipi {} sent successfully to ingestion service", key)
+    }
+
+    fun sendFinCre(finCre: FinCre) {
+        val url = "$baseUrl$finCreEndpoint"
+        val dto = finCre.toIngestionDto(companyProvider.getCompanyCnpj())
+        val key = "${dto.codigoEmpresa}/${dto.dataEmissao}/${dto.documento}"
+
+        logger.info("Sending fincre {} ({} parcela(s)) to ingestion service at {}", key, dto.parcelas.size, url)
+        sendToIngestion("fincre", key) {
+            restClient.post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("FinCre {} sent successfully to ingestion service", key)
     }
 }
