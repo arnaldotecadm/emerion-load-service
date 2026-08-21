@@ -7,10 +7,8 @@ import br.com.vercel.emerionloadservice.service.IcmsService
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("icms")
@@ -30,5 +28,11 @@ class IcmsController(
         @PathVariable tipicm: String
     ): IcmsIngestionDto {
         return icmsService.getIcmsByKey(codicm, tipicm).toIngestionDto(companyProvider.getCompanyCnpj())
+    }
+
+    @PostMapping("{codicm}/{tipicm}/send")
+    fun sendIcmsToIngestion(@PathVariable codicm: String, @PathVariable tipicm: String): ResponseEntity<Void> {
+        this.icmsService.sendIcmsToIngestion(codicm, tipicm)
+        return ResponseEntity.ok().build()
     }
 }

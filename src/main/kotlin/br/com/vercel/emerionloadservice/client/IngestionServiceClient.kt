@@ -4,6 +4,7 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerAddressIngestionMa
 import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceItemLinkIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
@@ -13,6 +14,7 @@ import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.model.CustomerAddress
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
+import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.model.Invoice
 import br.com.vercel.emerionloadservice.model.InvoiceItemLink
 import br.com.vercel.emerionloadservice.model.Product
@@ -41,7 +43,8 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String,
     @Value("\${ingestion-service.endpoints.invoice}") private val invoiceEndpoint: String,
     @Value("\${ingestion-service.endpoints.invoice-item-link}") private val invoiceItemLinkEndpoint: String,
-    @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String
+    @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
+    @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -207,5 +210,20 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Receivable(s) of customer {} sent successfully to ingestion service", customerExternalId)
+    }
+
+    fun sendIcms(icms: Icms) {
+        val url = "$baseUrl$icmsEndpoint"
+        val dto = icms.toIngestionDto(companyProvider.getCompanyCnpj())
+
+        logger.info("Sending icms {} to ingestion service at {}", dto.codigoIcms, url)
+        sendToIngestion("icms", dto.codigoIcms) {
+            restClient.post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Icms {} sent successfully to ingestion service", dto.codigoIcms)
     }
 }
