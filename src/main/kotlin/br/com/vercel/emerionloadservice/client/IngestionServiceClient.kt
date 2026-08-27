@@ -9,6 +9,7 @@ import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toInge
 import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceItemLinkIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.PedlibIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ReceivableIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.toIngestionDto
@@ -21,6 +22,7 @@ import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Invoice
 import br.com.vercel.emerionloadservice.model.InvoiceItemLink
+import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.model.Product
 import br.com.vercel.emerionloadservice.model.Receivable
 import br.com.vercel.emerionloadservice.model.Vendedor
@@ -50,7 +52,8 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
     @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
     @Value("\${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
-    @Value("\${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String
+    @Value("\${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String,
+    @Value("\${ingestion-service.endpoints.pedlib}") private val pedlibEndpoint: String
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -263,5 +266,21 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("FinCre {} sent successfully to ingestion service", key)
+    }
+
+    fun sendPedlib(pedlib: Pedlib) {
+        val url = "$baseUrl$pedlibEndpoint"
+        val dto = pedlib.toIngestionDto(companyProvider.getCompanyCnpj())
+        val key = "${dto.codigoEmpresa}/${dto.dataPedido}/${dto.numeroPedido}/${dto.numeroLiberacao}"
+
+        logger.info("Sending pedlib {} ({} detail(s)) to ingestion service at {}", key, dto.detalhes.size, url)
+        sendToIngestion("pedlib", key) {
+            restClient.post()
+                .uri(url)
+                .body(dto)
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Pedlib {} sent successfully to ingestion service", key)
     }
 }
