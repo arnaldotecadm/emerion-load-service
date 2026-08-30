@@ -6,21 +6,17 @@ import br.com.vercel.emerionloadservice.repository.projection.CustomerAddressHea
 import br.com.vercel.emerionloadservice.repository.projection.CustomerAddressRowProjection
 
 object CustomerAddressMapper {
-
-    fun CustomerAddressHeaderProjection.toModel(rows: List<CustomerAddressRowProjection>): CustomerAddress {
-        return CustomerAddress(
+    fun CustomerAddressHeaderProjection.toModel(rows: List<CustomerAddressRowProjection>): CustomerAddress =
+        CustomerAddress(
             codCli = this.codCli,
             cpfCnpj = this.cpfCnpj,
-            enderecos = rows.toModel()
+            enderecos = rows.toModel(),
         )
-    }
 
-    fun List<CustomerAddressRowProjection>.toModel(): List<CustomerAddressDetail> {
-        return this.map { it.toModel() }
-    }
+    fun List<CustomerAddressRowProjection>.toModel(): List<CustomerAddressDetail> = this.map { it.toModel() }
 
-    fun CustomerAddressRowProjection.toModel(): CustomerAddressDetail {
-        return CustomerAddressDetail(
+    fun CustomerAddressRowProjection.toModel(): CustomerAddressDetail =
+        CustomerAddressDetail(
             tipo = this.tipo,
             cep = this.cep,
             endereco = this.endereco,
@@ -32,7 +28,6 @@ object CustomerAddressMapper {
             telefone = this.telefone,
             telefoneContato = this.telefoneContato,
             complemento = this.complemento,
-            fax = this.fax
+            fax = this.fax,
         )
-    }
 }

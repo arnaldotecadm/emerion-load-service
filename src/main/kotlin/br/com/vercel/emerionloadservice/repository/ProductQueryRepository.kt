@@ -84,8 +84,9 @@ const val BASE_QUERY_ESTPRO = """
  * which Spring Data JPA's Pageable-based native queries cannot generate.
  */
 @Repository
-class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class ProductQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     private fun resultSetToModel(rs: ResultSet) =
         ProductProjectionImpl(
             codGru = rs.getString("codGru"),
@@ -120,7 +121,6 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             estoqueAdquirido = rs.getBigDecimal("estoqueAdquirido"),
             estoqueAtual = rs.getBigDecimal("estoqueAtual"),
             estoqueRMA = rs.getBigDecimal("estoqueRMA"),
-
             similar = rs.getString("similar"),
             quantidadeVolumes = rs.getBigDecimal("quantidadeVolumes"),
             quantidadeEmbalagem = rs.getBigDecimal("quantidadeEmbalagem"),
@@ -147,20 +147,27 @@ class ProductQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         return PageImpl(content, pageable, total)
     }
 
-    fun getProductByCodGruCodSubCodPro(codGru: String, codSub: String, codPro: String): ProductProjectionImpl? {
-        val query = """
+    fun getProductByCodGruCodSubCodPro(
+        codGru: String,
+        codSub: String,
+        codPro: String,
+    ): ProductProjectionImpl? {
+        val query =
+            """
             $BASE_QUERY_ESTPRO
             where pro.codgru = ?
             and pro.codsub = ?
             and pro.codpro = ?
-        """.trimIndent()
-        return jdbcTemplate.query(
-            query,
-            { ps ->
-                ps.setString(1, codGru)
-                ps.setString(2, codSub)
-                ps.setString(3, codPro)
-            }
-        ) { rs, _ -> resultSetToModel(rs) }.firstOrNull()
+            """.trimIndent()
+        return jdbcTemplate
+            .query(
+                query,
+                { ps ->
+                    ps.setString(1, codGru)
+                    ps.setString(2, codSub)
+                    ps.setString(3, codPro)
+                },
+            ) { rs, _ -> resultSetToModel(rs) }
+            .firstOrNull()
     }
 }

@@ -17,5 +17,5 @@ data class FinCre(
     val nomeVendedor: String?,
     val codigoTipoDocumento: String?,
     val nomeTipoDocumento: String?,
-    val parcelas: List<FinCrp>
+    val parcelas: List<FinCrp>,
 )

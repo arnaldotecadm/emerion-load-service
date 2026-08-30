@@ -16,5 +16,5 @@ data class FinCreProjectionImpl(
     val codigoVendedor: Long?,
     val nomeVendedor: String?,
     val codigoTipoDocumento: String?,
-    val nomeTipoDocumento: String?
+    val nomeTipoDocumento: String?,
 )

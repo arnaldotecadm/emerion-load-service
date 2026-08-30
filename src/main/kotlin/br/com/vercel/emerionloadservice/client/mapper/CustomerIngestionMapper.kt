@@ -4,11 +4,10 @@ import br.com.vercel.emerionloadservice.client.dto.CustomerIngestionDto
 import br.com.vercel.emerionloadservice.model.Customer
 
 object CustomerIngestionMapper {
-
     // The receiving service generates its own internal id, so the local id
     // is sent as externalId to allow it to be traced back to the source record.
-    fun Customer.toIngestionDto(cnpjEmpresa: String): CustomerIngestionDto {
-        return CustomerIngestionDto(
+    fun Customer.toIngestionDto(cnpjEmpresa: String): CustomerIngestionDto =
+        CustomerIngestionDto(
             externalId = this.id,
             cnpjEmpresa = cnpjEmpresa,
             nomeFantasia = this.nomeFantasia,
@@ -35,7 +34,6 @@ object CustomerIngestionMapper {
             macroRegiao = this.macroRegiao,
             microRegiao = this.microRegiao,
             setor = this.setor,
-
             faturamentoCep = this.faturamentoCep,
             faturamentoTipoEndereco = this.faturamentoTipoEndereco,
             faturamentoEndereco = this.faturamentoEndereco,
@@ -51,7 +49,6 @@ object CustomerIngestionMapper {
             faturamentoContato = this.faturamentoContato,
             faturamentoDDDCelular = this.faturamentoDDDCelular,
             faturamentoCelular = this.faturamentoCelular,
-
             cobrancaCep = this.cobrancaCep,
             cobrancaTipoEndereco = this.cobrancaTipoEndereco,
             cobrancaEndereco = this.cobrancaEndereco,
@@ -67,7 +64,6 @@ object CustomerIngestionMapper {
             cobrancaContato = this.cobrancaContato,
             cobrancaDDDCelular = this.cobrancaDDDCelular,
             cobrancaCelular = this.cobrancaCelular,
-
             entregaCep = this.entregaCep,
             entregaTipoEndereco = this.entregaTipoEndereco,
             entregaEndereco = this.entregaEndereco,
@@ -84,5 +80,4 @@ object CustomerIngestionMapper {
             entregaDDDCelular = this.entregaDDDCelular,
             entregaCelular = this.entregaCelular,
         )
-    }
 }

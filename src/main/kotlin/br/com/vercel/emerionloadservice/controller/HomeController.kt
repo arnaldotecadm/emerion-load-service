@@ -5,9 +5,6 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController()
 class HomeController {
-
     @GetMapping("ping")
-    fun ping(): String {
-        return "ping"
-    }
+    fun ping(): String = "ping"
 }

@@ -13,4 +13,3 @@ interface ReceivableProjection {
     val saldoAberto: Double
     val situacao: String?
 }
-

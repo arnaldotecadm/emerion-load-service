@@ -10,5 +10,5 @@ data class IcmsIngestionDto(
     val aliquotaIcms: Double?,
     val percentualReducaoValorImposto: Double?,
     val percentualBaseCalculoIcms: Double?,
-    val situacaoTributariaIcms: String?
+    val situacaoTributariaIcms: String?,
 )

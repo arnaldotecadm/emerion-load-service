@@ -12,19 +12,25 @@ import java.time.LocalDate
 @Service
 class InvoiceService(
     private val invoiceQueryRepository: InvoiceQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllInvoices(pageable: Pageable): Page<Invoice> {
-        return invoiceQueryRepository.findAllPaged(pageable).toModel()
-    }
+    fun getAllInvoices(pageable: Pageable): Page<Invoice> = invoiceQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getInvoicesByOrder(codEmp: Int, dteres: LocalDate, numres: String): List<Invoice> {
-        return invoiceQueryRepository.findByOrder(codEmp, dteres, numres).map { it.toModel() }
-    }
+    fun getInvoicesByOrder(
+        codEmp: Int,
+        dteres: LocalDate,
+        numres: String,
+    ): List<Invoice> =
+        invoiceQueryRepository.findByOrder(codEmp, dteres, numres).map {
+            it.toModel()
+        }
 
-    fun sendInvoicesToIngestion(codEmp: Int, dteres: LocalDate, numres: String) {
+    fun sendInvoicesToIngestion(
+        codEmp: Int,
+        dteres: LocalDate,
+        numres: String,
+    ) {
         val invoices = getInvoicesByOrder(codEmp, dteres, numres)
         ingestionServiceClient.sendInvoices(invoices)
     }
 }
-

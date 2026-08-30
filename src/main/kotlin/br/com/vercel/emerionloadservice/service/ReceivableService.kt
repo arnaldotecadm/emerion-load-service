@@ -11,19 +11,14 @@ import org.springframework.stereotype.Service
 @Service
 class ReceivableService(
     private val receivableQueryRepository: ReceivableQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllReceivables(pageable: Pageable): Page<Receivable> {
-        return receivableQueryRepository.findAllPaged(pageable).toModel()
-    }
+    fun getAllReceivables(pageable: Pageable): Page<Receivable> = receivableQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getReceivablesByCodCli(codCli: Long): List<Receivable> {
-        return receivableQueryRepository.findByCodCli(codCli).map { it.toModel() }
-    }
+    fun getReceivablesByCodCli(codCli: Long): List<Receivable> = receivableQueryRepository.findByCodCli(codCli).map { it.toModel() }
 
     fun sendReceivablesToIngestion(codCli: Long) {
         val receivables = getReceivablesByCodCli(codCli)
         ingestionServiceClient.sendReceivables(receivables)
     }
 }
-

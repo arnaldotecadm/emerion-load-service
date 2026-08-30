@@ -5,26 +5,20 @@ import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.repository.FinCreQueryRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import org.springframework.format.annotation.DateTimeFormat
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
 
 @Service
 class FinCreService(
     private val finCreQueryRepository: FinCreQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
+    fun getAllFinCre(pageable: Pageable): Page<FinCre> = finCreQueryRepository.findAllPaged(pageable)
 
-    fun getAllFinCre(pageable: Pageable): Page<FinCre> {
-        return finCreQueryRepository.findAllPaged(pageable)
-    }
-
-    fun getFinCreByKey(documento: String): FinCre {
-        return finCreQueryRepository.findByKey(documento)
+    fun getFinCreByKey(documento: String): FinCre =
+        finCreQueryRepository.findByKey(documento)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
 
     fun sendFinCreToIngestion(documento: String) {
         val finCre = getFinCreByKey(documento)

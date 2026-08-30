@@ -28,5 +28,5 @@ data class CustomerOrderIngestionDto(
     val regimeTributario: String?,
     val nomeRegimeTributario: String?,
     val codigoPadraoFaturamento: String?,
-    val itens: List<CustomerOrderItemIngestionDto>
+    val itens: List<CustomerOrderItemIngestionDto>,
 )

@@ -16,5 +16,5 @@ data class PedlibProjectionImpl(
     val situacaoLiberacao: String?,
     val codigoVendedor: Long?,
     val comissaoLiberacao: Double?,
-    val totalCusto: Double?
+    val totalCusto: Double?,
 )

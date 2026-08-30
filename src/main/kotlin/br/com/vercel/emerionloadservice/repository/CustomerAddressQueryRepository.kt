@@ -24,8 +24,9 @@ import org.springframework.stereotype.Repository
  * grouped back onto each customer.
  */
 @Repository
-class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class CustomerAddressQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     fun findAllPaged(pageable: Pageable): Page<CustomerAddress> {
         val total = jdbcTemplate.queryForObject("select count(*) from fincli", Long::class.java) ?: 0L
         val headers = findHeadersPaged(pageable)
@@ -40,20 +41,21 @@ class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     private fun findHeadersPaged(pageable: Pageable): List<CustomerAddressHeaderProjection> {
-        val baseQuery = """
+        val baseQuery =
+            """
             select
                 codcli as codCli,
                 cgccli as cpfCnpj
             from fincli
             order by codcli
-        """.trimIndent()
+            """.trimIndent()
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
         return jdbcTemplate.query(pagedQuery) { rs, _ ->
             CustomerAddressHeaderProjectionImpl(
                 codCli = rs.getLong("codCli"),
-                cpfCnpj = rs.getString("cpfCnpj")
+                cpfCnpj = rs.getString("cpfCnpj"),
             )
         }
     }
@@ -66,7 +68,8 @@ class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         // Firebird 1.5 does not support UNION inside a derived table (subquery in FROM), so
         // the codCli filter is repeated in every branch and ORDER BY references column
         // position (1 = codCli, 2 = tipo) applied to the union as a whole.
-        val query = """
+        val query =
+            """
             select
                 codcli as codCli, cast('FATURAMENTO' as varchar(20)) as tipo,
                 cefcli as cep, tefcli as telefone, enfcli as endereco, nrfcli as numero,
@@ -103,7 +106,7 @@ class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             from fincli
             where codcli in ($idList)
             order by 1, 2
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(query) { rs, _ ->
             CustomerAddressRowProjectionImpl(
@@ -119,7 +122,7 @@ class CustomerAddressQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 telefone = rs.getString("telefone"),
                 telefoneContato = rs.getString("telefoneContato"),
                 complemento = rs.getString("complemento"),
-                fax = rs.getString("fax")
+                fax = rs.getString("fax"),
             )
         }
     }

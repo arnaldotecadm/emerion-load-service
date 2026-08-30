@@ -8,16 +8,17 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class RestClientConfig(
-    @Value("\${ingestion-service.api-key}") private val ingestionApiKey: String
+    @Value("\${ingestion-service.api-key}") private val ingestionApiKey: String,
 ) {
-
     @Bean
     fun ingestionRestClient(): RestClient {
-        val requestFactory = SimpleClientHttpRequestFactory().apply {
-            setConnectTimeout(5000)
-            setReadTimeout(10000)
-        }
-        return RestClient.builder()
+        val requestFactory =
+            SimpleClientHttpRequestFactory().apply {
+                setConnectTimeout(5000)
+                setReadTimeout(10000)
+            }
+        return RestClient
+            .builder()
             .requestFactory(requestFactory)
             .defaultHeader("X-API-Key", ingestionApiKey)
             .build()

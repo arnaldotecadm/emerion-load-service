@@ -20,34 +20,35 @@ import java.time.LocalDate
 @RequestMapping("invoice-item-link")
 class InvoiceItemLinkController(
     private val invoiceItemLinkService: InvoiceItemLinkService,
-    private val companyProvider: CompanyProvider
+    private val companyProvider: CompanyProvider,
 ) {
-
     @GetMapping("all")
-    fun getAllInvoiceItemLinks(@PageableDefault(size = 40) pageable: Pageable): Page<InvoiceItemLinkIngestionDto> {
-        return invoiceItemLinkService.getAllInvoiceItemLinks(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-    }
+    fun getAllInvoiceItemLinks(
+        @PageableDefault(size = 40) pageable: Pageable,
+    ): Page<InvoiceItemLinkIngestionDto> =
+        invoiceItemLinkService.getAllInvoiceItemLinks(pageable).map {
+            it.toIngestionDto(companyProvider.getCompanyCnpj())
+        }
 
     @GetMapping("{codEmp}/{dteres}/{numres}/{seqRe2}")
     fun getInvoiceItemLinksByOrderItem(
         @PathVariable codEmp: Int,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dteres: LocalDate,
         @PathVariable numres: String,
-        @PathVariable seqRe2: Int
-    ): List<InvoiceItemLinkIngestionDto> {
-        return invoiceItemLinkService.getInvoiceItemLinksByOrderItem(codEmp, dteres, numres, seqRe2)
+        @PathVariable seqRe2: Int,
+    ): List<InvoiceItemLinkIngestionDto> =
+        invoiceItemLinkService
+            .getInvoiceItemLinksByOrderItem(codEmp, dteres, numres, seqRe2)
             .map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-    }
 
     @PostMapping("{codEmp}/{dteres}/{numres}/{seqRe2}/send")
     fun sendInvoiceItemLinksToIngestion(
         @PathVariable codEmp: Int,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dteres: LocalDate,
         @PathVariable numres: String,
-        @PathVariable seqRe2: Int
+        @PathVariable seqRe2: Int,
     ): ResponseEntity<Void> {
         invoiceItemLinkService.sendInvoiceItemLinksToIngestion(codEmp, dteres, numres, seqRe2)
         return ResponseEntity.ok().build()
     }
 }
-

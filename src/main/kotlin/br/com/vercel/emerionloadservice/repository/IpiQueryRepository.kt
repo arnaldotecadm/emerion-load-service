@@ -43,22 +43,27 @@ private const val BASE_QUERY_IPI = """
  * Records are identified by the composite key (codipi, tipipi).
  */
 @Repository
-class IpiQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class IpiQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     fun findAllPaged(pageable: Pageable): Page<IpiProjectionImpl> {
         val total = jdbcTemplate.queryForObject("select count(*) from estipi", Long::class.java) ?: 0L
 
-        val pagedQuery = FirebirdPagination.applyFirstSkip(
-            "$BASE_QUERY_IPI order by ipi.codipi, ipi.tipipi",
-            pageable
-        )
+        val pagedQuery =
+            FirebirdPagination.applyFirstSkip(
+                "$BASE_QUERY_IPI order by ipi.codipi, ipi.tipipi",
+                pageable,
+            )
 
         val content = jdbcTemplate.query(pagedQuery) { rs, _ -> mapRow(rs) }
 
         return PageImpl(content, pageable, total)
     }
 
-    fun findByKey(codipi: String, tipipi: String): IpiProjectionImpl? {
+    fun findByKey(
+        codipi: String,
+        tipipi: String,
+    ): IpiProjectionImpl? {
         // Values come from path variables (caller-controlled strings), so we use
         // a PreparedStatement via JdbcTemplate to avoid SQL injection.
         val query = "$BASE_QUERY_IPI where ipi.codipi = ? and ipi.tipipi = ?"
@@ -66,26 +71,27 @@ class IpiQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         return jdbcTemplate.query(query, { rs, _ -> mapRow(rs) }, codipi, tipipi).firstOrNull()
     }
 
-    private fun mapRow(rs: java.sql.ResultSet) = IpiProjectionImpl(
-        flgAtivo = rs.getString("flgAtivo"),
-        codigoIpi = rs.getString("codigoIpi"),
-        tipoIpi = rs.getString("tipoIpi"),
-        nomeIpi = rs.getString("nomeIpi"),
-        ncmIpi = rs.getString("ncmIPI"),
-        codigoEnquadramentoLegal = rs.getString("codigoEnquadramentoLegal"),
-        cstIpi = rs.getString("cstIpi"),
-        descricaoSituacaoTributariaIpi = rs.getString("descricaoSituacaoTributariaIpi"),
-        aliquotaIpi = rs.getBigDecimal("aliquotaIpi")?.toDouble(),
-        percentualBaseCalculoIpi = rs.getBigDecimal("percentualBaseCalculoIpi")?.toDouble(),
-        flgSineif20 = rs.getString("flgSineif20"),
-        codigoTextoFiscal = rs.getString("codigoTextoFiscal"),
-        cstPis = rs.getString("cstPis"),
-        descricaoSituacaoTributariaPis = rs.getString("descricaoSituacaoTributariaPis"),
-        aliquotaPis = rs.getBigDecimal("aliquotaPis")?.toDouble(),
-        incluiDescontoSuframaPis = rs.getString("incluiDescontoSuframaPis"),
-        cstCofins = rs.getString("cstCofins"),
-        descricaoSituacaoTributariaCofins = rs.getString("descricaoSituacaoTributariaCofins"),
-        aliquotaCofins = rs.getBigDecimal("aliquotaCofins")?.toDouble(),
-        incluiDescontoSuframaCofins = rs.getString("incluiDescontoSuframaCofins")
-    )
+    private fun mapRow(rs: java.sql.ResultSet) =
+        IpiProjectionImpl(
+            flgAtivo = rs.getString("flgAtivo"),
+            codigoIpi = rs.getString("codigoIpi"),
+            tipoIpi = rs.getString("tipoIpi"),
+            nomeIpi = rs.getString("nomeIpi"),
+            ncmIpi = rs.getString("ncmIPI"),
+            codigoEnquadramentoLegal = rs.getString("codigoEnquadramentoLegal"),
+            cstIpi = rs.getString("cstIpi"),
+            descricaoSituacaoTributariaIpi = rs.getString("descricaoSituacaoTributariaIpi"),
+            aliquotaIpi = rs.getBigDecimal("aliquotaIpi")?.toDouble(),
+            percentualBaseCalculoIpi = rs.getBigDecimal("percentualBaseCalculoIpi")?.toDouble(),
+            flgSineif20 = rs.getString("flgSineif20"),
+            codigoTextoFiscal = rs.getString("codigoTextoFiscal"),
+            cstPis = rs.getString("cstPis"),
+            descricaoSituacaoTributariaPis = rs.getString("descricaoSituacaoTributariaPis"),
+            aliquotaPis = rs.getBigDecimal("aliquotaPis")?.toDouble(),
+            incluiDescontoSuframaPis = rs.getString("incluiDescontoSuframaPis"),
+            cstCofins = rs.getString("cstCofins"),
+            descricaoSituacaoTributariaCofins = rs.getString("descricaoSituacaoTributariaCofins"),
+            aliquotaCofins = rs.getBigDecimal("aliquotaCofins")?.toDouble(),
+            incluiDescontoSuframaCofins = rs.getString("incluiDescontoSuframaCofins"),
+        )
 }

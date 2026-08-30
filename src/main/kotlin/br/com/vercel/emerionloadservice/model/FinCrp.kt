@@ -15,5 +15,5 @@ data class FinCrp(
     val observacoes: String?,
     val flagCartaAnuencia: String?,
     val dataCartaAnuencia: LocalDate?,
-    val flagPago: String?
+    val flagPago: String?,
 )

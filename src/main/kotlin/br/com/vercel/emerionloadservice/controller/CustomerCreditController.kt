@@ -18,23 +18,27 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("customer-credit")
 class CustomerCreditController(
     private val customerCreditService: CustomerCreditService,
-    private val companyProvider: CompanyProvider
+    private val companyProvider: CompanyProvider,
 ) {
-
     @GetMapping("all")
-    fun getAllCredits(@PageableDefault(size = 40) pageable: Pageable): Page<CustomerCreditIngestionDto> {
-        return this.customerCreditService.getAllCredits(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-    }
+    fun getAllCredits(
+        @PageableDefault(size = 40) pageable: Pageable,
+    ): Page<CustomerCreditIngestionDto> =
+        this.customerCreditService.getAllCredits(pageable).map {
+            it.toIngestionDto(companyProvider.getCompanyCnpj())
+        }
 
     @GetMapping("{codCli}")
-    fun getCreditsByCodCli(@PathVariable codCli: Long): List<CustomerCreditIngestionDto> {
-        return this.customerCreditService.getCreditsByCodCli(codCli).toIngestionDto(companyProvider.getCompanyCnpj())
-    }
+    fun getCreditsByCodCli(
+        @PathVariable codCli: Long,
+    ): List<CustomerCreditIngestionDto> =
+        this.customerCreditService.getCreditsByCodCli(codCli).toIngestionDto(companyProvider.getCompanyCnpj())
 
     @PostMapping("{codCli}/send")
-    fun sendCreditsToIngestion(@PathVariable codCli: Long): ResponseEntity<Void> {
+    fun sendCreditsToIngestion(
+        @PathVariable codCli: Long,
+    ): ResponseEntity<Void> {
         this.customerCreditService.sendCreditsToIngestion(codCli)
         return ResponseEntity.ok().build()
     }
 }
-

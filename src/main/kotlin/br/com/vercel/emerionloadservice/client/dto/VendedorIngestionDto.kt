@@ -17,5 +17,5 @@ data class VendedorIngestionDto(
     val situacao: String?,
     val saldo: BigDecimal?,
     val dataCadastro: LocalDate?,
-    val metaRepresentacao: BigDecimal?
+    val metaRepresentacao: BigDecimal?,
 )

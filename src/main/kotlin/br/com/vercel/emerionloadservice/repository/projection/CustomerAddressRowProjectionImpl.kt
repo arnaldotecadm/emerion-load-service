@@ -13,5 +13,5 @@ data class CustomerAddressRowProjectionImpl(
     override val telefone: String?,
     override val telefoneContato: String?,
     override val complemento: String?,
-    override val fax: String?
+    override val fax: String?,
 ) : CustomerAddressRowProjection

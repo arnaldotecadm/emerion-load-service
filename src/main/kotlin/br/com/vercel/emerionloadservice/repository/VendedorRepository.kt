@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface VendedorRepository : PagingAndSortingRepository<DummyEntity, Long> {
-
     @Query(
         nativeQuery = true,
         value = """
@@ -28,7 +27,7 @@ interface VendedorRepository : PagingAndSortingRepository<DummyEntity, Long> {
                 ven.metrep as metaRepresentacao
             from finven ven
             where ven.codven = :codVen
-        """
+        """,
     )
     fun getVendedorByCodVen(codVen: Long): VendedorProjection?
 }

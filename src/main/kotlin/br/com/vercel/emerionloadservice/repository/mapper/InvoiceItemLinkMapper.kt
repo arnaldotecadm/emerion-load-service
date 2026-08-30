@@ -5,13 +5,10 @@ import br.com.vercel.emerionloadservice.repository.projection.InvoiceItemLinkPro
 import org.springframework.data.domain.Page
 
 object InvoiceItemLinkMapper {
+    fun Page<InvoiceItemLinkProjection>.toModel(): Page<InvoiceItemLink> = this.map { it.toModel() }
 
-    fun Page<InvoiceItemLinkProjection>.toModel(): Page<InvoiceItemLink> {
-        return this.map { it.toModel() }
-    }
-
-    fun InvoiceItemLinkProjection.toModel(): InvoiceItemLink {
-        return InvoiceItemLink(
+    fun InvoiceItemLinkProjection.toModel(): InvoiceItemLink =
+        InvoiceItemLink(
             codEmp = this.codEmp,
             numres = this.numres,
             dteres = this.dteres.toLocalDate(),
@@ -22,8 +19,6 @@ object InvoiceItemLinkMapper {
             codPro = this.codPro?.trim(),
             nronfs = this.nronfs?.trim(),
             dataFaturamento = this.dataFaturamento?.toLocalDate(),
-            totalFaturado = this.totalFaturado
+            totalFaturado = this.totalFaturado,
         )
-    }
 }
-

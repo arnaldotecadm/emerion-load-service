@@ -13,5 +13,5 @@ data class CustomerCreditIngestionDto(
     val valorTotal: Double,
     val saldo: Double,
     val situacao: String?,
-    val tipo: String
+    val tipo: String,
 )

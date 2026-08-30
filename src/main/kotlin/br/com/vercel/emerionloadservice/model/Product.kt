@@ -51,7 +51,7 @@ data class Product(
     val icmEntrada: String?,
     val icmStSaida: String?,
     val icmStEntrada: String?,
-    val observacao: String?
+    val observacao: String?,
 ) {
     val id: String
         get() = "$codGru.$codSub.$codPro"

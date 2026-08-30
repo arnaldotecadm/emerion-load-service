@@ -5,13 +5,10 @@ import br.com.vercel.emerionloadservice.repository.projection.VendedorProjection
 import org.springframework.data.domain.Page
 
 object VendedorMapper {
+    fun Page<VendedorProjection>.toModel(): Page<Vendedor> = this.map { it.toModel() }
 
-    fun Page<VendedorProjection>.toModel(): Page<Vendedor> {
-        return this.map { it.toModel() }
-    }
-
-    fun VendedorProjection.toModel(): Vendedor {
-        return Vendedor(
+    fun VendedorProjection.toModel(): Vendedor =
+        Vendedor(
             id = this.id,
             nome = this.nome.trim(),
             apelido = this.apelido?.trim(),
@@ -24,7 +21,6 @@ object VendedorMapper {
             situacao = this.situacao?.trim(),
             saldo = this.saldo,
             dataCadastro = this.dataCadastro?.toLocalDate(),
-            metaRepresentacao = this.metaRepresentacao
+            metaRepresentacao = this.metaRepresentacao,
         )
-    }
 }

@@ -55,9 +55,14 @@ private const val BASE_QUERY_PEDRES = """
  * header + item list shape used by the legacy emerion-cliente-loader.
  */
 @Repository
-class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
-    private data class OrderBusinessKey(val codEmp: Int, val dteres: java.time.LocalDate, val numres: String)
+class CustomerOrderQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
+    private data class OrderBusinessKey(
+        val codEmp: Int,
+        val dteres: java.time.LocalDate,
+        val numres: String,
+    )
 
     private fun mapHeader(rs: ResultSet) =
         CustomerOrderHeaderProjectionImpl(
@@ -84,7 +89,7 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             pedidoAnterior = rs.getString("pedidoAnterior"),
             regimeTributario = rs.getString("regimeTributario"),
             nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
-            codigoPadraoFaturamento = rs.getString("codigoPadraoFaturamento")
+            codigoPadraoFaturamento = rs.getString("codigoPadraoFaturamento"),
         )
 
     fun findAllPaged(pageable: Pageable): Page<CustomerOrder> {
@@ -96,46 +101,53 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
 
         val headerKeys =
             headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido) }.toSet()
-        val itemsByOrderKey = findItems(headers.map { it.numeroPedido }, headerKeys)
-            .groupBy { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }
-        val content = headers.map { header ->
-            val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
-            header.toModel(itemsByOrderKey[orderKey].orEmpty())
-        }
+        val itemsByOrderKey =
+            findItems(headers.map { it.numeroPedido }, headerKeys)
+                .groupBy { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }
+        val content =
+            headers.map { header ->
+                val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
+                header.toModel(itemsByOrderKey[orderKey].orEmpty())
+            }
 
         return PageImpl(content, pageable, total)
     }
 
     fun findByKey(numres: String): CustomerOrder? {
         val headerQuery = "$BASE_QUERY_PEDRES where ped.numres = ?"
-        val header = jdbcTemplate.query(headerQuery, { rs, _ -> mapHeader(rs) }, numres)
-            .firstOrNull() ?: return null
+        val header =
+            jdbcTemplate
+                .query(headerQuery, { rs, _ -> mapHeader(rs) }, numres)
+                .firstOrNull() ?: return null
 
-        val itemsByOrderKey = findItems(
-            listOf(numres),
-            setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido))
-        )
+        val itemsByOrderKey =
+            findItems(
+                listOf(numres),
+                setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)),
+            )
 
         return header.toModel(itemsByOrderKey)
     }
 
     private fun findHeadersPaged(pageable: Pageable): List<CustomerOrderHeaderProjectionImpl> {
-        val query = FirebirdPagination.applyFirstSkip(
-            "$BASE_QUERY_PEDRES order by ped.dteres desc",
-            pageable
-        )
+        val query =
+            FirebirdPagination.applyFirstSkip(
+                "$BASE_QUERY_PEDRES order by ped.dteres desc",
+                pageable,
+            )
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
     }
 
     private fun findItems(
         numresList: List<String>,
-        headerKeys: Set<OrderBusinessKey>
+        headerKeys: Set<OrderBusinessKey>,
     ): List<CustomerOrderItemProjection> {
         // Values come from a prior query result (never user input), so they are safe to
         // inline as a literal IN list; Firebird 1.5 native queries can't bind IN (:list).
         val idList = numresList.joinToString(",") { "'$it'" }
 
-        val query = """
+        val query =
+            """
             select
                 re2.codemp as codEmp,
                 re2.dteres as dteres,
@@ -208,80 +220,81 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             from pedre2 re2
             where re2.numres in ($idList)
             order by re2.numres, re2.seqre2
-        """.trimIndent()
+            """.trimIndent()
 
-        return jdbcTemplate.query(query) { rs, _ ->
-            CustomerOrderItemProjectionImpl(
-                codEmp = rs.getInt("codEmp"),
-                dteres = rs.getTimestamp("dteres").toLocalDateTime(),
-                numres = rs.getString("numres"),
-                codGru = rs.getString("codGru"),
-                codSub = rs.getString("codSub"),
-                codPro = rs.getString("codPro"),
-                descricao = rs.getString("descricao"),
-                quantidade = rs.getDouble("quantidade"),
-                valorUnitario = rs.getDouble("valorUnitario"),
-                valorTotal = rs.getDouble("valorTotal"),
-                seqRe2 = rs.getInt("seqRe2"),
-                codClp = rs.getString("codClp"),
-                codSt1 = rs.getString("codSt1"),
-                codUnd = rs.getString("codUnd"),
-                vluRe2 = rs.getBigDecimal("vluRe2")?.toDouble(),
-                dscRe2 = rs.getBigDecimal("dscRe2")?.toDouble(),
-                dsrRe2 = rs.getBigDecimal("dsrRe2")?.toDouble(),
-                icmsAliquota = rs.getBigDecimal("icmsAliquota")?.toDouble(),
-                icmsBase = rs.getBigDecimal("icmsBase")?.toDouble(),
-                icmsValor = rs.getBigDecimal("icmsValor")?.toDouble(),
-                icmsReducaoBase = rs.getBigDecimal("icmsReducaoBase")?.toDouble(),
-                icmsSubstituicaoBase = rs.getBigDecimal("icmsSubstituicaoBase")?.toDouble(),
-                icmsSubstituicaoValor = rs.getBigDecimal("icmsSubstituicaoValor")?.toDouble(),
-                icmsSubstituicaoAliquota = rs.getBigDecimal("icmsSubstituicaoAliquota")?.toDouble(),
-                icmsSubstituicaoMargem = rs.getBigDecimal("icmsSubstituicaoMargem")?.toDouble(),
-                icmsSubstituicaoReducaoBase = rs.getBigDecimal("icmsSubstituicaoReducaoBase")?.toDouble(),
-                ipiAliquota = rs.getBigDecimal("ipiAliquota")?.toDouble(),
-                ipiBase = rs.getBigDecimal("ipiBase")?.toDouble(),
-                ipiValor = rs.getBigDecimal("ipiValor")?.toDouble(),
-                ipiClassificacao = rs.getString("ipiClassificacao"),
-                ipiCst = rs.getString("ipiCst"),
-                pisBase = rs.getBigDecimal("pisBase")?.toDouble(),
-                pisAliquota = rs.getBigDecimal("pisAliquota")?.toDouble(),
-                pisValor = rs.getBigDecimal("pisValor")?.toDouble(),
-                pisCst = rs.getString("pisCst"),
-                cofinsBase = rs.getBigDecimal("cofinsBase")?.toDouble(),
-                cofinsAliquota = rs.getBigDecimal("cofinsAliquota")?.toDouble(),
-                cofinsValor = rs.getBigDecimal("cofinsValor")?.toDouble(),
-                cofinsCst = rs.getString("cofinsCst"),
-                descontoValor = rs.getBigDecimal("descontoValor")?.toDouble(),
-                freteValor = rs.getBigDecimal("freteValor")?.toDouble(),
-                seguroValor = rs.getBigDecimal("seguroValor")?.toDouble(),
-                outrasDespesasValor = rs.getBigDecimal("outrasDespesasValor")?.toDouble(),
-                totalItemTributado = rs.getBigDecimal("totalItemTributado")?.toDouble(),
-                totRen = rs.getBigDecimal("totRen")?.toDouble(),
-                totGe2 = rs.getBigDecimal("totGe2")?.toDouble(),
-                observacao = rs.getString("observacao"),
-                pedidoCompraCliente = rs.getString("pedidoCompraCliente"),
-                itemPedidoCompraCliente = rs.getNullableInt("itemPedidoCompraCliente"),
-                nroRe2 = rs.getNullableInt("nroRe2"),
-                flgVal = rs.getString("flgVal"),
-                flgPac = rs.getString("flgPac"),
-                flgLib = rs.getString("flgLib"),
-                codCfo = rs.getString("codCfo"),
-                codcor = rs.getString("codcor"),
-                codtam = rs.getString("codtam"),
-                descricaoNFe = rs.getString("descricaoNFe"),
-                pesoLiquido = rs.getBigDecimal("pesoLiquido")?.toDouble(),
-                pesoBruto = rs.getBigDecimal("pesoBruto")?.toDouble(),
-                referencia = rs.getString("referencia"),
-                quantidadeFaturada = rs.getBigDecimal("quantidadeFaturada")?.toDouble(),
-                quantidadeSeparada = rs.getBigDecimal("quantidadeSeparada")?.toDouble(),
-                custoTotal = rs.getBigDecimal("custoTotal")?.toDouble(),
-                lucroValor = rs.getBigDecimal("lucroValor")?.toDouble(),
-                lucroPorcentagem = rs.getBigDecimal("lucroPorcentagem")?.toDouble(),
-                saldoQuantidade = rs.getBigDecimal("saldoQuantidade")?.toDouble(),
-                descontoItemValor = rs.getBigDecimal("descontoItemValor")?.toDouble(),
-                descontoItemTotal = rs.getBigDecimal("descontoItemTotal")?.toDouble(),
-            )
-        }.filter { headerKeys.contains(OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres)) }
+        return jdbcTemplate
+            .query(query) { rs, _ ->
+                CustomerOrderItemProjectionImpl(
+                    codEmp = rs.getInt("codEmp"),
+                    dteres = rs.getTimestamp("dteres").toLocalDateTime(),
+                    numres = rs.getString("numres"),
+                    codGru = rs.getString("codGru"),
+                    codSub = rs.getString("codSub"),
+                    codPro = rs.getString("codPro"),
+                    descricao = rs.getString("descricao"),
+                    quantidade = rs.getDouble("quantidade"),
+                    valorUnitario = rs.getDouble("valorUnitario"),
+                    valorTotal = rs.getDouble("valorTotal"),
+                    seqRe2 = rs.getInt("seqRe2"),
+                    codClp = rs.getString("codClp"),
+                    codSt1 = rs.getString("codSt1"),
+                    codUnd = rs.getString("codUnd"),
+                    vluRe2 = rs.getBigDecimal("vluRe2")?.toDouble(),
+                    dscRe2 = rs.getBigDecimal("dscRe2")?.toDouble(),
+                    dsrRe2 = rs.getBigDecimal("dsrRe2")?.toDouble(),
+                    icmsAliquota = rs.getBigDecimal("icmsAliquota")?.toDouble(),
+                    icmsBase = rs.getBigDecimal("icmsBase")?.toDouble(),
+                    icmsValor = rs.getBigDecimal("icmsValor")?.toDouble(),
+                    icmsReducaoBase = rs.getBigDecimal("icmsReducaoBase")?.toDouble(),
+                    icmsSubstituicaoBase = rs.getBigDecimal("icmsSubstituicaoBase")?.toDouble(),
+                    icmsSubstituicaoValor = rs.getBigDecimal("icmsSubstituicaoValor")?.toDouble(),
+                    icmsSubstituicaoAliquota = rs.getBigDecimal("icmsSubstituicaoAliquota")?.toDouble(),
+                    icmsSubstituicaoMargem = rs.getBigDecimal("icmsSubstituicaoMargem")?.toDouble(),
+                    icmsSubstituicaoReducaoBase = rs.getBigDecimal("icmsSubstituicaoReducaoBase")?.toDouble(),
+                    ipiAliquota = rs.getBigDecimal("ipiAliquota")?.toDouble(),
+                    ipiBase = rs.getBigDecimal("ipiBase")?.toDouble(),
+                    ipiValor = rs.getBigDecimal("ipiValor")?.toDouble(),
+                    ipiClassificacao = rs.getString("ipiClassificacao"),
+                    ipiCst = rs.getString("ipiCst"),
+                    pisBase = rs.getBigDecimal("pisBase")?.toDouble(),
+                    pisAliquota = rs.getBigDecimal("pisAliquota")?.toDouble(),
+                    pisValor = rs.getBigDecimal("pisValor")?.toDouble(),
+                    pisCst = rs.getString("pisCst"),
+                    cofinsBase = rs.getBigDecimal("cofinsBase")?.toDouble(),
+                    cofinsAliquota = rs.getBigDecimal("cofinsAliquota")?.toDouble(),
+                    cofinsValor = rs.getBigDecimal("cofinsValor")?.toDouble(),
+                    cofinsCst = rs.getString("cofinsCst"),
+                    descontoValor = rs.getBigDecimal("descontoValor")?.toDouble(),
+                    freteValor = rs.getBigDecimal("freteValor")?.toDouble(),
+                    seguroValor = rs.getBigDecimal("seguroValor")?.toDouble(),
+                    outrasDespesasValor = rs.getBigDecimal("outrasDespesasValor")?.toDouble(),
+                    totalItemTributado = rs.getBigDecimal("totalItemTributado")?.toDouble(),
+                    totRen = rs.getBigDecimal("totRen")?.toDouble(),
+                    totGe2 = rs.getBigDecimal("totGe2")?.toDouble(),
+                    observacao = rs.getString("observacao"),
+                    pedidoCompraCliente = rs.getString("pedidoCompraCliente"),
+                    itemPedidoCompraCliente = rs.getNullableInt("itemPedidoCompraCliente"),
+                    nroRe2 = rs.getNullableInt("nroRe2"),
+                    flgVal = rs.getString("flgVal"),
+                    flgPac = rs.getString("flgPac"),
+                    flgLib = rs.getString("flgLib"),
+                    codCfo = rs.getString("codCfo"),
+                    codcor = rs.getString("codcor"),
+                    codtam = rs.getString("codtam"),
+                    descricaoNFe = rs.getString("descricaoNFe"),
+                    pesoLiquido = rs.getBigDecimal("pesoLiquido")?.toDouble(),
+                    pesoBruto = rs.getBigDecimal("pesoBruto")?.toDouble(),
+                    referencia = rs.getString("referencia"),
+                    quantidadeFaturada = rs.getBigDecimal("quantidadeFaturada")?.toDouble(),
+                    quantidadeSeparada = rs.getBigDecimal("quantidadeSeparada")?.toDouble(),
+                    custoTotal = rs.getBigDecimal("custoTotal")?.toDouble(),
+                    lucroValor = rs.getBigDecimal("lucroValor")?.toDouble(),
+                    lucroPorcentagem = rs.getBigDecimal("lucroPorcentagem")?.toDouble(),
+                    saldoQuantidade = rs.getBigDecimal("saldoQuantidade")?.toDouble(),
+                    descontoItemValor = rs.getBigDecimal("descontoItemValor")?.toDouble(),
+                    descontoItemTotal = rs.getBigDecimal("descontoItemTotal")?.toDouble(),
+                )
+            }.filter { headerKeys.contains(OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres)) }
     }
 
     // The bundled Jaybird driver (2.2.15) predates JDBC 4.1's getObject(column, Class),

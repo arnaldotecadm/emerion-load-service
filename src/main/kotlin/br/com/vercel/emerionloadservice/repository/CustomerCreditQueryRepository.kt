@@ -18,10 +18,12 @@ import org.springframework.stereotype.Repository
  * one row per movement rather than one row per customer.
  */
 @Repository
-class CustomerCreditQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class CustomerCreditQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     fun findAllPaged(pageable: Pageable): Page<CustomerCreditProjection> {
-        val baseQuery = """
+        val baseQuery =
+            """
             select
                 cde.codcli as codCli,
                 cde.seqcde as sequencia,
@@ -33,22 +35,23 @@ class CustomerCreditQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 cde.sitcde as situacao
             from fincde cde
             order by cde.codcli, cde.seqcde
-        """.trimIndent()
+            """.trimIndent()
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
-        val content: List<CustomerCreditProjection> = jdbcTemplate.query(pagedQuery) { rs, _ ->
-            CustomerCreditProjectionImpl(
-                codCli = rs.getLong("codCli"),
-                sequencia = rs.getString("sequencia"),
-                data = rs.getTimestamp("data").toInstant(),
-                dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
-                valorUtilizado = rs.getDouble("valorUtilizado"),
-                valorTotal = rs.getDouble("valorTotal"),
-                saldo = rs.getDouble("saldo"),
-                situacao = rs.getString("situacao")
-            )
-        }
+        val content: List<CustomerCreditProjection> =
+            jdbcTemplate.query(pagedQuery) { rs, _ ->
+                CustomerCreditProjectionImpl(
+                    codCli = rs.getLong("codCli"),
+                    sequencia = rs.getString("sequencia"),
+                    data = rs.getTimestamp("data").toInstant(),
+                    dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
+                    valorUtilizado = rs.getDouble("valorUtilizado"),
+                    valorTotal = rs.getDouble("valorTotal"),
+                    saldo = rs.getDouble("saldo"),
+                    situacao = rs.getString("situacao"),
+                )
+            }
 
         val total = jdbcTemplate.queryForObject("select count(*) from fincde", Long::class.java) ?: 0L
 

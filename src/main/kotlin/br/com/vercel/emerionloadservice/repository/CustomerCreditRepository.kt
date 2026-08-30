@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CustomerCreditRepository : PagingAndSortingRepository<DummyEntity, Long> {
-
     @Query(
         nativeQuery = true,
         value = """
@@ -24,7 +23,7 @@ interface CustomerCreditRepository : PagingAndSortingRepository<DummyEntity, Lon
             from fincde cde
             where cde.codcli = :codCli
             order by cde.seqcde
-        """
+        """,
     )
     fun getCreditsByCodCli(codCli: Long): List<CustomerCreditProjection>
 }

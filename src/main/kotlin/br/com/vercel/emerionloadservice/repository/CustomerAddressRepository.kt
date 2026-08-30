@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CustomerAddressRepository : PagingAndSortingRepository<DummyEntity, Long> {
-
     @Query(
         nativeQuery = true,
         value = """
@@ -18,7 +17,7 @@ interface CustomerAddressRepository : PagingAndSortingRepository<DummyEntity, Lo
                 cgccli as cpfCnpj
             from fincli
             where codcli = :codCli
-        """
+        """,
     )
     fun getHeaderByCodCli(codCli: Long): CustomerAddressHeaderProjection
 
@@ -66,7 +65,7 @@ interface CustomerAddressRepository : PagingAndSortingRepository<DummyEntity, Lo
             from fincli
             where codcli = :codCli
             order by 2
-        """
+        """,
     )
     fun getAddressRowsByCodCli(codCli: Long): List<CustomerAddressRowProjection>
 }

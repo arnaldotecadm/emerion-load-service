@@ -11,4 +11,3 @@ interface InvoiceProjection {
     val dataFaturamento: LocalDateTime?
     val totalFaturado: Double?
 }
-

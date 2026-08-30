@@ -13,20 +13,16 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class CustomerService(
     private val customerQueryRepository: CustomerQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllCustomers(pageable: Pageable): Page<Customer> {
-        return customerQueryRepository.findAllPaged(pageable).toModel()
-    }
+    fun getAllCustomers(pageable: Pageable): Page<Customer> = customerQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getCustomerByCodCli(codCli: Long): Customer {
-        return customerQueryRepository.getCustomerByCodCli(codCli)?.toModel()
+    fun getCustomerByCodCli(codCli: Long): Customer =
+        customerQueryRepository.getCustomerByCodCli(codCli)?.toModel()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
 
     fun sendCustomerToIngestion(codCli: Long) {
         val customer = getCustomerByCodCli(codCli)
         ingestionServiceClient.sendCustomer(customer)
     }
-
 }

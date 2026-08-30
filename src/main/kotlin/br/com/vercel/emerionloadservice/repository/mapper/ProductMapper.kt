@@ -5,13 +5,10 @@ import br.com.vercel.emerionloadservice.repository.projection.ProductProjectionI
 import org.springframework.data.domain.Page
 
 object ProductMapper {
+    fun Page<ProductProjectionImpl>.toModel(): Page<Product> = this.map { it.toModel() }
 
-    fun Page<ProductProjectionImpl>.toModel(): Page<Product> {
-        return this.map { it.toModel() }
-    }
-
-    fun ProductProjectionImpl.toModel(): Product {
-        return Product(
+    fun ProductProjectionImpl.toModel(): Product =
+        Product(
             codGru = this.codGru.trim(),
             codSub = this.codSub.trim(),
             codPro = this.codPro.trim(),
@@ -42,7 +39,6 @@ object ProductMapper {
             estoqueMaximo = this.estoqueMaximo,
             estoqueReservado = this.estoqueReservado,
             estoqueAdquirido = this.estoqueAdquirido,
-
             estoqueAtual = this.estoqueAtual,
             estoqueRMA = this.estoqueRMA,
             similar = this.similar,
@@ -63,5 +59,4 @@ object ProductMapper {
             icmStEntrada = this.icmStEntrada,
             observacao = this.observacao,
         )
-    }
 }

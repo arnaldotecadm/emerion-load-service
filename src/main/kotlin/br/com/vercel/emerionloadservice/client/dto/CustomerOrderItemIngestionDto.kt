@@ -68,5 +68,5 @@ data class CustomerOrderItemIngestionDto(
     val lucroPorcentagem: Double?,
     val saldoQuantidade: Double?,
     val descontoItemValor: Double?,
-    val descontoItemTotal: Double?
+    val descontoItemTotal: Double?,
 )

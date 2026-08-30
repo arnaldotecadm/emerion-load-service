@@ -4,5 +4,5 @@ data class CustomerAddressIngestionDto(
     val externalId: Long,
     val cnpjEmpresa: String,
     val cpfCnpj: String?,
-    val enderecos: List<CustomerAddressDetailIngestionDto>
+    val enderecos: List<CustomerAddressDetailIngestionDto>,
 )

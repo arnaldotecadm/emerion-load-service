@@ -13,6 +13,5 @@ data class InvoiceItemLinkProjectionImpl(
     override val codPro: String?,
     override val nronfs: String?,
     override val dataFaturamento: LocalDateTime?,
-    override val totalFaturado: Double?
+    override val totalFaturado: Double?,
 ) : InvoiceItemLinkProjection
-

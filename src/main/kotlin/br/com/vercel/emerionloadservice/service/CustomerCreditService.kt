@@ -13,15 +13,11 @@ import org.springframework.stereotype.Service
 class CustomerCreditService(
     private val customerCreditRepository: CustomerCreditRepository,
     private val customerCreditQueryRepository: CustomerCreditQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllCredits(pageable: Pageable): Page<CustomerCredit> {
-        return customerCreditQueryRepository.findAllPaged(pageable).toModel()
-    }
+    fun getAllCredits(pageable: Pageable): Page<CustomerCredit> = customerCreditQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getCreditsByCodCli(codCli: Long): List<CustomerCredit> {
-        return customerCreditRepository.getCreditsByCodCli(codCli).toModel()
-    }
+    fun getCreditsByCodCli(codCli: Long): List<CustomerCredit> = customerCreditRepository.getCreditsByCodCli(codCli).toModel()
 
     fun sendCreditsToIngestion(codCli: Long) {
         val credits = getCreditsByCodCli(codCli)

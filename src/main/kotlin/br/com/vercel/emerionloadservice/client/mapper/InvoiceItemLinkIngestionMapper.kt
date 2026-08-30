@@ -4,9 +4,8 @@ import br.com.vercel.emerionloadservice.client.dto.InvoiceItemLinkIngestionDto
 import br.com.vercel.emerionloadservice.model.InvoiceItemLink
 
 object InvoiceItemLinkIngestionMapper {
-
-    fun InvoiceItemLink.toIngestionDto(cnpjEmpresa: String): InvoiceItemLinkIngestionDto {
-        return InvoiceItemLinkIngestionDto(
+    fun InvoiceItemLink.toIngestionDto(cnpjEmpresa: String): InvoiceItemLinkIngestionDto =
+        InvoiceItemLinkIngestionDto(
             externalId = "${this.codEmp}-${this.dteres}-${this.numres}-${this.seqRe2}-${this.nronfs ?: "SEMNF"}",
             cnpjEmpresa = cnpjEmpresa,
             codEmp = this.codEmp,
@@ -19,8 +18,6 @@ object InvoiceItemLinkIngestionMapper {
             codPro = this.codPro,
             nronfs = this.nronfs,
             dataFaturamento = this.dataFaturamento,
-            totalFaturado = this.totalFaturado
+            totalFaturado = this.totalFaturado,
         )
-    }
 }
-

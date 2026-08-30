@@ -6,9 +6,8 @@ import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeade
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjection
 
 object CustomerOrderMapper {
-
-    fun CustomerOrderHeaderProjectionImpl.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder {
-        return CustomerOrder(
+    fun CustomerOrderHeaderProjectionImpl.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder =
+        CustomerOrder(
             codigoEmpresa = this.codigoEmpresa,
             codigoCliente = this.codigoCliente,
             cpfCnpj = this.cpfCnpj,
@@ -33,16 +32,13 @@ object CustomerOrderMapper {
             regimeTributario = this.regimeTributario,
             nomeRegimeTributario = this.nomeRegimeTributario,
             codigoPadraoFaturamento = this.codigoPadraoFaturamento,
-            itens = items.toModel()
+            itens = items.toModel(),
         )
-    }
 
-    fun List<CustomerOrderItemProjection>.toModel(): List<CustomerOrderItem> {
-        return this.map { it.toModel() }
-    }
+    fun List<CustomerOrderItemProjection>.toModel(): List<CustomerOrderItem> = this.map { it.toModel() }
 
-    fun CustomerOrderItemProjection.toModel(): CustomerOrderItem {
-        return CustomerOrderItem(
+    fun CustomerOrderItemProjection.toModel(): CustomerOrderItem =
+        CustomerOrderItem(
             codEmp = this.codEmp,
             dteres = this.dteres.toLocalDate(),
             numres = this.numres,
@@ -112,5 +108,4 @@ object CustomerOrderMapper {
             descontoItemValor = this.descontoItemValor,
             descontoItemTotal = this.descontoItemTotal,
         )
-    }
 }

@@ -13,6 +13,5 @@ data class ReceivableIngestionDto(
     val valorOriginal: Double,
     val valorUtilizado: Double,
     val saldoAberto: Double,
-    val situacao: String?
+    val situacao: String?,
 )
-

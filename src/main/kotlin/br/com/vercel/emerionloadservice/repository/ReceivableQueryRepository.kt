@@ -10,10 +10,12 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
 @Repository
-class ReceivableQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class ReceivableQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     fun findAllPaged(pageable: Pageable): Page<ReceivableProjection> {
-        val baseQuery = """
+        val baseQuery =
+            """
             select
                 cde.codcli as codCli,
                 cde.seqcde as sequencia,
@@ -25,29 +27,31 @@ class ReceivableQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 cde.sitcde as situacao
             from fincde cde
             order by cde.codcli, cde.seqcde
-        """.trimIndent()
+            """.trimIndent()
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
-        val content: List<ReceivableProjection> = jdbcTemplate.query(pagedQuery) { rs, _ ->
-            ReceivableProjectionImpl(
-                codCli = rs.getLong("codCli"),
-                sequencia = rs.getString("sequencia"),
-                dataLancamento = rs.getTimestamp("dataLancamento").toInstant(),
-                dataReferenciaPedido = rs.getTimestamp("dataReferenciaPedido")?.toLocalDateTime(),
-                valorOriginal = rs.getDouble("valorOriginal"),
-                valorUtilizado = rs.getDouble("valorUtilizado"),
-                saldoAberto = rs.getDouble("saldoAberto"),
-                situacao = rs.getString("situacao")
-            )
-        }
+        val content: List<ReceivableProjection> =
+            jdbcTemplate.query(pagedQuery) { rs, _ ->
+                ReceivableProjectionImpl(
+                    codCli = rs.getLong("codCli"),
+                    sequencia = rs.getString("sequencia"),
+                    dataLancamento = rs.getTimestamp("dataLancamento").toInstant(),
+                    dataReferenciaPedido = rs.getTimestamp("dataReferenciaPedido")?.toLocalDateTime(),
+                    valorOriginal = rs.getDouble("valorOriginal"),
+                    valorUtilizado = rs.getDouble("valorUtilizado"),
+                    saldoAberto = rs.getDouble("saldoAberto"),
+                    situacao = rs.getString("situacao"),
+                )
+            }
 
         val total = jdbcTemplate.queryForObject("select count(*) from fincde", Long::class.java) ?: 0L
         return PageImpl(content, pageable, total)
     }
 
     fun findByCodCli(codCli: Long): List<ReceivableProjection> {
-        val query = """
+        val query =
+            """
             select
                 cde.codcli as codCli,
                 cde.seqcde as sequencia,
@@ -60,7 +64,7 @@ class ReceivableQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             from fincde cde
             where cde.codcli = ?
             order by cde.seqcde
-        """.trimIndent()
+            """.trimIndent()
 
         return jdbcTemplate.query(query, { rs, _ ->
             ReceivableProjectionImpl(
@@ -71,7 +75,7 @@ class ReceivableQueryRepository(private val jdbcTemplate: JdbcTemplate) {
                 valorOriginal = rs.getDouble("valorOriginal"),
                 valorUtilizado = rs.getDouble("valorUtilizado"),
                 saldoAberto = rs.getDouble("saldoAberto"),
-                situacao = rs.getString("situacao")
+                situacao = rs.getString("situacao"),
             )
         }, codCli)
     }

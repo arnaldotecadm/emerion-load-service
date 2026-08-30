@@ -15,16 +15,13 @@ import org.springframework.web.server.ResponseStatusException
 class VendedorService(
     private val vendedorRepository: VendedorRepository,
     private val vendedorQueryRepository: VendedorQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllVendedores(pageable: Pageable): Page<Vendedor> {
-        return vendedorQueryRepository.findAllPaged(pageable).toModel()
-    }
+    fun getAllVendedores(pageable: Pageable): Page<Vendedor> = vendedorQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getVendedorByCodVen(codVen: Long): Vendedor {
-        return vendedorRepository.getVendedorByCodVen(codVen)?.toModel()
+    fun getVendedorByCodVen(codVen: Long): Vendedor =
+        vendedorRepository.getVendedorByCodVen(codVen)?.toModel()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
 
     fun sendVendedorToIngestion(codVen: Long) {
         val vendedor = getVendedorByCodVen(codVen)

@@ -30,8 +30,9 @@ private const val BASE_QUERY_ICMS = """
  * Records are identified by the composite key (codicm, tipicm).
  */
 @Repository
-class IcmsQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class IcmsQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     private fun resultsetToModel(rs: ResultSet) =
         IcmsProjectionImpl(
             codigoIcms = rs.getString("codigoIcms"),
@@ -42,31 +43,38 @@ class IcmsQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             aliquotaIcms = rs.getBigDecimal("aliquotaIcms")?.toDouble(),
             percentualReducaoValorImposto = rs.getBigDecimal("percentualReducaoValorImposto")?.toDouble(),
             percentualBaseCalculoIcms = rs.getBigDecimal("percentualBaseCalculoIcms")?.toDouble(),
-            situacaoTributariaIcms = rs.getString("situacaoTributariaIcms")
+            situacaoTributariaIcms = rs.getString("situacaoTributariaIcms"),
         )
 
     fun findAllPaged(pageable: Pageable): Page<IcmsProjectionImpl> {
         val total = jdbcTemplate.queryForObject("select count(*) from esticm", Long::class.java) ?: 0L
 
-        val pagedQuery = FirebirdPagination.applyFirstSkip(
-            "$BASE_QUERY_ICMS order by icms.codicm, icms.tipicm",
-            pageable
-        )
+        val pagedQuery =
+            FirebirdPagination.applyFirstSkip(
+                "$BASE_QUERY_ICMS order by icms.codicm, icms.tipicm",
+                pageable,
+            )
 
-        val content = jdbcTemplate.query(pagedQuery) { rs, _ ->
-            resultsetToModel(rs)
-        }
+        val content =
+            jdbcTemplate.query(pagedQuery) { rs, _ ->
+                resultsetToModel(rs)
+            }
 
         return PageImpl(content, pageable, total)
     }
 
-    fun findByKey(codicm: String, tipicm: String): IcmsProjectionImpl? {
+    fun findByKey(
+        codicm: String,
+        tipicm: String,
+    ): IcmsProjectionImpl? {
         // Values come from path variables (caller-controlled strings), so we use
         // a PreparedStatement via JdbcTemplate to avoid SQL injection.
         val query = "$BASE_QUERY_ICMS where icms.codicm = ? and icms.tipicm = ?"
 
-        return jdbcTemplate.query(query, { rs, _ ->
-            resultsetToModel(rs)
-        }, codicm, tipicm).firstOrNull()
+        return jdbcTemplate
+            .query(query, { rs, _ ->
+                resultsetToModel(rs)
+            }, codicm, tipicm)
+            .firstOrNull()
     }
 }

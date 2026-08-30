@@ -26,5 +26,5 @@ data class CustomerOrderHeaderProjectionImpl(
     val pedidoAnterior: String?,
     val regimeTributario: String?,
     val nomeRegimeTributario: String?,
-    val codigoPadraoFaturamento: String?
+    val codigoPadraoFaturamento: String?,
 )

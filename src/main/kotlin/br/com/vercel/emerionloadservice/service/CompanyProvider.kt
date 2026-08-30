@@ -17,23 +17,23 @@ import org.springframework.stereotype.Component
 @Component
 class CompanyProvider(
     private val jdbcTemplate: JdbcTemplate,
-    @Value("\${company.codemp:1}") private val codEmp: Int
+    @Value("\${company.codemp:1}") private val codEmp: Int,
 ) {
     @Volatile
     private var cachedCnpj: String? = null
 
-    fun getCompanyCnpj(): String {
-        return cachedCnpj ?: synchronized(this) {
+    fun getCompanyCnpj(): String =
+        cachedCnpj ?: synchronized(this) {
             cachedCnpj ?: fetchCompanyCnpj().also { cachedCnpj = it }
         }
-    }
 
     private fun fetchCompanyCnpj(): String {
-        val cnpj = jdbcTemplate.queryForObject(
-            "select cgcemp from geremp where codemp = ?",
-            String::class.java,
-            codEmp
-        )
+        val cnpj =
+            jdbcTemplate.queryForObject(
+                "select cgcemp from geremp where codemp = ?",
+                String::class.java,
+                codEmp,
+            )
 
         return requireNotNull(cnpj?.trim()?.takeIf { it.isNotEmpty() }) {
             "Could not resolve company CNPJ from geremp.cgcemp for codemp=$codEmp"

@@ -4,11 +4,10 @@ import br.com.vercel.emerionloadservice.client.dto.VendedorIngestionDto
 import br.com.vercel.emerionloadservice.model.Vendedor
 
 object VendedorIngestionMapper {
-
     // The receiving service generates its own internal id, so the local id
     // is sent as externalId to allow it to be traced back to the source record.
-    fun Vendedor.toIngestionDto(cnpjEmpresa: String): VendedorIngestionDto {
-        return VendedorIngestionDto(
+    fun Vendedor.toIngestionDto(cnpjEmpresa: String): VendedorIngestionDto =
+        VendedorIngestionDto(
             externalId = this.id,
             cnpjEmpresa = cnpjEmpresa,
             nome = this.nome,
@@ -22,7 +21,6 @@ object VendedorIngestionMapper {
             situacao = this.situacao,
             saldo = this.saldo,
             dataCadastro = this.dataCadastro,
-            metaRepresentacao = this.metaRepresentacao
+            metaRepresentacao = this.metaRepresentacao,
         )
-    }
 }

@@ -29,7 +29,6 @@ data class CustomerProjectionImpl(
     val macroRegiao: String?,
     val microRegiao: String?,
     val setor: String?,
-
     val faturamentoCep: String?,
     val faturamentoTipoEndereco: String?,
     val faturamentoEndereco: String?,
@@ -45,7 +44,6 @@ data class CustomerProjectionImpl(
     val faturamentoContato: String?,
     val faturamentoDDDCelular: String?,
     val faturamentoCelular: String?,
-
     val cobrancaCep: String?,
     val cobrancaTipoEndereco: String?,
     val cobrancaEndereco: String?,
@@ -61,7 +59,6 @@ data class CustomerProjectionImpl(
     val cobrancaContato: String?,
     val cobrancaDDDCelular: String?,
     val cobrancaCelular: String?,
-
     val entregaCep: String?,
     val entregaTipoEndereco: String?,
     val entregaEndereco: String?,
@@ -76,5 +73,5 @@ data class CustomerProjectionImpl(
     val entregaFax: String?,
     val entregaContato: String?,
     val entregaDDDCelular: String?,
-    val entregaCelular: String?
+    val entregaCelular: String?,
 )

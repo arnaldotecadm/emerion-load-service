@@ -6,9 +6,9 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.to
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.FinCreIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toIngestionDto
-import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.InvoiceItemLinkIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.PedlibIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ReceivableIngestionMapper.toIngestionDto
@@ -19,9 +19,9 @@ import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.model.Icms
-import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Invoice
 import br.com.vercel.emerionloadservice.model.InvoiceItemLink
+import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.model.Product
 import br.com.vercel.emerionloadservice.model.Receivable
@@ -53,12 +53,16 @@ class IngestionServiceClient(
     @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
     @Value("\${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
     @Value("\${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String,
-    @Value("\${ingestion-service.endpoints.pedlib}") private val pedlibEndpoint: String
+    @Value("\${ingestion-service.endpoints.pedlib}") private val pedlibEndpoint: String,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
-    private fun <T> sendToIngestion(entityName: String, externalId: Any?, action: () -> T): T {
-        return try {
+    private fun <T> sendToIngestion(
+        entityName: String,
+        externalId: Any?,
+        action: () -> T,
+    ): T =
+        try {
             action()
         } catch (e: RestClientResponseException) {
             logger.error("Failed to send {} {} to ingestion service", entityName, externalId, e)
@@ -66,13 +70,12 @@ class IngestionServiceClient(
                 e.statusCode,
                 e.responseBodyAsString?.takeIf(String::isNotBlank)
                     ?: "Failed to send $entityName $externalId to ingestion service",
-                e
+                e,
             )
         } catch (e: RestClientException) {
             logger.error("Failed to send {} {} to ingestion service", entityName, externalId, e)
             throw ResponseStatusException(HttpStatus.BAD_GATEWAY, "Failed to send $entityName $externalId to ingestion service", e)
         }
-    }
 
     fun sendCustomer(customer: Customer) {
         val url = "$baseUrl$customerEndpoint"
@@ -80,7 +83,8 @@ class IngestionServiceClient(
 
         logger.info("Sending customer {} to ingestion service at {}", dto.externalId, url)
         sendToIngestion("customer", dto.externalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -95,7 +99,8 @@ class IngestionServiceClient(
 
         logger.info("Sending product {} to ingestion service at {}", dto.externalId, url)
         sendToIngestion("product", dto.externalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -110,7 +115,8 @@ class IngestionServiceClient(
 
         logger.info("Sending {} address(es) of customer {} to ingestion service at {}", dto.enderecos.size, dto.externalId, url)
         sendToIngestion("customer address", dto.externalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -128,7 +134,8 @@ class IngestionServiceClient(
 
         logger.info("Sending {} credit(s) of customer {} to ingestion service at {}", dtos.size, customerExternalId, url)
         sendToIngestion("customer credit", customerExternalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dtos)
                 .retrieve()
@@ -143,7 +150,8 @@ class IngestionServiceClient(
 
         logger.info("Sending order {} ({} item(s)) to ingestion service at {}", dto.externalId, dto.itens.size, url)
         sendToIngestion("customer order", dto.externalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -158,7 +166,8 @@ class IngestionServiceClient(
 
         logger.info("Sending vendedor {} to ingestion service at {}", dto.externalId, url)
         sendToIngestion("vendedor", dto.externalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -176,7 +185,8 @@ class IngestionServiceClient(
 
         logger.info("Sending {} invoice(s) of order {} to ingestion service at {}", dtos.size, orderExternalId, url)
         sendToIngestion("invoice", orderExternalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dtos)
                 .retrieve()
@@ -194,7 +204,8 @@ class IngestionServiceClient(
 
         logger.info("Sending {} invoice item link(s) of order item {} to ingestion service at {}", dtos.size, orderItemExternalId, url)
         sendToIngestion("invoice item link", orderItemExternalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dtos)
                 .retrieve()
@@ -212,7 +223,8 @@ class IngestionServiceClient(
 
         logger.info("Sending {} receivable(s) of customer {} to ingestion service at {}", dtos.size, customerExternalId, url)
         sendToIngestion("receivable", customerExternalId) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dtos)
                 .retrieve()
@@ -227,7 +239,8 @@ class IngestionServiceClient(
 
         logger.info("Sending icms {} to ingestion service at {}", dto.codigoIcms, url)
         sendToIngestion("icms", dto.codigoIcms) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -243,7 +256,8 @@ class IngestionServiceClient(
 
         logger.info("Sending ipi {} to ingestion service at {}", key, url)
         sendToIngestion("ipi", key) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -259,7 +273,8 @@ class IngestionServiceClient(
 
         logger.info("Sending fincre {} ({} parcela(s)) to ingestion service at {}", key, dto.parcelas.size, url)
         sendToIngestion("fincre", key) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()
@@ -275,7 +290,8 @@ class IngestionServiceClient(
 
         logger.info("Sending pedlib {} ({} detail(s)) to ingestion service at {}", key, dto.detalhes.size, url)
         sendToIngestion("pedlib", key) {
-            restClient.post()
+            restClient
+                .post()
                 .uri(url)
                 .body(dto)
                 .retrieve()

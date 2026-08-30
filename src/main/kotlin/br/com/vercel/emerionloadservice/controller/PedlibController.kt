@@ -18,19 +18,22 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("pedlib")
 class PedlibController(
     private val pedlibService: PedlibService,
-    private val companyProvider: CompanyProvider
+    private val companyProvider: CompanyProvider,
 ) {
-
     @GetMapping("all")
-    fun getAllPedlib(@PageableDefault(size = 40) pageable: Pageable): Page<PedlibIngestionDto> =
-        pedlibService.getAllPedlib(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
+    fun getAllPedlib(
+        @PageableDefault(size = 40) pageable: Pageable,
+    ): Page<PedlibIngestionDto> = pedlibService.getAllPedlib(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
     @GetMapping("{numres}")
-    fun getPedlibByKey(@PathVariable numres: String): PedlibIngestionDto =
-        pedlibService.getPedlibByKey(numres).toIngestionDto(companyProvider.getCompanyCnpj())
+    fun getPedlibByKey(
+        @PathVariable numres: String,
+    ): PedlibIngestionDto = pedlibService.getPedlibByKey(numres).toIngestionDto(companyProvider.getCompanyCnpj())
 
     @PostMapping("{numres}/send")
-    fun sendPedlibToIngestion(@PathVariable numres: String): ResponseEntity<Void> {
+    fun sendPedlibToIngestion(
+        @PathVariable numres: String,
+    ): ResponseEntity<Void> {
         pedlibService.sendPedlibToIngestion(numres)
         return ResponseEntity.ok().build()
     }

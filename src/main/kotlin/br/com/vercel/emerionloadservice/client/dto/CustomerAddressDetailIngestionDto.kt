@@ -12,5 +12,5 @@ data class CustomerAddressDetailIngestionDto(
     val telefone: String?,
     val telefoneContato: String?,
     val complemento: String?,
-    val fax: String?
+    val fax: String?,
 )

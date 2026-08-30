@@ -13,19 +13,21 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class IcmsService(
     private val icmsQueryRepository: IcmsQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
+    fun getAllIcms(pageable: Pageable): Page<Icms> = icmsQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getAllIcms(pageable: Pageable): Page<Icms> {
-        return icmsQueryRepository.findAllPaged(pageable).toModel()
-    }
-
-    fun getIcmsByKey(codicm: String, tipicm: String): Icms {
-        return icmsQueryRepository.findByKey(codicm, tipicm)?.toModel()
+    fun getIcmsByKey(
+        codicm: String,
+        tipicm: String,
+    ): Icms =
+        icmsQueryRepository.findByKey(codicm, tipicm)?.toModel()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
 
-    fun sendIcmsToIngestion(codicm: String, tipicm: String) {
+    fun sendIcmsToIngestion(
+        codicm: String,
+        tipicm: String,
+    ) {
         val icms = getIcmsByKey(codicm, tipicm)
         ingestionServiceClient.sendIcms(icms)
     }

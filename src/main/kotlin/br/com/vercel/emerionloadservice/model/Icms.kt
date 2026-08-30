@@ -9,5 +9,5 @@ data class Icms(
     val aliquotaIcms: Double?,
     val percentualReducaoValorImposto: Double?,
     val percentualBaseCalculoIcms: Double?,
-    val situacaoTributariaIcms: String?
+    val situacaoTributariaIcms: String?,
 )

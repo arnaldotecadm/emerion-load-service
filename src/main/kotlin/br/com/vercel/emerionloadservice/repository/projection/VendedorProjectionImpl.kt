@@ -16,5 +16,5 @@ data class VendedorProjectionImpl(
     override val situacao: String?,
     override val saldo: BigDecimal?,
     override val dataCadastro: LocalDateTime?,
-    override val metaRepresentacao: BigDecimal?
+    override val metaRepresentacao: BigDecimal?,
 ) : VendedorProjection

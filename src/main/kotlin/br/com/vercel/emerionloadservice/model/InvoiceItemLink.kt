@@ -13,9 +13,8 @@ data class InvoiceItemLink(
     val codPro: String?,
     val nronfs: String?,
     val dataFaturamento: LocalDate?,
-    val totalFaturado: Double?
+    val totalFaturado: Double?,
 ) {
     val orderExternalId: String
         get() = "$codEmp-$dteres-$numres"
 }
-

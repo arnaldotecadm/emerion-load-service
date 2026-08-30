@@ -101,83 +101,82 @@ const val BASE_QUERY = """
  * which Spring Data JPA's Pageable-based native queries cannot generate.
  */
 @Repository
-class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
-    private fun resultSetToModel(rs: ResultSet): CustomerProjectionImpl = CustomerProjectionImpl(
-        id = rs.getLong("id"),
-        nomeFantasia = rs.getString("nomeFantasia"),
-        razaoSocial = rs.getString("razaoSocial"),
-        cpfCnpj = rs.getString("cpfCnpj"),
-        inscricaoEstadual = rs.getString("inscricaoEstadual"),
-        regimeTributario = rs.getString("regimeTributario"),
-        bloqueado = rs.getInt("bloqueado"),
-        dataNascimento = rs.getTimestamp("dataNascimento")?.toLocalDateTime(),
-        dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime(),
-        dataUltimaAtualizacao = rs.getTimestamp("dataUltimaAtualizacao")?.toLocalDateTime(),
-        email1 = rs.getString("email1"),
-        email2 = rs.getString("email2"),
-        website = rs.getString("website"),
-        limiteCredito = rs.getBigDecimal("limiteCredito"),
-        observacoes = rs.getString("observacoes"),
-        cnae = rs.getString("cnae"),
-        vendedorExternalId = rs.getLong("vendedorExternalId").takeIf { !rs.wasNull() },
-        nomeVendedor = rs.getString("nomeVendedor"),
-        codigoTipoCliente = rs.getString("codigoTipoCliente"),
-        codigoGrupoCliente = rs.getString("codigoGrupoCliente"),
-        codigoCategoriaCliente = rs.getString("codigoCategoriaCliente"),
-        uf = rs.getString("uf"),
-        macroRegiao = rs.getString("macroRegiao"),
-        microRegiao = rs.getString("microRegiao"),
-        setor = rs.getString("setor"),
-
-        faturamentoCep = rs.getString("faturamentoCep"),
-        faturamentoTipoEndereco = rs.getString("faturamentoTipoEndereco"),
-        faturamentoEndereco = rs.getString("faturamentoEndereco"),
-        faturamentoNumero = rs.getString("faturamentoNumero"),
-        faturamentoComplemento = rs.getString("faturamentoComplemento"),
-        faturamentoBairro = rs.getString("faturamentoBairro"),
-        faturamentoCidade = rs.getString("faturamentoCidade"),
-        faturamentoUf = rs.getString("faturamentoUf"),
-        faturamentoDDDTelefone = rs.getString("faturamentoDDDTelefone"),
-        faturamentoTelefone = rs.getString("faturamentoTelefone"),
-        faturamentoDDDFax = rs.getString("faturamentoDDDFax"),
-        faturamentoFax = rs.getString("faturamentoFax"),
-        faturamentoContato = rs.getString("faturamentoContato"),
-        faturamentoDDDCelular = rs.getString("faturamentoDDDCelular"),
-        faturamentoCelular = rs.getString("faturamentoCelular"),
-
-        cobrancaCep = rs.getString("cobrancaCep"),
-        cobrancaTipoEndereco = rs.getString("cobrancaTipoEndereco"),
-        cobrancaEndereco = rs.getString("cobrancaEndereco"),
-        cobrancaNumero = rs.getString("cobrancaNumero"),
-        cobrancaComplemento = rs.getString("cobrancaComplemento"),
-        cobrancaBairro = rs.getString("cobrancaBairro"),
-        cobrancaCidade = rs.getString("cobrancaCidade"),
-        cobrancaUf = rs.getString("cobrancaUf"),
-        cobrancaDDDTelefone = rs.getString("cobrancaDDDTelefone"),
-        cobrancaTelefone = rs.getString("cobrancaTelefone"),
-        cobrancaDDDFax = rs.getString("cobrancaDDDFax"),
-        cobrancaFax = rs.getString("cobrancaFax"),
-        cobrancaContato = rs.getString("cobrancaContato"),
-        cobrancaDDDCelular = rs.getString("cobrancaDDDCelular"),
-        cobrancaCelular = rs.getString("cobrancaCelular"),
-
-        entregaCep = rs.getString("entregaCep"),
-        entregaTipoEndereco = rs.getString("entregaTipoEndereco"),
-        entregaEndereco = rs.getString("entregaEndereco"),
-        entregaNumero = rs.getString("entregaNumero"),
-        entregaComplemento = rs.getString("entregaComplemento"),
-        entregaBairro = rs.getString("entregaBairro"),
-        entregaCidade = rs.getString("entregaCidade"),
-        entregaUf = rs.getString("entregaUf"),
-        entregaDDDTelefone = rs.getString("entregaDDDTelefone"),
-        entregaTelefone = rs.getString("entregaTelefone"),
-        entregaDDDFax = rs.getString("entregaDDDFax"),
-        entregaFax = rs.getString("entregaFax"),
-        entregaContato = rs.getString("entregaContato"),
-        entregaDDDCelular = rs.getString("entregaDDDCelular"),
-        entregaCelular = rs.getString("entregaCelular")
-    )
+class CustomerQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
+    private fun resultSetToModel(rs: ResultSet): CustomerProjectionImpl =
+        CustomerProjectionImpl(
+            id = rs.getLong("id"),
+            nomeFantasia = rs.getString("nomeFantasia"),
+            razaoSocial = rs.getString("razaoSocial"),
+            cpfCnpj = rs.getString("cpfCnpj"),
+            inscricaoEstadual = rs.getString("inscricaoEstadual"),
+            regimeTributario = rs.getString("regimeTributario"),
+            bloqueado = rs.getInt("bloqueado"),
+            dataNascimento = rs.getTimestamp("dataNascimento")?.toLocalDateTime(),
+            dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime(),
+            dataUltimaAtualizacao = rs.getTimestamp("dataUltimaAtualizacao")?.toLocalDateTime(),
+            email1 = rs.getString("email1"),
+            email2 = rs.getString("email2"),
+            website = rs.getString("website"),
+            limiteCredito = rs.getBigDecimal("limiteCredito"),
+            observacoes = rs.getString("observacoes"),
+            cnae = rs.getString("cnae"),
+            vendedorExternalId = rs.getLong("vendedorExternalId").takeIf { !rs.wasNull() },
+            nomeVendedor = rs.getString("nomeVendedor"),
+            codigoTipoCliente = rs.getString("codigoTipoCliente"),
+            codigoGrupoCliente = rs.getString("codigoGrupoCliente"),
+            codigoCategoriaCliente = rs.getString("codigoCategoriaCliente"),
+            uf = rs.getString("uf"),
+            macroRegiao = rs.getString("macroRegiao"),
+            microRegiao = rs.getString("microRegiao"),
+            setor = rs.getString("setor"),
+            faturamentoCep = rs.getString("faturamentoCep"),
+            faturamentoTipoEndereco = rs.getString("faturamentoTipoEndereco"),
+            faturamentoEndereco = rs.getString("faturamentoEndereco"),
+            faturamentoNumero = rs.getString("faturamentoNumero"),
+            faturamentoComplemento = rs.getString("faturamentoComplemento"),
+            faturamentoBairro = rs.getString("faturamentoBairro"),
+            faturamentoCidade = rs.getString("faturamentoCidade"),
+            faturamentoUf = rs.getString("faturamentoUf"),
+            faturamentoDDDTelefone = rs.getString("faturamentoDDDTelefone"),
+            faturamentoTelefone = rs.getString("faturamentoTelefone"),
+            faturamentoDDDFax = rs.getString("faturamentoDDDFax"),
+            faturamentoFax = rs.getString("faturamentoFax"),
+            faturamentoContato = rs.getString("faturamentoContato"),
+            faturamentoDDDCelular = rs.getString("faturamentoDDDCelular"),
+            faturamentoCelular = rs.getString("faturamentoCelular"),
+            cobrancaCep = rs.getString("cobrancaCep"),
+            cobrancaTipoEndereco = rs.getString("cobrancaTipoEndereco"),
+            cobrancaEndereco = rs.getString("cobrancaEndereco"),
+            cobrancaNumero = rs.getString("cobrancaNumero"),
+            cobrancaComplemento = rs.getString("cobrancaComplemento"),
+            cobrancaBairro = rs.getString("cobrancaBairro"),
+            cobrancaCidade = rs.getString("cobrancaCidade"),
+            cobrancaUf = rs.getString("cobrancaUf"),
+            cobrancaDDDTelefone = rs.getString("cobrancaDDDTelefone"),
+            cobrancaTelefone = rs.getString("cobrancaTelefone"),
+            cobrancaDDDFax = rs.getString("cobrancaDDDFax"),
+            cobrancaFax = rs.getString("cobrancaFax"),
+            cobrancaContato = rs.getString("cobrancaContato"),
+            cobrancaDDDCelular = rs.getString("cobrancaDDDCelular"),
+            cobrancaCelular = rs.getString("cobrancaCelular"),
+            entregaCep = rs.getString("entregaCep"),
+            entregaTipoEndereco = rs.getString("entregaTipoEndereco"),
+            entregaEndereco = rs.getString("entregaEndereco"),
+            entregaNumero = rs.getString("entregaNumero"),
+            entregaComplemento = rs.getString("entregaComplemento"),
+            entregaBairro = rs.getString("entregaBairro"),
+            entregaCidade = rs.getString("entregaCidade"),
+            entregaUf = rs.getString("entregaUf"),
+            entregaDDDTelefone = rs.getString("entregaDDDTelefone"),
+            entregaTelefone = rs.getString("entregaTelefone"),
+            entregaDDDFax = rs.getString("entregaDDDFax"),
+            entregaFax = rs.getString("entregaFax"),
+            entregaContato = rs.getString("entregaContato"),
+            entregaDDDCelular = rs.getString("entregaDDDCelular"),
+            entregaCelular = rs.getString("entregaCelular"),
+        )
 
     fun findAllPaged(pageable: Pageable): Page<CustomerProjectionImpl> {
         val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY.plus(" order by cli.codcli"), pageable)
@@ -186,15 +185,17 @@ class CustomerQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         return PageImpl(content, pageable, total)
     }
 
-
     fun getCustomerByCodCli(codCli: Long): CustomerProjectionImpl? {
-        val query = """
+        val query =
+            """
             $BASE_QUERY
             WHERE cli.codcli = ?
-        """.trimIndent()
-        return jdbcTemplate.query(
-            query,
-            { ps -> ps.setLong(1, codCli) }
-        ) { rs, _ -> resultSetToModel(rs) }.firstOrNull()
+            """.trimIndent()
+        return jdbcTemplate
+            .query(
+                query,
+                { ps -> ps.setLong(1, codCli) },
+            ) { rs, _ -> resultSetToModel(rs) }
+            .firstOrNull()
     }
 }

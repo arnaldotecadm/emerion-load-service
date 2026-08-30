@@ -11,7 +11,7 @@ data class CustomerCredit(
     val valorUtilizado: Double,
     val valorTotal: Double,
     val saldo: Double,
-    val situacao: String?
+    val situacao: String?,
 ) {
     // Mirrors the legacy rule: a credit entry with usage is an outgoing (SAIDA) movement.
     val tipo: String

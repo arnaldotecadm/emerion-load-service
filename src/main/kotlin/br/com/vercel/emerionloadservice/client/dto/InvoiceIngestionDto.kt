@@ -11,6 +11,5 @@ data class InvoiceIngestionDto(
     val dteres: LocalDate,
     val nronfs: String?,
     val dataFaturamento: LocalDate?,
-    val totalFaturado: Double?
+    val totalFaturado: Double?,
 )
-

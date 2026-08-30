@@ -6,20 +6,18 @@ import br.com.vercel.emerionloadservice.model.CustomerAddress
 import br.com.vercel.emerionloadservice.model.CustomerAddressDetail
 
 object CustomerAddressIngestionMapper {
-
     // The receiving service generates its own internal id, so codCli is sent as
     // externalId to allow it to be traced back to the source customer record.
-    fun CustomerAddress.toIngestionDto(cnpjEmpresa: String): CustomerAddressIngestionDto {
-        return CustomerAddressIngestionDto(
+    fun CustomerAddress.toIngestionDto(cnpjEmpresa: String): CustomerAddressIngestionDto =
+        CustomerAddressIngestionDto(
             externalId = this.codCli,
             cnpjEmpresa = cnpjEmpresa,
             cpfCnpj = this.cpfCnpj,
-            enderecos = this.enderecos.map { it.toIngestionDto() }
+            enderecos = this.enderecos.map { it.toIngestionDto() },
         )
-    }
 
-    private fun CustomerAddressDetail.toIngestionDto(): CustomerAddressDetailIngestionDto {
-        return CustomerAddressDetailIngestionDto(
+    private fun CustomerAddressDetail.toIngestionDto(): CustomerAddressDetailIngestionDto =
+        CustomerAddressDetailIngestionDto(
             tipo = this.tipo,
             cep = this.cep,
             endereco = this.endereco,
@@ -31,7 +29,6 @@ object CustomerAddressIngestionMapper {
             telefone = this.telefone,
             telefoneContato = this.telefoneContato,
             complemento = this.complemento,
-            fax = this.fax
+            fax = this.fax,
         )
-    }
 }

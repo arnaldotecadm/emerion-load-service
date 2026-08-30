@@ -9,6 +9,5 @@ data class InvoiceProjectionImpl(
     override val dteres: LocalDateTime,
     override val nronfs: String?,
     override val dataFaturamento: LocalDateTime?,
-    override val totalFaturado: Double?
+    override val totalFaturado: Double?,
 ) : InvoiceProjection
-

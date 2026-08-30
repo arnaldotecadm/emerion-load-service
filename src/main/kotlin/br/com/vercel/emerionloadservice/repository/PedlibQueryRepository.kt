@@ -59,13 +59,14 @@ private const val BASE_QUERY_PEDLB2 = """
 """
 
 @Repository
-class PedlibQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
+class PedlibQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
     private data class PedlibKey(
         val codigoEmpresa: Int,
         val dataPedido: java.time.LocalDate?,
         val numeroPedido: String,
-        val numeroLiberacao: Int
+        val numeroLiberacao: Int,
     )
 
     fun findAllPaged(pageable: Pageable): Page<Pedlib> {
@@ -74,108 +75,118 @@ class PedlibQueryRepository(private val jdbcTemplate: JdbcTemplate) {
         if (headers.isEmpty()) return PageImpl(emptyList(), pageable, total)
 
         val detailsByKey = findDetails(headers).groupBy { toKey(it) }
-        val content = headers.map { header ->
-            header.toModel(detailsByKey[toKey(header)].orEmpty())
-        }
+        val content =
+            headers.map { header ->
+                header.toModel(detailsByKey[toKey(header)].orEmpty())
+            }
 
         return PageImpl(content, pageable, total)
     }
 
     fun findByKey(numres: String): Pedlib? {
         val headerQuery = "$BASE_QUERY_PEDLIB where lib.numres = ? order by lib.seqlib"
-        val header = jdbcTemplate.query(headerQuery, { rs, _ -> mapHeader(rs) }, numres)
-            .firstOrNull() ?: return null
+        val header =
+            jdbcTemplate
+                .query(headerQuery, { rs, _ -> mapHeader(rs) }, numres)
+                .firstOrNull() ?: return null
 
-        val detailsQuery = """
+        val detailsQuery =
+            """
             $BASE_QUERY_PEDLB2
             where lb2.numres = ? and lb2.seqlib = ?
             order by lb2.seqlb2
-        """.trimIndent()
-        val details = jdbcTemplate.query(
-            detailsQuery,
-            { rs, _ -> mapDetail(rs) },
-            numres,
-            header.numeroLiberacao
-        )
+            """.trimIndent()
+        val details =
+            jdbcTemplate.query(
+                detailsQuery,
+                { rs, _ -> mapDetail(rs) },
+                numres,
+                header.numeroLiberacao,
+            )
 
         return header.toModel(details)
     }
 
     private fun findHeadersPaged(pageable: Pageable): List<PedlibProjectionImpl> {
-        val query = FirebirdPagination.applyFirstSkip(
-            "$BASE_QUERY_PEDLIB order by lib.numres desc, lib.seqlib",
-            pageable
-        )
+        val query =
+            FirebirdPagination.applyFirstSkip(
+                "$BASE_QUERY_PEDLIB order by lib.numres desc, lib.seqlib",
+                pageable,
+            )
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
     }
 
     private fun findDetails(headers: List<PedlibProjectionImpl>): List<Pedlb2ProjectionImpl> {
         val numresList = headers.joinToString(",") { it.numeroPedido }
-        val details = jdbcTemplate.query(
-            """
+        val details =
+            jdbcTemplate.query(
+                """
                 $BASE_QUERY_PEDLB2
                 where lb2.numres in ($numresList)
                 order by lb2.codemp, lb2.dteres, lb2.numres, lb2.seqlib, lb2.seqlb2
-            """.trimIndent()
-        ) { rs, _ -> mapDetail(rs) }
+                """.trimIndent(),
+            ) { rs, _ -> mapDetail(rs) }
 
         val headerKeys = headers.map(::toKey).toSet()
         return details.filter { toKey(it) in headerKeys }
     }
 
-    private fun mapHeader(rs: ResultSet) = PedlibProjectionImpl(
-        codigoEmpresa = rs.getInt("codigoEmpresa"),
-        dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
-        numeroPedido = rs.getString("numeroPedido"),
-        numeroLiberacao = rs.getInt("numeroLiberacao"),
-        dataLiberacao = rs.getTimestamp("dataLiberacao")?.toLocalDateTime(),
-        horaLiberacao = rs.getString("horaLiberacao"),
-        codigoCliente = rs.getLong("codigoCliente").takeIf { !rs.wasNull() },
-        quantidadeSeparada = rs.getInt("quantidadeSeparada").takeIf { !rs.wasNull() },
-        totalLiberadoSemImpostos = rs.getBigDecimal("totalLiberadoSemImpostos")?.toDouble(),
-        totalLiberadoComImpostos = rs.getBigDecimal("totalLiberadoComImpostos")?.toDouble(),
-        situacaoLiberacao = rs.getString("situacaoLiberacao"),
-        codigoVendedor = rs.getLong("codigoVendedor").takeIf { !rs.wasNull() },
-        comissaoLiberacao = rs.getBigDecimal("comissaoLiberacao")?.toDouble(),
-        totalCusto = rs.getBigDecimal("totalCusto")?.toDouble()
-    )
+    private fun mapHeader(rs: ResultSet) =
+        PedlibProjectionImpl(
+            codigoEmpresa = rs.getInt("codigoEmpresa"),
+            dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
+            numeroPedido = rs.getString("numeroPedido"),
+            numeroLiberacao = rs.getInt("numeroLiberacao"),
+            dataLiberacao = rs.getTimestamp("dataLiberacao")?.toLocalDateTime(),
+            horaLiberacao = rs.getString("horaLiberacao"),
+            codigoCliente = rs.getLong("codigoCliente").takeIf { !rs.wasNull() },
+            quantidadeSeparada = rs.getInt("quantidadeSeparada").takeIf { !rs.wasNull() },
+            totalLiberadoSemImpostos = rs.getBigDecimal("totalLiberadoSemImpostos")?.toDouble(),
+            totalLiberadoComImpostos = rs.getBigDecimal("totalLiberadoComImpostos")?.toDouble(),
+            situacaoLiberacao = rs.getString("situacaoLiberacao"),
+            codigoVendedor = rs.getLong("codigoVendedor").takeIf { !rs.wasNull() },
+            comissaoLiberacao = rs.getBigDecimal("comissaoLiberacao")?.toDouble(),
+            totalCusto = rs.getBigDecimal("totalCusto")?.toDouble(),
+        )
 
-    private fun mapDetail(rs: ResultSet) = Pedlb2ProjectionImpl(
-        codigoEmpresa = rs.getInt("codigoEmpresa"),
-        dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
-        numeroPedido = rs.getString("numeroPedido"),
-        numeroLiberacao = rs.getInt("numeroLiberacao"),
-        numeroSequenciaLiberacao = rs.getInt("numeroSequenciaLiberacao"),
-        classificacaoItem = rs.getString("classificacaoItem"),
-        codigoGrupo = rs.getString("codigoGrupo"),
-        codigoSubGrupo = rs.getString("codigoSubGrupo"),
-        codigoProduto = rs.getString("codigoProduto"),
-        descricaoItemLiberacao = rs.getString("descricaoItemLiberacao"),
-        quantidadeNoPedido = rs.getBigDecimal("quantidadeNoPedido")?.toDouble(),
-        totalSeparado = rs.getBigDecimal("totalSeparado")?.toDouble(),
-        quantidadeRestante = rs.getBigDecimal("quantidadeRestante")?.toDouble(),
+    private fun mapDetail(rs: ResultSet) =
+        Pedlb2ProjectionImpl(
+            codigoEmpresa = rs.getInt("codigoEmpresa"),
+            dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
+            numeroPedido = rs.getString("numeroPedido"),
+            numeroLiberacao = rs.getInt("numeroLiberacao"),
+            numeroSequenciaLiberacao = rs.getInt("numeroSequenciaLiberacao"),
+            classificacaoItem = rs.getString("classificacaoItem"),
+            codigoGrupo = rs.getString("codigoGrupo"),
+            codigoSubGrupo = rs.getString("codigoSubGrupo"),
+            codigoProduto = rs.getString("codigoProduto"),
+            descricaoItemLiberacao = rs.getString("descricaoItemLiberacao"),
+            quantidadeNoPedido = rs.getBigDecimal("quantidadeNoPedido")?.toDouble(),
+            totalSeparado = rs.getBigDecimal("totalSeparado")?.toDouble(),
+            quantidadeRestante = rs.getBigDecimal("quantidadeRestante")?.toDouble(),
+            totalValorLiquido = rs.getBigDecimal("totalValorLiquido")?.toDouble(),
+            totalValorBruto = rs.getBigDecimal("totalValorBruto")?.toDouble(),
+            percentualDesconto = rs.getBigDecimal("percentualDesconto")?.toDouble(),
+            totalCusto = rs.getBigDecimal("totalCusto")?.toDouble(),
+            percentualDeAcrescimo = rs.getBigDecimal("percentualDeAcrescimo")?.toDouble(),
+            precoVendaItem = rs.getBigDecimal("precoVendaItem")?.toDouble(),
+            precoPraticado = rs.getBigDecimal("precoPraticado")?.toDouble(),
+            custoPraticado = rs.getBigDecimal("custoPraticado")?.toDouble(),
+        )
 
-        totalValorLiquido = rs.getBigDecimal("totalValorLiquido")?.toDouble(),
-        totalValorBruto = rs.getBigDecimal("totalValorBruto")?.toDouble(),
-        percentualDesconto = rs.getBigDecimal("percentualDesconto")?.toDouble(),
-        totalCusto = rs.getBigDecimal("totalCusto")?.toDouble(),
-        percentualDeAcrescimo = rs.getBigDecimal("percentualDeAcrescimo")?.toDouble(),
-        precoVendaItem = rs.getBigDecimal("precoVendaItem")?.toDouble(),
-        precoPraticado = rs.getBigDecimal("precoPraticado")?.toDouble(),
-        custoPraticado = rs.getBigDecimal("custoPraticado")?.toDouble()
-    )
+    private fun toKey(header: PedlibProjectionImpl) =
+        PedlibKey(
+            header.codigoEmpresa,
+            header.dataPedido?.toLocalDate(),
+            header.numeroPedido,
+            header.numeroLiberacao,
+        )
 
-    private fun toKey(header: PedlibProjectionImpl) = PedlibKey(
-        header.codigoEmpresa,
-        header.dataPedido?.toLocalDate(),
-        header.numeroPedido,
-        header.numeroLiberacao
-    )
-
-    private fun toKey(detail: Pedlb2ProjectionImpl) = PedlibKey(
-        detail.codigoEmpresa,
-        detail.dataPedido?.toLocalDate(),
-        detail.numeroPedido,
-        detail.numeroLiberacao
-    )
+    private fun toKey(detail: Pedlb2ProjectionImpl) =
+        PedlibKey(
+            detail.codigoEmpresa,
+            detail.dataPedido?.toLocalDate(),
+            detail.numeroPedido,
+            detail.numeroLiberacao,
+        )
 }

@@ -11,6 +11,5 @@ data class ReceivableProjectionImpl(
     override val valorOriginal: Double,
     override val valorUtilizado: Double,
     override val saldoAberto: Double,
-    override val situacao: String?
+    override val situacao: String?,
 ) : ReceivableProjection
-

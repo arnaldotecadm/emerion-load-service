@@ -11,5 +11,5 @@ data class CustomerCreditProjectionImpl(
     override val valorUtilizado: Double,
     override val valorTotal: Double,
     override val saldo: Double,
-    override val situacao: String?
+    override val situacao: String?,
 ) : CustomerCreditProjection

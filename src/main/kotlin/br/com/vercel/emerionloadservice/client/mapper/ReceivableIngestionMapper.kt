@@ -4,9 +4,8 @@ import br.com.vercel.emerionloadservice.client.dto.ReceivableIngestionDto
 import br.com.vercel.emerionloadservice.model.Receivable
 
 object ReceivableIngestionMapper {
-
-    fun Receivable.toIngestionDto(cnpjEmpresa: String): ReceivableIngestionDto {
-        return ReceivableIngestionDto(
+    fun Receivable.toIngestionDto(cnpjEmpresa: String): ReceivableIngestionDto =
+        ReceivableIngestionDto(
             externalId = "${this.codCli}-${this.sequencia ?: "SEMSEQ"}",
             cnpjEmpresa = cnpjEmpresa,
             customerExternalId = this.codCli,
@@ -16,12 +15,8 @@ object ReceivableIngestionMapper {
             valorOriginal = this.valorOriginal,
             valorUtilizado = this.valorUtilizado,
             saldoAberto = this.saldoAberto,
-            situacao = this.situacao
+            situacao = this.situacao,
         )
-    }
 
-    fun List<Receivable>.toIngestionDto(cnpjEmpresa: String): List<ReceivableIngestionDto> {
-        return this.map { it.toIngestionDto(cnpjEmpresa) }
-    }
+    fun List<Receivable>.toIngestionDto(cnpjEmpresa: String): List<ReceivableIngestionDto> = this.map { it.toIngestionDto(cnpjEmpresa) }
 }
-

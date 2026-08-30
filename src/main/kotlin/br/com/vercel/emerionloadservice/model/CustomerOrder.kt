@@ -27,5 +27,5 @@ data class CustomerOrder(
     val regimeTributario: String?,
     val nomeRegimeTributario: String?,
     val codigoPadraoFaturamento: String?,
-    val itens: List<CustomerOrderItem>
+    val itens: List<CustomerOrderItem>,
 )

@@ -18,26 +18,23 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("ipi")
 class IpiController(
     private val ipiService: IpiService,
-    private val companyProvider: CompanyProvider
+    private val companyProvider: CompanyProvider,
 ) {
-
     @GetMapping("all")
-    fun getAllIpi(@PageableDefault(size = 40) pageable: Pageable): Page<IpiIngestionDto> {
-        return ipiService.getAllIpi(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-    }
+    fun getAllIpi(
+        @PageableDefault(size = 40) pageable: Pageable,
+    ): Page<IpiIngestionDto> = ipiService.getAllIpi(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
     @GetMapping("{codipi}/{tipipi}")
     fun getIpiByKey(
         @PathVariable codipi: String,
-        @PathVariable tipipi: String
-    ): IpiIngestionDto {
-        return ipiService.getIpiByKey(codipi, tipipi).toIngestionDto(companyProvider.getCompanyCnpj())
-    }
+        @PathVariable tipipi: String,
+    ): IpiIngestionDto = ipiService.getIpiByKey(codipi, tipipi).toIngestionDto(companyProvider.getCompanyCnpj())
 
     @PostMapping("{codipi}/{tipipi}/send")
     fun sendIpiToIngestion(
         @PathVariable codipi: String,
-        @PathVariable tipipi: String
+        @PathVariable tipipi: String,
     ): ResponseEntity<Void> {
         ipiService.sendIpiToIngestion(codipi, tipipi)
         return ResponseEntity.ok().build()

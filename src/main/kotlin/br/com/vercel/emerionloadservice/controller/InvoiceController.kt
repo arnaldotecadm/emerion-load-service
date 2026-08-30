@@ -20,32 +20,30 @@ import java.time.LocalDate
 @RequestMapping("invoice")
 class InvoiceController(
     private val invoiceService: InvoiceService,
-    private val companyProvider: CompanyProvider
+    private val companyProvider: CompanyProvider,
 ) {
-
     @GetMapping("all")
-    fun getAllInvoices(@PageableDefault(size = 40) pageable: Pageable): Page<InvoiceIngestionDto> {
-        return invoiceService.getAllInvoices(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-    }
+    fun getAllInvoices(
+        @PageableDefault(size = 40) pageable: Pageable,
+    ): Page<InvoiceIngestionDto> = invoiceService.getAllInvoices(pageable).map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
     @GetMapping("{codEmp}/{dteres}/{numres}")
     fun getInvoicesByOrder(
         @PathVariable codEmp: Int,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dteres: LocalDate,
-        @PathVariable numres: String
-    ): List<InvoiceIngestionDto> {
-        return invoiceService.getInvoicesByOrder(codEmp, dteres, numres)
+        @PathVariable numres: String,
+    ): List<InvoiceIngestionDto> =
+        invoiceService
+            .getInvoicesByOrder(codEmp, dteres, numres)
             .map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-    }
 
     @PostMapping("{codEmp}/{dteres}/{numres}/send")
     fun sendInvoicesToIngestion(
         @PathVariable codEmp: Int,
         @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) dteres: LocalDate,
-        @PathVariable numres: String
+        @PathVariable numres: String,
     ): ResponseEntity<Void> {
         invoiceService.sendInvoicesToIngestion(codEmp, dteres, numres)
         return ResponseEntity.ok().build()
     }
 }
-

@@ -13,11 +13,9 @@ import org.springframework.stereotype.Service
 class CustomerAddressService(
     private val customerAddressRepository: CustomerAddressRepository,
     private val customerAddressQueryRepository: CustomerAddressQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllAddresses(pageable: Pageable): Page<CustomerAddress> {
-        return customerAddressQueryRepository.findAllPaged(pageable)
-    }
+    fun getAllAddresses(pageable: Pageable): Page<CustomerAddress> = customerAddressQueryRepository.findAllPaged(pageable)
 
     fun getAddressByCodCli(codCli: Long): CustomerAddress {
         val header = customerAddressRepository.getHeaderByCodCli(codCli)

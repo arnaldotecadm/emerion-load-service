@@ -5,13 +5,10 @@ import br.com.vercel.emerionloadservice.repository.projection.ReceivableProjecti
 import org.springframework.data.domain.Page
 
 object ReceivableMapper {
+    fun Page<ReceivableProjection>.toModel(): Page<Receivable> = this.map { it.toModel() }
 
-    fun Page<ReceivableProjection>.toModel(): Page<Receivable> {
-        return this.map { it.toModel() }
-    }
-
-    fun ReceivableProjection.toModel(): Receivable {
-        return Receivable(
+    fun ReceivableProjection.toModel(): Receivable =
+        Receivable(
             codCli = this.codCli,
             sequencia = this.sequencia,
             dataLancamento = this.dataLancamento,
@@ -19,8 +16,6 @@ object ReceivableMapper {
             valorOriginal = this.valorOriginal,
             valorUtilizado = this.valorUtilizado,
             saldoAberto = this.saldoAberto,
-            situacao = this.situacao
+            situacao = this.situacao,
         )
-    }
 }
-

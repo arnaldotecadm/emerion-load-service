@@ -15,4 +15,3 @@ interface InvoiceItemLinkProjection {
     val dataFaturamento: LocalDateTime?
     val totalFaturado: Double?
 }
-

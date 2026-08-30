@@ -12,13 +12,13 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class PedlibService(
     private val pedlibQueryRepository: PedlibQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-
     fun getAllPedlib(pageable: Pageable): Page<Pedlib> = pedlibQueryRepository.findAllPaged(pageable)
 
-    fun getPedlibByKey(numres: String): Pedlib = pedlibQueryRepository.findByKey(numres)
-        ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    fun getPedlibByKey(numres: String): Pedlib =
+        pedlibQueryRepository.findByKey(numres)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
     fun sendPedlibToIngestion(numres: String) {
         ingestionServiceClient.sendPedlib(getPedlibByKey(numres))

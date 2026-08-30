@@ -15,6 +15,5 @@ data class InvoiceItemLinkIngestionDto(
     val codPro: String?,
     val nronfs: String?,
     val dataFaturamento: LocalDate?,
-    val totalFaturado: Double?
+    val totalFaturado: Double?,
 )
-

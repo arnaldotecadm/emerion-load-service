@@ -50,5 +50,5 @@ data class ProductIngestionDto(
     val icmEntrada: String?,
     val icmStSaida: String?,
     val icmStEntrada: String?,
-    val observacao: String?
+    val observacao: String?,
 )

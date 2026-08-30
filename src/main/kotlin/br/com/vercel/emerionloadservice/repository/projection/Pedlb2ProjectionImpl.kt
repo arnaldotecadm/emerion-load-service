@@ -16,7 +16,6 @@ data class Pedlb2ProjectionImpl(
     val quantidadeNoPedido: Double?,
     val totalSeparado: Double?,
     val quantidadeRestante: Double?,
-
     val totalValorLiquido: Double?,
     val totalValorBruto: Double?,
     val percentualDesconto: Double?,

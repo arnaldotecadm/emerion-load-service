@@ -4,11 +4,10 @@ import br.com.vercel.emerionloadservice.client.dto.CustomerCreditIngestionDto
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 
 object CustomerCreditIngestionMapper {
-
     // The credit entry has no id of its own in the legacy schema, so codCli is sent as
     // customerExternalId to allow the receiving service to associate it with the customer.
-    fun CustomerCredit.toIngestionDto(cnpjEmpresa: String): CustomerCreditIngestionDto {
-        return CustomerCreditIngestionDto(
+    fun CustomerCredit.toIngestionDto(cnpjEmpresa: String): CustomerCreditIngestionDto =
+        CustomerCreditIngestionDto(
             customerExternalId = this.codCli,
             cnpjEmpresa = cnpjEmpresa,
             sequencia = this.sequencia,
@@ -18,11 +17,9 @@ object CustomerCreditIngestionMapper {
             valorTotal = this.valorTotal,
             saldo = this.saldo,
             situacao = this.situacao,
-            tipo = this.tipo
+            tipo = this.tipo,
         )
-    }
 
-    fun List<CustomerCredit>.toIngestionDto(cnpjEmpresa: String): List<CustomerCreditIngestionDto> {
-        return this.map { it.toIngestionDto(cnpjEmpresa) }
-    }
+    fun List<CustomerCredit>.toIngestionDto(cnpjEmpresa: String): List<CustomerCreditIngestionDto> =
+        this.map { it.toIngestionDto(cnpjEmpresa) }
 }

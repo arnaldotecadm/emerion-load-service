@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
-import java.math.RoundingMode
 import java.sql.ResultSet
 
 private const val BASE_QUERY_FINCRE = """
@@ -71,9 +70,14 @@ private const val BASE_QUERY_FINCRP = """
  * Records are identified by the composite key (codigoEmpresa, dataEmissao, documento).
  */
 @Repository
-class FinCreQueryRepository(private val jdbcTemplate: JdbcTemplate) {
-
-    private data class FinCreKey(val codigoEmpresa: Int, val dataEmissao: java.time.LocalDate?, val documento: String)
+class FinCreQueryRepository(
+    private val jdbcTemplate: JdbcTemplate,
+) {
+    private data class FinCreKey(
+        val codigoEmpresa: Int,
+        val dataEmissao: java.time.LocalDate?,
+        val documento: String,
+    )
 
     fun findAllPaged(pageable: Pageable): Page<FinCre> {
         val total = jdbcTemplate.queryForObject("select count(*) from fincre", Long::class.java) ?: 0L
@@ -83,9 +87,10 @@ class FinCreQueryRepository(private val jdbcTemplate: JdbcTemplate) {
 
         val parcelasByKey = findParcelas(headers).groupBy { toKey(it) }
 
-        val content = headers.map { header ->
-            header.toModel(parcelasByKey[toKey(header)].orEmpty())
-        }
+        val content =
+            headers.map { header ->
+                header.toModel(parcelasByKey[toKey(header)].orEmpty())
+            }
 
         return PageImpl(content, pageable, total)
     }
@@ -93,26 +98,32 @@ class FinCreQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     fun findByKey(documento: String): FinCre? {
         val query = "$BASE_QUERY_FINCRE where cre.numcre = ?"
 
-        val header = jdbcTemplate.query(
-            query, { rs, _ -> mapHeader(rs) },
-            documento
-        ).firstOrNull() ?: return null
+        val header =
+            jdbcTemplate
+                .query(
+                    query,
+                    { rs, _ -> mapHeader(rs) },
+                    documento,
+                ).firstOrNull() ?: return null
 
         val parcelasQuery = "$BASE_QUERY_FINCRP where crp.numcre = ? order by crp.numcrp"
 
-        val parcelas = jdbcTemplate.query(
-            parcelasQuery, { rs, _ -> mapParcela(rs) },
-            documento
-        )
+        val parcelas =
+            jdbcTemplate.query(
+                parcelasQuery,
+                { rs, _ -> mapParcela(rs) },
+                documento,
+            )
 
         return header.toModel(parcelas)
     }
 
     private fun findHeadersPaged(pageable: Pageable): List<FinCreProjectionImpl> {
-        val pagedQuery = FirebirdPagination.applyFirstSkip(
-            "$BASE_QUERY_FINCRE order by cre.numcre desc ",
-            pageable
-        )
+        val pagedQuery =
+            FirebirdPagination.applyFirstSkip(
+                "$BASE_QUERY_FINCRE order by cre.numcre desc ",
+                pageable,
+            )
         return jdbcTemplate.query(pagedQuery) { rs, _ -> mapHeader(rs) }
     }
 
@@ -121,50 +132,54 @@ class FinCreQueryRepository(private val jdbcTemplate: JdbcTemplate) {
     // inline as a literal IN list; Firebird 1.5 native queries can't bind IN (:list).
     private fun findParcelas(headers: List<FinCreProjectionImpl>): List<FinCrpProjectionImpl> {
         val numcreList = headers.joinToString(",") { "'${it.documento}'" }
-        val query = """
+        val query =
+            """
             $BASE_QUERY_FINCRP
             where crp.numcre in ($numcreList)
             order by crp.codemp, crp.dtecre, crp.numcre, crp.numcrp
-        """.trimIndent()
+            """.trimIndent()
         return jdbcTemplate.query(query) { rs, _ -> mapParcela(rs) }
     }
 
-    private fun mapHeader(rs: ResultSet) = FinCreProjectionImpl(
-        codigoEmpresa = rs.getInt("codigoEmpresa"),
-        dataEmissao = rs.getTimestamp("dataEmissao")?.toLocalDateTime(),
-        documento = rs.getBigDecimal("documento").toLong().toString(),
-        codigoCondicaoRecebimento = rs.getString("codigoCondicaoRecebimento"),
-        nomeCondicaoRecebimento = rs.getString("nomeCondicaoRecebimento"),
-        nomeEmpresa = rs.getString("nomeEmpresa"),
-        codigoComissao = rs.getString("codigoComissao"),
-        percentualComissao = rs.getBigDecimal("percentualComissao")?.toDouble(),
-        codigoCliente = rs.getLong("codigoCliente").takeIf { !rs.wasNull() },
-        nomeCliente = rs.getString("nomeCliente"),
-        codigoVendedor = rs.getLong("codigoVendedor").takeIf { !rs.wasNull() },
-        nomeVendedor = rs.getString("nomeVendedor"),
-        codigoTipoDocumento = rs.getString("codigoTipoDocumento"),
-        nomeTipoDocumento = rs.getString("nomeTipoDocumento")
-    )
+    private fun mapHeader(rs: ResultSet) =
+        FinCreProjectionImpl(
+            codigoEmpresa = rs.getInt("codigoEmpresa"),
+            dataEmissao = rs.getTimestamp("dataEmissao")?.toLocalDateTime(),
+            documento = rs.getBigDecimal("documento").toLong().toString(),
+            codigoCondicaoRecebimento = rs.getString("codigoCondicaoRecebimento"),
+            nomeCondicaoRecebimento = rs.getString("nomeCondicaoRecebimento"),
+            nomeEmpresa = rs.getString("nomeEmpresa"),
+            codigoComissao = rs.getString("codigoComissao"),
+            percentualComissao = rs.getBigDecimal("percentualComissao")?.toDouble(),
+            codigoCliente = rs.getLong("codigoCliente").takeIf { !rs.wasNull() },
+            nomeCliente = rs.getString("nomeCliente"),
+            codigoVendedor = rs.getLong("codigoVendedor").takeIf { !rs.wasNull() },
+            nomeVendedor = rs.getString("nomeVendedor"),
+            codigoTipoDocumento = rs.getString("codigoTipoDocumento"),
+            nomeTipoDocumento = rs.getString("nomeTipoDocumento"),
+        )
 
-    private fun mapParcela(rs: ResultSet) = FinCrpProjectionImpl(
-        codigoEmpresa = rs.getInt("codigoEmpresa"),
-        dataEmissao = rs.getTimestamp("dataEmissao")?.toLocalDateTime(),
-        documento = rs.getBigDecimal("documento").toLong().toString(),
-        numeroParcela = rs.getInt("numeroParcela").takeIf { !rs.wasNull() },
-        flagIncobravel = rs.getString("flagIncobravel"),
-        dataIncobravel = rs.getTimestamp("dataIncobravel")?.toLocalDateTime(),
-        dataVencimento = rs.getTimestamp("dataVencimento")?.toLocalDateTime(),
-        prazoEmDias = rs.getInt("prazoEmDias").takeIf { !rs.wasNull() },
-        valorParcela = rs.getBigDecimal("valorParcela")?.toDouble(),
-        numeroBancario = rs.getString("numeroBancario"),
-        codigoBanco = rs.getString("codigoBanco"),
-        nomeBanco = rs.getString("nomeBanco"),
-        observacoes = rs.getString("observacoes"),
-        flagCartaAnuencia = rs.getString("flagCartaAnuencia"),
-        dataCartaAnuencia = rs.getTimestamp("dataCartaAnuencia")?.toLocalDateTime(),
-        flagPago = rs.getString("flagPago")
-    )
+    private fun mapParcela(rs: ResultSet) =
+        FinCrpProjectionImpl(
+            codigoEmpresa = rs.getInt("codigoEmpresa"),
+            dataEmissao = rs.getTimestamp("dataEmissao")?.toLocalDateTime(),
+            documento = rs.getBigDecimal("documento").toLong().toString(),
+            numeroParcela = rs.getInt("numeroParcela").takeIf { !rs.wasNull() },
+            flagIncobravel = rs.getString("flagIncobravel"),
+            dataIncobravel = rs.getTimestamp("dataIncobravel")?.toLocalDateTime(),
+            dataVencimento = rs.getTimestamp("dataVencimento")?.toLocalDateTime(),
+            prazoEmDias = rs.getInt("prazoEmDias").takeIf { !rs.wasNull() },
+            valorParcela = rs.getBigDecimal("valorParcela")?.toDouble(),
+            numeroBancario = rs.getString("numeroBancario"),
+            codigoBanco = rs.getString("codigoBanco"),
+            nomeBanco = rs.getString("nomeBanco"),
+            observacoes = rs.getString("observacoes"),
+            flagCartaAnuencia = rs.getString("flagCartaAnuencia"),
+            dataCartaAnuencia = rs.getTimestamp("dataCartaAnuencia")?.toLocalDateTime(),
+            flagPago = rs.getString("flagPago"),
+        )
 
     private fun toKey(h: FinCreProjectionImpl) = FinCreKey(h.codigoEmpresa, h.dataEmissao?.toLocalDate(), h.documento)
+
     private fun toKey(p: FinCrpProjectionImpl) = FinCreKey(p.codigoEmpresa, p.dataEmissao?.toLocalDate(), p.documento)
 }

@@ -13,19 +13,21 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class IpiService(
     private val ipiQueryRepository: IpiQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
+    fun getAllIpi(pageable: Pageable): Page<Ipi> = ipiQueryRepository.findAllPaged(pageable).toModel()
 
-    fun getAllIpi(pageable: Pageable): Page<Ipi> {
-        return ipiQueryRepository.findAllPaged(pageable).toModel()
-    }
-
-    fun getIpiByKey(codipi: String, tipipi: String): Ipi {
-        return ipiQueryRepository.findByKey(codipi, tipipi)?.toModel()
+    fun getIpiByKey(
+        codipi: String,
+        tipipi: String,
+    ): Ipi =
+        ipiQueryRepository.findByKey(codipi, tipipi)?.toModel()
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
 
-    fun sendIpiToIngestion(codipi: String, tipipi: String) {
+    fun sendIpiToIngestion(
+        codipi: String,
+        tipipi: String,
+    ) {
         val ipi = getIpiByKey(codipi, tipipi)
         ingestionServiceClient.sendIpi(ipi)
     }

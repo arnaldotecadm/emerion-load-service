@@ -70,5 +70,5 @@ data class CustomerOrderItemProjectionImpl(
     override val lucroPorcentagem: Double?,
     override val saldoQuantidade: Double?,
     override val descontoItemValor: Double?,
-    override val descontoItemTotal: Double?
+    override val descontoItemTotal: Double?,
 ) : CustomerOrderItemProjection

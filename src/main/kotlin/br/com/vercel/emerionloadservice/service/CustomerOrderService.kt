@@ -12,20 +12,16 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class CustomerOrderService(
     private val customerOrderQueryRepository: CustomerOrderQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllOrders(pageable: Pageable): Page<CustomerOrder> {
-        return customerOrderQueryRepository.findAllPaged(pageable)
-    }
+    fun getAllOrders(pageable: Pageable): Page<CustomerOrder> = customerOrderQueryRepository.findAllPaged(pageable)
 
-    fun getOrderByNumres(numres: String): CustomerOrder {
-        return customerOrderQueryRepository.findByKey(numres)
+    fun getOrderByNumres(numres: String): CustomerOrder =
+        customerOrderQueryRepository.findByKey(numres)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
-    }
 
     fun sendOrderToIngestion(numres: String) {
         val order = getOrderByNumres(numres)
         ingestionServiceClient.sendCustomerOrder(order)
     }
-
 }

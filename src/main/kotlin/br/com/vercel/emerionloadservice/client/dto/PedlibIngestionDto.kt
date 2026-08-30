@@ -18,5 +18,5 @@ data class PedlibIngestionDto(
     val codigoVendedor: Long?,
     val comissaoLiberacao: Double?,
     val totalCusto: Double?,
-    val detalhes: List<Pedlb2IngestionDto>
+    val detalhes: List<Pedlb2IngestionDto>,
 )

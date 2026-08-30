@@ -18,5 +18,5 @@ data class FinCreIngestionDto(
     val nomeVendedor: String?,
     val codigoTipoDocumento: String?,
     val nomeTipoDocumento: String?,
-    val parcelas: List<FinCrpIngestionDto>
+    val parcelas: List<FinCrpIngestionDto>,
 )

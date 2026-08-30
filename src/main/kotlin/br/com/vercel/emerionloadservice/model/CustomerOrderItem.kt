@@ -13,7 +13,6 @@ data class CustomerOrderItem(
     val quantidade: Double,
     val valorUnitario: Double,
     val valorTotal: Double,
-
     // Additional PEDRE2 fields identified from the legacy emerion-cliente-loader's
     // ProcessadorDetalhePedido#getItemsPedidos query.
     val seqRe2: Int,
@@ -73,7 +72,7 @@ data class CustomerOrderItem(
     val lucroPorcentagem: Double?,
     val saldoQuantidade: Double?,
     val descontoItemValor: Double?,
-    val descontoItemTotal: Double?
+    val descontoItemTotal: Double?,
 ) {
     val produto: String
         get() = "$codGru.$codSub.$codPro"

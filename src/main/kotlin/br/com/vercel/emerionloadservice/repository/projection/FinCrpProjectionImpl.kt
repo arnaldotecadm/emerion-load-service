@@ -18,5 +18,5 @@ data class FinCrpProjectionImpl(
     val observacoes: String?,
     val flagCartaAnuencia: String?,
     val dataCartaAnuencia: LocalDateTime?,
-    val flagPago: String?
+    val flagPago: String?,
 )

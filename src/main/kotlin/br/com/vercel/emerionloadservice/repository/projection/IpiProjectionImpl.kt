@@ -20,5 +20,5 @@ data class IpiProjectionImpl(
     val cstCofins: String?,
     val descricaoSituacaoTributariaCofins: String?,
     val aliquotaCofins: Double?,
-    val incluiDescontoSuframaCofins: String?
+    val incluiDescontoSuframaCofins: String?,
 )

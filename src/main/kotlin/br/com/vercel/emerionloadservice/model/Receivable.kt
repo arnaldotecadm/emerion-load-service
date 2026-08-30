@@ -11,6 +11,5 @@ data class Receivable(
     val valorOriginal: Double,
     val valorUtilizado: Double,
     val saldoAberto: Double,
-    val situacao: String?
+    val situacao: String?,
 )
-

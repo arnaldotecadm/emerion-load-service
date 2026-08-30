@@ -17,5 +17,5 @@ data class Pedlb2(
     val percentualDeAcrescimo: Double?,
     val precoVendaItem: Double?,
     val precoPraticado: Double?,
-    val custoPraticado: Double?
+    val custoPraticado: Double?,
 )

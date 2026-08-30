@@ -13,12 +13,9 @@ import org.springframework.web.server.ResponseStatusException
 @Service
 class ProductService(
     private val productQueryRepository: ProductQueryRepository,
-    private val ingestionServiceClient: IngestionServiceClient
+    private val ingestionServiceClient: IngestionServiceClient,
 ) {
-
-    fun getAllProducts(pageable: Pageable): Page<Product> {
-        return productQueryRepository.findAllPaged(pageable).toModel()
-    }
+    fun getAllProducts(pageable: Pageable): Page<Product> = productQueryRepository.findAllPaged(pageable).toModel()
 
     fun getProductById(id: String): Product {
         val (codGru, codSub, codPro) = parseId(id)
@@ -33,10 +30,12 @@ class ProductService(
 
     private fun parseId(id: String): Triple<String, String, String> {
         val parts = id.split(".")
-        if (parts.size != 3) throw ResponseStatusException(
-            HttpStatus.BAD_REQUEST,
-            "Product id must be in the format codGru.codSub.codPro"
-        )
+        if (parts.size != 3) {
+            throw ResponseStatusException(
+                HttpStatus.BAD_REQUEST,
+                "Product id must be in the format codGru.codSub.codPro",
+            )
+        }
         val codGru = parts[0].padStart(CODGRU_LENGTH, '0')
         val codSub = parts[1].padStart(CODSUB_LENGTH, '0')
         val codPro = parts[2].padStart(CODPRO_LENGTH, '0')
