@@ -2,48 +2,37 @@ package br.com.vercel.emerionloadservice.repository.mapper
 
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.CustomerOrderItem
-import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeaderProjection
+import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeaderProjectionImpl
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjection
 
 object CustomerOrderMapper {
 
-    fun CustomerOrderHeaderProjection.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder {
+    fun CustomerOrderHeaderProjectionImpl.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder {
         return CustomerOrder(
-            codEmp = this.codEmp,
-            codCli = this.codCli,
+            codigoEmpresa = this.codigoEmpresa,
+            codigoCliente = this.codigoCliente,
             cpfCnpj = this.cpfCnpj,
-            numres = this.numres,
-            nronfe = this.nronfe,
-            dataFaturamento = this.dataFaturamento,
-            totalFaturado = this.totalFaturado,
-            dteres = this.dteres.toLocalDate(),
-            sitres = this.sitres,
-            totger = this.totger,
-            totres = this.totres,
-            totipi = this.totipi,
-            totsub = this.totsub,
-            totdescinc = this.totdescinc,
-            totfrt = this.totfrt,
-            totseg = this.totseg,
-            totoutdesp = this.totoutdesp,
+            numeroPedido = this.numeroPedido,
+            dataPedido = this.dataPedido,
+            statusPedido = this.statusPedido,
+            totalPedidoComImpostos = this.totalPedidoComImpostos,
+            totalPedidoSemImpostos = this.totalPedidoSemImpostos,
+            totalIpi = this.totalIpi,
+            totalIcms = this.totalIcms,
+            totalPis = this.totalPis,
+            totalCofins = this.totalCofins,
+            totalSubstituicaoTributaria = this.totalSubstituicaoTributaria,
+            totalDescontoIncondicional = this.totalDescontoIncondicional,
+            totalFrete = this.totalFrete,
+            totalSeguro = this.totalSeguro,
+            totalOutrasDespesas = this.totalOutrasDespesas,
             vendedorExternalId = this.vendedorExternalId,
-            atendenteCod = this.atendenteCod,
-            dataEntregaPrevista = this.dataEntregaPrevista?.toLocalDate(),
-            descontoComercial = this.descontoComercial,
-            descontoRegional = this.descontoRegional,
+            dataEntregaPrevista = this.dataEntregaPrevista,
             codigoTransportadora = this.codigoTransportadora,
-            linhaReserva = this.linhaReserva,
             pedidoAnterior = this.pedidoAnterior,
             regimeTributario = this.regimeTributario,
             nomeRegimeTributario = this.nomeRegimeTributario,
-            dataProcessamentoComercial = this.dataProcessamentoComercial,
-            dataProcessamentoFinanceiro = this.dataProcessamentoFinanceiro,
-            dataRejeicao = this.dataRejeicao,
-            observacaoRejeicao = this.observacaoRejeicao,
-            dataEntrega = this.dataEntrega,
-            dataFinalizacao = this.dataFinalizacao,
-            codigoPagamento = this.codigoPagamento,
-            descricaoPagamento = this.descricaoPagamento,
+            codigoPadraoFaturamento = this.codigoPadraoFaturamento,
             itens = items.toModel()
         )
     }

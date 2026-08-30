@@ -2,7 +2,6 @@ package br.com.vercel.emerionloadservice.repository
 
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.repository.mapper.CustomerOrderMapper.toModel
-import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeaderProjection
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeaderProjectionImpl
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjection
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjectionImpl
@@ -13,6 +12,38 @@ import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
+
+private const val BASE_QUERY_PEDRES = """
+    select
+        ped.codemp            as codigoEmpresa,
+        ped.codcli            as codigoCliente,
+        ped.cgccli           as cpfCnpj,
+        ped.numres            as numeroPedido,
+        ped.dteres            as dataPedido,
+        ped.sitres            as statusPedido,
+        ped.totger            as totalPedidoComImpostos,
+        ped.totres            as totalPedidoSemImpostos,
+        ped.totipi            as totalIpi,
+        ped.toticm            as totalIcms,
+        ped.totpis            as totalPis,
+        ped.totcof            as totalCofins,
+        ped.totsub            as totalSubstituicaoTributaria,
+        ped.totdescinc        as totalDescontoIncondicional,
+        ped.totfrt            as totalFrete,
+        ped.totseg            as totalSeguro,
+        ped.totoutdesp        as totalOutrasDespesas,
+        ped.codven            as vendedorExternalId,
+        ped.codatd            as atendenteCod,
+        ped.dtfres            as dataEntregaPrevista,
+        ped.codtra            as codigoTransportadora,
+        ped.pedant            as pedidoAnterior,
+        ped.regtrb            as regimeTributario,
+        reg.nomregtrib      as nomeRegimeTributario,
+        ped.codpfa            as codigoPadraoFaturamento
+    from pedres ped
+    left join finregtrib reg
+        on reg.numregtrib = ped.regtrb
+"""
 
 /**
  * Handles paginated customer order queries using JdbcTemplate directly, since Firebird 1.5
@@ -28,6 +59,34 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
 
     private data class OrderBusinessKey(val codEmp: Int, val dteres: java.time.LocalDate, val numres: String)
 
+    private fun mapHeader(rs: ResultSet) =
+        CustomerOrderHeaderProjectionImpl(
+            codigoEmpresa = rs.getInt("codigoEmpresa"),
+            codigoCliente = rs.getLong("codigoCliente"),
+            cpfCnpj = rs.getString("cpfCnpj"),
+            numeroPedido = rs.getString("numeroPedido"),
+            dataPedido = rs.getTimestamp("dataPedido").toLocalDateTime(),
+            statusPedido = rs.getString("statusPedido"),
+            totalPedidoComImpostos = rs.getDouble("totalPedidoComImpostos"),
+            totalPedidoSemImpostos = rs.getDouble("totalPedidoSemImpostos"),
+            totalIpi = rs.getDouble("totalIpi"),
+            totalIcms = rs.getDouble("totalIcms"),
+            totalPis = rs.getDouble("totalPis"),
+            totalCofins = rs.getDouble("totalCofins"),
+            totalSubstituicaoTributaria = rs.getDouble("totalSubstituicaoTributaria"),
+            totalDescontoIncondicional = rs.getDouble("totalDescontoIncondicional"),
+            totalFrete = rs.getBigDecimal("totalFrete")?.toDouble(),
+            totalSeguro = rs.getBigDecimal("totalSeguro")?.toDouble(),
+            totalOutrasDespesas = rs.getBigDecimal("totalOutrasDespesas")?.toDouble(),
+            vendedorExternalId = rs.getLong("vendedorExternalId"),
+            dataEntregaPrevista = rs.getTimestamp("dataEntregaPrevista")?.toLocalDateTime(),
+            codigoTransportadora = rs.getString("codigoTransportadora"),
+            pedidoAnterior = rs.getString("pedidoAnterior"),
+            regimeTributario = rs.getString("regimeTributario"),
+            nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
+            codigoPadraoFaturamento = rs.getString("codigoPadraoFaturamento")
+        )
+
     fun findAllPaged(pageable: Pageable): Page<CustomerOrder> {
         val total = jdbcTemplate.queryForObject("select count(*) from pedres", Long::class.java) ?: 0L
         val headers = findHeadersPaged(pageable)
@@ -35,109 +94,37 @@ class CustomerOrderQueryRepository(private val jdbcTemplate: JdbcTemplate) {
             return PageImpl(emptyList(), pageable, total)
         }
 
-        val headerKeys = headers.map { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }.toSet()
-        val itemsByOrderKey = findItems(headers.map { it.numres }, headerKeys)
+        val headerKeys =
+            headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido) }.toSet()
+        val itemsByOrderKey = findItems(headers.map { it.numeroPedido }, headerKeys)
             .groupBy { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }
         val content = headers.map { header ->
-            val orderKey = OrderBusinessKey(header.codEmp, header.dteres.toLocalDate(), header.numres)
+            val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
             header.toModel(itemsByOrderKey[orderKey].orEmpty())
         }
 
         return PageImpl(content, pageable, total)
     }
 
-    private fun findHeadersPaged(pageable: Pageable): List<CustomerOrderHeaderProjection> {
-        val baseQuery = """
-            select
-                p.codemp            as codEmp,
-                p.codcli            as codCli,
-                fc.cgccli           as cpfCnpj,
-                p.numres            as numres,
-                fat.nronfs          as nronfe,
-                fat.dtafat          as dataFaturamento,
-                fat.totfat          as totalFaturado,
-                p.dteres            as dteres,
-                p.sitres            as sitres,
-                p.totger            as totger,
-                p.totres            as totres,
-                p.totipi            as totipi,
-                p.totsub            as totsub,
-                p.totdescinc        as totdescinc,
-                p.totfrt            as totfrt,
-                p.totseg            as totseg,
-                p.totoutdesp        as totoutdesp,
-                p.codven            as vendedorExternalId,
-                p.codatd            as atendenteCod,
-                p.dtfres            as dataEntregaPrevista,
-                p.dsccom            as descontoComercial,
-                p.dscreg            as descontoRegional,
-                p.codtra            as codigoTransportadora,
-                p.linres            as linhaReserva,
-                p.pedant            as pedidoAnterior,
-                p.regtrb            as regimeTributario,
-                reg.nomregtrib      as nomeRegimeTributario,
-                p.dtecom            as dataProcessamentoComercial,
-                p.dtefin            as dataProcessamentoFinanceiro,
-                p.dterej            as dataRejeicao,
-                p.obsrej            as observacaoRejeicao,
-                p.dtedel            as dataEntrega,
-                p.dtefpe            as dataFinalizacao,
-                p.codpfa            as codigoPagamento,
-                pfa.despfa          as descricaoPagamento
-            from pedres p
-            left join fatped fat
-                on fat.codemp = p.codemp
-                and fat.dteres = p.dteres
-                and fat.numres = p.numres
-            left join fincli fc
-                on fc.codcli = p.codcli
-            left join finregtrib reg
-                on reg.numregtrib = p.regtrb
-            left join estpfa pfa on pfa.codpfa = p.codpfa and pfa.tippfa = p.tippfa
-            order by p.codemp, p.dteres, p.numres
-        """.trimIndent()
+    fun findByKey(numres: String): CustomerOrder? {
+        val headerQuery = "$BASE_QUERY_PEDRES where ped.numres = ?"
+        val header = jdbcTemplate.query(headerQuery, { rs, _ -> mapHeader(rs) }, numres)
+            .firstOrNull() ?: return null
 
-        val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
+        val itemsByOrderKey = findItems(
+            listOf(numres),
+            setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido))
+        )
 
-        return jdbcTemplate.query(pagedQuery) { rs, _ ->
-            CustomerOrderHeaderProjectionImpl(
-                codEmp = rs.getInt("codEmp"),
-                codCli = rs.getLong("codCli"),
-                cpfCnpj = rs.getString("cpfCnpj"),
-                numres = rs.getString("numres"),
-                nronfe = rs.getString("nronfe"),
-                dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime()?.toLocalDate(),
-                totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
-                dteres = rs.getTimestamp("dteres").toLocalDateTime(),
-                sitres = rs.getString("sitres"),
-                totger = rs.getDouble("totger"),
-                totres = rs.getDouble("totres"),
-                totipi = rs.getDouble("totipi"),
-                totsub = rs.getDouble("totsub"),
-                totdescinc = rs.getDouble("totdescinc"),
-                totfrt = rs.getDouble("totfrt"),
-                totseg = rs.getDouble("totseg"),
-                totoutdesp = rs.getDouble("totoutdesp"),
-                vendedorExternalId = rs.getLong("vendedorExternalId").takeIf { !rs.wasNull() },
-                atendenteCod = rs.getString("atendenteCod"),
-                dataEntregaPrevista = rs.getTimestamp("dataEntregaPrevista")?.toLocalDateTime(),
-                descontoComercial = rs.getBigDecimal("descontoComercial")?.toDouble(),
-                descontoRegional = rs.getBigDecimal("descontoRegional")?.toDouble(),
-                codigoTransportadora = rs.getString("codigoTransportadora"),
-                linhaReserva = rs.getString("linhaReserva"),
-                pedidoAnterior = rs.getString("pedidoAnterior"),
-                regimeTributario = rs.getString("regimeTributario"),
-                nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
-                dataProcessamentoComercial = rs.getTimestamp("dataProcessamentoComercial")?.toLocalDateTime()?.toLocalDate(),
-                dataProcessamentoFinanceiro = rs.getTimestamp("dataProcessamentoFinanceiro")?.toLocalDateTime()?.toLocalDate(),
-                dataRejeicao = rs.getTimestamp("dataRejeicao")?.toLocalDateTime()?.toLocalDate(),
-                observacaoRejeicao = rs.getString("observacaoRejeicao"),
-                dataEntrega = rs.getTimestamp("dataEntrega")?.toLocalDateTime()?.toLocalDate(),
-                dataFinalizacao = rs.getTimestamp("dataFinalizacao")?.toLocalDateTime()?.toLocalDate(),
-                codigoPagamento = rs.getString("codigoPagamento"),
-                descricaoPagamento = rs.getString("descricaoPagamento"),
-            )
-        }
+        return header.toModel(itemsByOrderKey)
+    }
+
+    private fun findHeadersPaged(pageable: Pageable): List<CustomerOrderHeaderProjectionImpl> {
+        val query = FirebirdPagination.applyFirstSkip(
+            "$BASE_QUERY_PEDRES order by ped.dteres desc",
+            pageable
+        )
+        return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
     }
 
     private fun findItems(

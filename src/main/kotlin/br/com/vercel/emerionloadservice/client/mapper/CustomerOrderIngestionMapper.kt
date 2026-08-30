@@ -1,7 +1,7 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.CustomerOrderItemIngestionDto
 import br.com.vercel.emerionloadservice.client.dto.CustomerOrderIngestionDto
+import br.com.vercel.emerionloadservice.client.dto.CustomerOrderItemIngestionDto
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.CustomerOrderItem
 
@@ -11,43 +11,31 @@ object CustomerOrderIngestionMapper {
     // is sent as externalId to keep cross-company and cross-date uniqueness.
     fun CustomerOrder.toIngestionDto(cnpjEmpresa: String): CustomerOrderIngestionDto {
         return CustomerOrderIngestionDto(
-            externalId = "${this.codEmp}-${this.dteres}-${this.numres}",
-            codEmp = this.codEmp,
-            numres = this.numres,
-            customerExternalId = this.codCli,
-            cnpjEmpresa = cnpjEmpresa,
+            externalId = "${this.codigoEmpresa}.${this.dataPedido}.${this.numeroPedido}",
+            codigoEmpresa = this.codigoEmpresa,
+            codigoCliente = this.codigoCliente,
             cpfCnpj = this.cpfCnpj,
-            nronfe = this.nronfe,
-            dataFaturamento = this.dataFaturamento,
-            totalFaturado = this.totalFaturado,
-            dteres = this.dteres,
-            sitres = this.sitres,
-            totger = this.totger,
-            totres = this.totres,
-            totipi = this.totipi,
-            totsub = this.totsub,
-            totdescinc = this.totdescinc,
-            totfrt = this.totfrt,
-            totseg = this.totseg,
-            totoutdesp = this.totoutdesp,
+            numeroPedido = this.numeroPedido,
+            dataPedido = this.dataPedido,
+            statusPedido = this.statusPedido,
+            totalPedidoComImpostos = this.totalPedidoComImpostos,
+            totalPedidoSemImpostos = this.totalPedidoSemImpostos,
+            totalIpi = this.totalIpi,
+            totalIcms = this.totalIcms,
+            totalPis = this.totalPis,
+            totalCofins = this.totalCofins,
+            totalSubstituicaoTributaria = this.totalSubstituicaoTributaria,
+            totalDescontoIncondicional = this.totalDescontoIncondicional,
+            totalFrete = this.totalFrete,
+            totalSeguro = this.totalSeguro,
+            totalOutrasDespesas = this.totalOutrasDespesas,
             vendedorExternalId = this.vendedorExternalId,
-            atendenteCod = this.atendenteCod,
             dataEntregaPrevista = this.dataEntregaPrevista,
-            descontoComercial = this.descontoComercial,
-            descontoRegional = this.descontoRegional,
             codigoTransportadora = this.codigoTransportadora,
-            linhaReserva = this.linhaReserva,
             pedidoAnterior = this.pedidoAnterior,
             regimeTributario = this.regimeTributario,
             nomeRegimeTributario = this.nomeRegimeTributario,
-            dataProcessamentoComercial = this.dataProcessamentoComercial,
-            dataProcessamentoFinanceiro = this.dataProcessamentoFinanceiro,
-            dataRejeicao = this.dataRejeicao,
-            observacaoRejeicao = this.observacaoRejeicao,
-            dataEntrega = this.dataEntrega,
-            dataFinalizacao = this.dataFinalizacao,
-            codigoPagamento = this.codigoPagamento,
-            descricaoPagamento = this.descricaoPagamento,
+            codigoPadraoFaturamento = this.codigoPadraoFaturamento,
             itens = this.itens.map { it.toIngestionDto() }
         )
     }

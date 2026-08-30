@@ -10,61 +10,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface CustomerOrderRepository : PagingAndSortingRepository<DummyEntity, Long> {
 
-    @Query(
-        nativeQuery = true,
-        value = """
-            select
-                p.codemp            as codEmp,
-                p.codcli            as codCli,
-                fc.cgccli           as cpfCnpj,
-                p.numres            as numres,
-                fat.nronfs          as nronfe,
-                fat.dtafat          as dataFaturamento,
-                fat.totfat          as totalFaturado,
-                p.dteres            as dteres,
-                p.sitres            as sitres,
-                p.totger            as totger,
-                p.totres            as totres,
-                p.totipi            as totipi,
-                p.totsub            as totsub,
-                p.totdescinc        as totdescinc,
-                p.totfrt            as totfrt,
-                p.totseg            as totseg,
-                p.totoutdesp        as totoutdesp,
-                p.codven            as vendedorExternalId,
-                p.codatd            as atendenteCod,
-                p.dtfres            as dataEntregaPrevista,
-                p.dsccom            as descontoComercial,
-                p.dscreg            as descontoRegional,
-                p.codtra            as codigoTransportadora,
-                p.linres            as linhaReserva,
-                p.pedant            as pedidoAnterior,
-                p.regtrb            as regimeTributario,
-                reg.nomregtrib      as nomeRegimeTributario,
-                p.dtecom            as dataProcessamentoComercial,
-                p.dtefin            as dataProcessamentoFinanceiro,
-                p.dterej            as dataRejeicao,
-                p.obsrej            as observacaoRejeicao,
-                p.dtedel            as dataEntrega,
-                p.dtefpe            as dataFinalizacao,
-                p.codpfa            as codigoPagamento,
-                pfa.despfa          as descricaoPagamento
-            from pedres p
-            left join fatped fat
-                on fat.codemp = p.codemp
-                and fat.dteres = p.dteres
-                and fat.numres = p.numres
-            left join fincli fc
-                on fc.codcli = p.codcli
-            left join finregtrib reg
-                on reg.numregtrib = p.regtrb
-            left join estpfa pfa
-                on pfa.codpfa = p.codpfa
-                and pfa.tippfa = p.tippfa
-            where p.numres = :numres
-        """
-    )
-    fun getHeaderByNumres(numres: String): CustomerOrderHeaderProjection?
 
     @Query(
         nativeQuery = true,
