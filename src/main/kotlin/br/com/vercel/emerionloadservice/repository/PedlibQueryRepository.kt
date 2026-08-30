@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 
@@ -70,7 +71,7 @@ class PedlibQueryRepository(
     )
 
     fun findAllPaged(pageable: Pageable): Page<Pedlib> {
-        val total = jdbcTemplate.queryForObject("select count(*) from pedlib", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from pedlib") ?: 0L
         val headers = findHeadersPaged(pageable)
         if (headers.isEmpty()) return PageImpl(emptyList(), pageable, total)
 

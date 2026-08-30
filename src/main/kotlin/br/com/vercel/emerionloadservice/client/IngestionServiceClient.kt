@@ -40,20 +40,20 @@ import org.springframework.web.server.ResponseStatusException
 class IngestionServiceClient(
     private val restClient: RestClient,
     private val companyProvider: CompanyProvider,
-    @Value("\${ingestion-service.base-url}") private val baseUrl: String,
-    @Value("\${ingestion-service.endpoints.customer}") private val customerEndpoint: String,
-    @Value("\${ingestion-service.endpoints.product}") private val productEndpoint: String,
-    @Value("\${ingestion-service.endpoints.customer-address}") private val customerAddressEndpoint: String,
-    @Value("\${ingestion-service.endpoints.customer-credit}") private val customerCreditEndpoint: String,
-    @Value("\${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String,
-    @Value("\${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String,
-    @Value("\${ingestion-service.endpoints.invoice}") private val invoiceEndpoint: String,
-    @Value("\${ingestion-service.endpoints.invoice-item-link}") private val invoiceItemLinkEndpoint: String,
-    @Value("\${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
-    @Value("\${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
-    @Value("\${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
-    @Value("\${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String,
-    @Value("\${ingestion-service.endpoints.pedlib}") private val pedlibEndpoint: String,
+    @Value($$"${ingestion-service.base-url}") private val baseUrl: String,
+    @Value($$"${ingestion-service.endpoints.customer}") private val customerEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.product}") private val productEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.customer-address}") private val customerAddressEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.customer-credit}") private val customerCreditEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.invoice}") private val invoiceEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.invoice-item-link}") private val invoiceItemLinkEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.pedlib}") private val pedlibEndpoint: String,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -68,7 +68,7 @@ class IngestionServiceClient(
             logger.error("Failed to send {} {} to ingestion service", entityName, externalId, e)
             throw ResponseStatusException(
                 e.statusCode,
-                e.responseBodyAsString?.takeIf(String::isNotBlank)
+                e.responseBodyAsString.takeIf(String::isNotBlank)
                     ?: "Failed to send $entityName $externalId to ingestion service",
                 e,
             )
