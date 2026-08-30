@@ -14,7 +14,4 @@ data class InvoiceItemLink(
     val nronfs: String?,
     val dataFaturamento: LocalDate?,
     val totalFaturado: Double?,
-) {
-    val orderExternalId: String
-        get() = "$codEmp-$dteres-$numres"
-}
+)

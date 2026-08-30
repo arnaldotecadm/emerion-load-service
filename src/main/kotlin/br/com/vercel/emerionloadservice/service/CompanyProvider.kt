@@ -2,6 +2,7 @@ package br.com.vercel.emerionloadservice.service
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Component
 
 /**
@@ -17,7 +18,7 @@ import org.springframework.stereotype.Component
 @Component
 class CompanyProvider(
     private val jdbcTemplate: JdbcTemplate,
-    @Value("\${company.codemp:1}") private val codEmp: Int,
+    @Value($$"${company.codemp:1}") private val codEmp: Int,
 ) {
     @Volatile
     private var cachedCnpj: String? = null
@@ -29,9 +30,8 @@ class CompanyProvider(
 
     private fun fetchCompanyCnpj(): String {
         val cnpj =
-            jdbcTemplate.queryForObject(
+            jdbcTemplate.queryForObject<String>(
                 "select cgcemp from geremp where codemp = ?",
-                String::class.java,
                 codEmp,
             )
 

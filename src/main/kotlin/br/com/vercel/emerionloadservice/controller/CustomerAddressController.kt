@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController()
+@RestController
 @RequestMapping("customer-address")
 class CustomerAddressController(
     private val customerAddressService: CustomerAddressService,

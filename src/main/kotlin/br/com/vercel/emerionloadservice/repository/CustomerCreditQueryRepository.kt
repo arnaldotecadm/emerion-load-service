@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 
 /**
@@ -53,7 +54,7 @@ class CustomerCreditQueryRepository(
                 )
             }
 
-        val total = jdbcTemplate.queryForObject("select count(*) from fincde", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from fincde") ?: 0L
 
         return PageImpl(content, pageable, total)
     }

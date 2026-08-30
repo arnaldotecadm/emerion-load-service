@@ -8,7 +8,7 @@ import br.com.vercel.emerionloadservice.model.CustomerOrderItem
 object CustomerOrderIngestionMapper {
     // The receiving service generates its own internal id, so the order business key
     // is sent as externalId to keep cross-company and cross-date uniqueness.
-    fun CustomerOrder.toIngestionDto(cnpjEmpresa: String): CustomerOrderIngestionDto =
+    fun CustomerOrder.toIngestionDto(): CustomerOrderIngestionDto =
         CustomerOrderIngestionDto(
             externalId = "${this.codigoEmpresa}.${this.dataPedido}.${this.numeroPedido}",
             codigoEmpresa = this.codigoEmpresa,

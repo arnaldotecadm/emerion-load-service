@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController()
+@RestController
 @RequestMapping("customer-credit")
 class CustomerCreditController(
     private val customerCreditService: CustomerCreditService,

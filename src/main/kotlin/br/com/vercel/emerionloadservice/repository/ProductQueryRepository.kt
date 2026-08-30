@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 
@@ -143,7 +144,7 @@ class ProductQueryRepository(
     fun findAllPaged(pageable: Pageable): Page<ProductProjectionImpl> {
         val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY_ESTPRO.plus(" order by pro.codgru, pro.codsub, pro.codpro"), pageable)
         val content: List<ProductProjectionImpl> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
-        val total = jdbcTemplate.queryForObject("select count(*) from estpro", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from estpro") ?: 0L
         return PageImpl(content, pageable, total)
     }
 

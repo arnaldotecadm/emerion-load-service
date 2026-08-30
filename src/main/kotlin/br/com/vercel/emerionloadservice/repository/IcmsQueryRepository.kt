@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 
@@ -47,7 +48,7 @@ class IcmsQueryRepository(
         )
 
     fun findAllPaged(pageable: Pageable): Page<IcmsProjectionImpl> {
-        val total = jdbcTemplate.queryForObject("select count(*) from esticm", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from esticm") ?: 0L
 
         val pagedQuery =
             FirebirdPagination.applyFirstSkip(

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
 import java.time.LocalDate
@@ -47,22 +48,10 @@ class InvoiceItemLinkQueryRepository(
 
         val content: List<InvoiceItemLinkProjection> =
             jdbcTemplate.query(pagedQuery) { rs, _ ->
-                InvoiceItemLinkProjectionImpl(
-                    codEmp = rs.getInt("codEmp"),
-                    numres = rs.getString("numres"),
-                    dteres = rs.getTimestamp("dteres").toLocalDateTime(),
-                    seqRe2 = rs.getNullableInt("seqRe2") ?: 0,
-                    codClp = rs.getString("codClp"),
-                    codGru = rs.getString("codGru"),
-                    codSub = rs.getString("codSub"),
-                    codPro = rs.getString("codPro"),
-                    nronfs = rs.getString("nronfs"),
-                    dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime(),
-                    totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
-                )
+                resultsetToModel(rs)
             }
 
-        val total = jdbcTemplate.queryForObject("select count(*) from fatde2", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from fatde2") ?: 0L
         return PageImpl(content, pageable, total)
     }
 
@@ -104,21 +93,24 @@ class InvoiceItemLinkQueryRepository(
             """.trimIndent()
 
         return jdbcTemplate.query(query, { rs, _ ->
-            InvoiceItemLinkProjectionImpl(
-                codEmp = rs.getInt("codEmp"),
-                numres = rs.getString("numres"),
-                dteres = rs.getTimestamp("dteres").toLocalDateTime(),
-                seqRe2 = rs.getNullableInt("seqRe2") ?: 0,
-                codClp = rs.getString("codClp"),
-                codGru = rs.getString("codGru"),
-                codSub = rs.getString("codSub"),
-                codPro = rs.getString("codPro"),
-                nronfs = rs.getString("nronfs"),
-                dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime(),
-                totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
-            )
+            resultsetToModel(rs)
         }, codEmp, java.sql.Date.valueOf(dteres), numres, seqRe2)
     }
+
+    private fun resultsetToModel(rs: ResultSet): InvoiceItemLinkProjectionImpl =
+        InvoiceItemLinkProjectionImpl(
+            codEmp = rs.getInt("codEmp"),
+            numres = rs.getString("numres"),
+            dteres = rs.getTimestamp("dteres").toLocalDateTime(),
+            seqRe2 = rs.getNullableInt("seqRe2") ?: 0,
+            codClp = rs.getString("codClp"),
+            codGru = rs.getString("codGru"),
+            codSub = rs.getString("codSub"),
+            codPro = rs.getString("codPro"),
+            nronfs = rs.getString("nronfs"),
+            dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime(),
+            totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
+        )
 
     private fun ResultSet.getNullableInt(columnLabel: String): Int? {
         val value = getInt(columnLabel)

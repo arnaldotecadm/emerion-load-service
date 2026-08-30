@@ -7,7 +7,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
+import java.sql.ResultSet
 import java.time.LocalDate
 
 private const val BASE_QUERY_INVOICE = """
@@ -37,18 +39,10 @@ class InvoiceQueryRepository(
 
         val content: List<InvoiceProjection> =
             jdbcTemplate.query(pagedQuery) { rs, _ ->
-                InvoiceProjectionImpl(
-                    codEmp = rs.getInt("codEmp"),
-                    codCli = rs.getLong("codCli").takeIf { !rs.wasNull() },
-                    numres = rs.getString("numres"),
-                    dteres = rs.getTimestamp("dteres").toLocalDateTime(),
-                    nronfs = rs.getString("nronfs"),
-                    dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime(),
-                    totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
-                )
+                resultsetToModel(rs)
             }
 
-        val total = jdbcTemplate.queryForObject("select count(*) from fatped", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from fatped") ?: 0L
         return PageImpl(content, pageable, total)
     }
 
@@ -79,15 +73,18 @@ class InvoiceQueryRepository(
             """.trimIndent()
 
         return jdbcTemplate.query(query, { rs, _ ->
-            InvoiceProjectionImpl(
-                codEmp = rs.getInt("codEmp"),
-                codCli = rs.getLong("codCli").takeIf { !rs.wasNull() },
-                numres = rs.getString("numres"),
-                dteres = rs.getTimestamp("dteres").toLocalDateTime(),
-                nronfs = rs.getString("nronfs"),
-                dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime(),
-                totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
-            )
+            resultsetToModel(rs)
         }, codEmp, java.sql.Date.valueOf(dteres), numres)
     }
+
+    private fun resultsetToModel(rs: ResultSet): InvoiceProjectionImpl =
+        InvoiceProjectionImpl(
+            codEmp = rs.getInt("codEmp"),
+            codCli = rs.getLong("codCli").takeIf { !rs.wasNull() },
+            numres = rs.getString("numres"),
+            dteres = rs.getTimestamp("dteres").toLocalDateTime(),
+            nronfs = rs.getString("nronfs"),
+            dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime(),
+            totalFaturado = rs.getBigDecimal("totalFaturado")?.toDouble(),
+        )
 }

@@ -10,7 +10,4 @@ data class Invoice(
     val nronfs: String?,
     val dataFaturamento: LocalDate?,
     val totalFaturado: Double?,
-) {
-    val orderExternalId: String
-        get() = "$codEmp-$dteres-$numres"
-}
+)

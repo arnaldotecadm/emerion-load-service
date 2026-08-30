@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 
 private const val BASE_QUERY_IPI = """
@@ -47,7 +48,7 @@ class IpiQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
     fun findAllPaged(pageable: Pageable): Page<IpiProjectionImpl> {
-        val total = jdbcTemplate.queryForObject("select count(*) from estipi", Long::class.java) ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from estipi") ?: 0L
 
         val pagedQuery =
             FirebirdPagination.applyFirstSkip(

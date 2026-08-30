@@ -146,7 +146,7 @@ class IngestionServiceClient(
 
     fun sendCustomerOrder(order: CustomerOrder) {
         val url = "$baseUrl$customerOrderEndpoint"
-        val dto = order.toIngestionDto(companyProvider.getCompanyCnpj())
+        val dto = order.toIngestionDto()
 
         logger.info("Sending order {} ({} item(s)) to ingestion service at {}", dto.externalId, dto.itens.size, url)
         sendToIngestion("customer order", dto.externalId) {

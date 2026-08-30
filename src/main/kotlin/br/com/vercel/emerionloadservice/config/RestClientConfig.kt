@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClient
 
 @Configuration
 class RestClientConfig(
-    @Value("\${ingestion-service.api-key}") private val ingestionApiKey: String,
+    @Value($$"${ingestion-service.api-key}") private val ingestionApiKey: String,
 ) {
     @Bean
     fun ingestionRestClient(): RestClient {

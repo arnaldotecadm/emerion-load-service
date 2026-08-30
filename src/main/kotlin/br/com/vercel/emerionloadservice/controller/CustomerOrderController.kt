@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@RestController()
+@RestController
 @RequestMapping("customer-order")
 class CustomerOrderController(
     private val customerOrderService: CustomerOrderService,
@@ -26,12 +26,12 @@ class CustomerOrderController(
     ): Page<CustomerOrderIngestionDto> =
         this.customerOrderService
             .getAllOrders(pageable)
-            .map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
+            .map { it.toIngestionDto() }
 
     @GetMapping("{numres}")
     fun getOrderByNumres(
         @PathVariable numres: String,
-    ): CustomerOrderIngestionDto = this.customerOrderService.getOrderByNumres(numres).toIngestionDto(companyProvider.getCompanyCnpj())
+    ): CustomerOrderIngestionDto = this.customerOrderService.getOrderByNumres(numres).toIngestionDto()
 
     @PostMapping("{numres}/send")
     fun sendOrderToIngestion(
