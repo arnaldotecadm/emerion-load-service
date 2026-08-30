@@ -1,12 +1,10 @@
 package br.com.vercel.emerionloadservice.service
 
 import br.com.vercel.emerionloadservice.client.IngestionServiceClient
-import br.com.vercel.emerionloadservice.model.SendAllResult
 import br.com.vercel.emerionloadservice.model.Vendedor
 import br.com.vercel.emerionloadservice.repository.VendedorQueryRepository
 import br.com.vercel.emerionloadservice.repository.VendedorRepository
 import br.com.vercel.emerionloadservice.repository.mapper.VendedorMapper.toModel
-import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -31,35 +29,5 @@ class VendedorService(
     fun sendVendedorToIngestion(codVen: Long) {
         val vendedor = getVendedorByCodVen(codVen)
         ingestionServiceClient.sendVendedor(vendedor)
-    }
-
-    fun sendAllVendedoresToIngestion(pageable: Pageable): SendAllResult {
-        var page = pageable
-        var totalSent = 0
-        var totalErrors = 0
-        var totalPages = 0
-
-        do {
-            val currentPage = getAllVendedores(page)
-            totalPages = currentPage.totalPages
-
-            currentPage.content.forEach { vendedor ->
-                try {
-                    ingestionServiceClient.sendVendedor(vendedor)
-                    totalSent++
-                } catch (e: Exception) {
-                    logger.error("Failed to send vendedor {}: {}", vendedor.id, e.message)
-                    totalErrors++
-                }
-            }
-
-            page = page.next()
-        } while (currentPage.hasNext())
-
-        return SendAllResult(totalSent = totalSent, totalErrors = totalErrors, totalPages = totalPages)
-    }
-
-    companion object {
-        private val logger = LoggerFactory.getLogger(VendedorService::class.java)
     }
 }

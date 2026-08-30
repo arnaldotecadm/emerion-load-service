@@ -3,6 +3,7 @@ plugins {
 	kotlin("plugin.spring") version "2.2.21"
 	id("org.springframework.boot") version "4.0.6"
 	id("io.spring.dependency-management") version "1.1.7"
+	id("org.sonarqube") version "7.4.0.8496"
 }
 
 group = "br.com.vercel"
@@ -42,4 +43,13 @@ kotlin {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+sonar {
+	properties {
+		property("sonar.projectKey", "emerion-service")
+		property("sonar.projectName", "Emerion Service")
+		property("sonar.host.url", "http://localhost:9000")
+		property("sonar.token", "sqa_9eaa30e260643ad5a6d963c501bc9cfcf5bd031f")
+	}
 }

@@ -3,7 +3,6 @@ package br.com.vercel.emerionloadservice.service
 import br.com.vercel.emerionloadservice.client.IngestionServiceClient
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.repository.CustomerOrderQueryRepository
-import br.com.vercel.emerionloadservice.repository.CustomerOrderRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -12,7 +11,6 @@ import org.springframework.web.server.ResponseStatusException
 
 @Service
 class CustomerOrderService(
-    private val customerOrderRepository: CustomerOrderRepository,
     private val customerOrderQueryRepository: CustomerOrderQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient
 ) {

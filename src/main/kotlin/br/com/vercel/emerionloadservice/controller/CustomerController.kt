@@ -40,11 +40,4 @@ class CustomerController(
         return ResponseEntity.ok().build()
     }
 
-    @PostMapping("send-all")
-    fun sendAllCustomersToIngestion(
-        @RequestParam(defaultValue = "40") pageSize: Int
-    ): ResponseEntity<SendAllResult> {
-        val result = this.customerService.sendAllCustomersToIngestion(PageRequest.of(0, pageSize))
-        return ResponseEntity.ok(result)
-    }
 }

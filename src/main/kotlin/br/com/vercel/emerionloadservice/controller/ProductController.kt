@@ -39,13 +39,5 @@ class ProductController(
         this.productService.sendProductToIngestion(id)
         return ResponseEntity.ok().build()
     }
-
-    @PostMapping("send-all")
-    fun sendAllProductsToIngestion(
-        @RequestParam(defaultValue = "40") pageSize: Int
-    ): ResponseEntity<SendAllResult> {
-        val result = this.productService.sendAllProductsToIngestion(PageRequest.of(0, pageSize))
-        return ResponseEntity.ok(result)
-    }
 }
 
