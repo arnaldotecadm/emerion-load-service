@@ -4,12 +4,12 @@ import java.time.Instant
 import java.time.LocalDateTime
 
 data class ReceivableProjectionImpl(
-    override val codCli: Long,
-    override val sequencia: String?,
-    override val dataLancamento: Instant,
-    override val dataReferenciaPedido: LocalDateTime?,
-    override val valorOriginal: Double,
-    override val valorUtilizado: Double,
-    override val saldoAberto: Double,
-    override val situacao: String?,
-) : ReceivableProjection
+    val codCli: Long,
+    val sequencia: String?,
+    val dataLancamento: Instant,
+    val dataReferenciaPedido: LocalDateTime?,
+    val valorOriginal: Double,
+    val valorUtilizado: Double,
+    val saldoAberto: Double,
+    val situacao: String?,
+)

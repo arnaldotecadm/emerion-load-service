@@ -1,6 +1,5 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.ReceivableProjection
 import br.com.vercel.emerionloadservice.repository.projection.ReceivableProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
@@ -40,12 +39,12 @@ class ReceivableQueryRepository(
             situacao = rs.getString("situacao"),
         )
 
-    fun findAllPaged(pageable: Pageable): Page<ReceivableProjection> {
+    fun findAllPaged(pageable: Pageable): Page<ReceivableProjectionImpl> {
         val baseQuery = "$BASE_QUERY_RECEIVABLE order by cde.codcli, cde.seqcde"
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
-        val content: List<ReceivableProjection> =
+        val content: List<ReceivableProjectionImpl> =
             jdbcTemplate.query(pagedQuery) { rs, _ ->
                 resultsetToModel(rs)
             }
@@ -54,7 +53,7 @@ class ReceivableQueryRepository(
         return PageImpl(content, pageable, total)
     }
 
-    fun findByCodCli(codCli: Long): List<ReceivableProjection> {
+    fun findByCodCli(codCli: Long): List<ReceivableProjectionImpl> {
         val query = "$BASE_QUERY_RECEIVABLE where cde.codcli = ? order by cde.seqcde"
 
         return jdbcTemplate.query(query, { rs, _ ->

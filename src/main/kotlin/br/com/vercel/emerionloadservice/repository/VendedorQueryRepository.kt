@@ -1,6 +1,5 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.VendedorProjection
 import br.com.vercel.emerionloadservice.repository.projection.VendedorProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
@@ -54,22 +53,22 @@ class VendedorQueryRepository(
             metaRepresentacao = rs.getBigDecimal("metaRepresentacao"),
         )
 
-    fun findAllPaged(pageable: Pageable): Page<VendedorProjection> {
+    fun findAllPaged(pageable: Pageable): Page<VendedorProjectionImpl> {
         val baseQuery = "$BASE_QUERY_VENDEDOR order by ven.codven"
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
-        val content: List<VendedorProjection> =
+        val content: List<VendedorProjectionImpl> =
             jdbcTemplate.query(pagedQuery) { rs, _ ->
                 resultsetToModel(rs)
             }
 
-        val total = jdbcTemplate.queryForObject<Long>("select count(*) from finven") ?: 0L
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from finven")!!
 
         return PageImpl(content, pageable, total)
     }
 
-    fun findByCodVen(codVen: Long): VendedorProjection? {
+    fun findByCodVen(codVen: Long): VendedorProjectionImpl? {
         val query = "$BASE_QUERY_VENDEDOR where ven.codven = ?"
 
         return jdbcTemplate

@@ -4,17 +4,17 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class VendedorProjectionImpl(
-    override val id: Long,
-    override val nome: String,
-    override val apelido: String?,
-    override val cpfCnpj: String?,
-    override val telefone: String?,
-    override val celular: String?,
-    override val email: String?,
-    override val cidade: String?,
-    override val uf: String?,
-    override val situacao: String?,
-    override val saldo: BigDecimal?,
-    override val dataCadastro: LocalDateTime?,
-    override val metaRepresentacao: BigDecimal?,
-) : VendedorProjection
+    val id: Long,
+    val nome: String,
+    val apelido: String?,
+    val cpfCnpj: String?,
+    val telefone: String?,
+    val celular: String?,
+    val email: String?,
+    val cidade: String?,
+    val uf: String?,
+    val situacao: String?,
+    val saldo: BigDecimal?,
+    val dataCadastro: LocalDateTime?,
+    val metaRepresentacao: BigDecimal?,
+)

@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.sonarqube") version "7.4.0.8496"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
+    jacoco
 }
 
 group = "br.com.vercel"
@@ -34,6 +35,17 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
+    testImplementation("org.testcontainers:jdbc:1.21.4")
+    testImplementation("org.firebirdsql.jdbc:jaybird:6.0.6")
+    testImplementation("org.testcontainers:testcontainers:2.0.5")
+    testImplementation("org.firebirdsql:firebird-testcontainers-java:2.0.0")
+
+    testImplementation("org.flywaydb:flyway-core:13.4.0")
+    testImplementation("org.flywaydb:flyway-firebird:13.4.0")
+    testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
 }
 
 kotlin {
@@ -53,4 +65,18 @@ sonar {
         property("sonar.host.url", "http://localhost:9000")
         property("sonar.token", "sqa_9eaa30e260643ad5a6d963c501bc9cfcf5bd031f")
     }
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+
+    reports {
+        xml.required.set(true)
+        html.required.set(true)
+        csv.required.set(false)
+    }
+}
+
+tasks.named("sonar") {
+    dependsOn(tasks.jacocoTestReport)
 }

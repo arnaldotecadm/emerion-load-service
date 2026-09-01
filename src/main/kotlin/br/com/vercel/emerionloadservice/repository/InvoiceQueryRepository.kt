@@ -1,6 +1,5 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.InvoiceProjection
 import br.com.vercel.emerionloadservice.repository.projection.InvoiceProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
@@ -32,12 +31,12 @@ private const val BASE_QUERY_INVOICE = """
 class InvoiceQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
-    fun findAllPaged(pageable: Pageable): Page<InvoiceProjection> {
+    fun findAllPaged(pageable: Pageable): Page<InvoiceProjectionImpl> {
         val baseQuery = "$BASE_QUERY_INVOICE order by fat.codemp, fat.dteres, fat.numres, fat.nronfs"
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
-        val content: List<InvoiceProjection> =
+        val content: List<InvoiceProjectionImpl> =
             jdbcTemplate.query(pagedQuery) { rs, _ ->
                 resultsetToModel(rs)
             }
@@ -50,27 +49,8 @@ class InvoiceQueryRepository(
         codEmp: Int,
         dteres: LocalDate,
         numres: String,
-    ): List<InvoiceProjection> {
-        val query =
-            """
-            select
-                fat.codemp as codEmp,
-                p.codcli as codCli,
-                fat.numres as numres,
-                fat.dteres as dteres,
-                fat.nronfs as nronfs,
-                fat.dtafat as dataFaturamento,
-                fat.totfat as totalFaturado
-            from fatped fat
-            left join pedres p
-                on p.codemp = fat.codemp
-                and p.dteres = fat.dteres
-                and p.numres = fat.numres
-            where fat.codemp = ?
-                and fat.dteres = ?
-                and fat.numres = ?
-            order by fat.nronfs
-            """.trimIndent()
+    ): List<InvoiceProjectionImpl> {
+        val query = "$BASE_QUERY_INVOICE where fat.codemp = ? and fat.dteres = ? and fat.numres = ? order by fat.nronfs"
 
         return jdbcTemplate.query(query, { rs, _ ->
             resultsetToModel(rs)

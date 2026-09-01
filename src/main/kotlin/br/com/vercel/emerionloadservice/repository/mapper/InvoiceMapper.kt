@@ -1,13 +1,13 @@
 package br.com.vercel.emerionloadservice.repository.mapper
 
 import br.com.vercel.emerionloadservice.model.Invoice
-import br.com.vercel.emerionloadservice.repository.projection.InvoiceProjection
+import br.com.vercel.emerionloadservice.repository.projection.InvoiceProjectionImpl
 import org.springframework.data.domain.Page
 
 object InvoiceMapper {
-    fun Page<InvoiceProjection>.toModel(): Page<Invoice> = this.map { it.toModel() }
+    fun Page<InvoiceProjectionImpl>.toModel(): Page<Invoice> = this.map { it.toModel() }
 
-    fun InvoiceProjection.toModel(): Invoice =
+    fun InvoiceProjectionImpl.toModel(): Invoice =
         Invoice(
             codEmp = this.codEmp,
             codCli = this.codCli,
