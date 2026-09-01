@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.CustomerIngestionDto
+import br.com.vercel.emerionloadservice.api.model.CustomerIngestionDto
 import br.com.vercel.emerionloadservice.model.Customer
 
 object CustomerIngestionMapper {

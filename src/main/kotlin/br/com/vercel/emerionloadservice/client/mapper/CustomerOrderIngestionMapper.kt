@@ -1,18 +1,21 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.CustomerOrderIngestionDto
-import br.com.vercel.emerionloadservice.client.dto.CustomerOrderItemIngestionDto
+import br.com.vercel.emerionloadservice.api.model.CustomerOrderIngestionDto
+import br.com.vercel.emerionloadservice.api.model.CustomerOrderItemIngestionDto
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.CustomerOrderItem
 
 object CustomerOrderIngestionMapper {
     // The receiving service generates its own internal id, so the order business key
     // is sent as externalId to keep cross-company and cross-date uniqueness.
-    fun CustomerOrder.toIngestionDto(): CustomerOrderIngestionDto =
+    fun CustomerOrder.toIngestionDto(cnpjEmpresa: String): CustomerOrderIngestionDto =
         CustomerOrderIngestionDto(
             externalId = "${this.codigoEmpresa}.${this.dataPedido}.${this.numeroPedido}",
             codigoEmpresa = this.codigoEmpresa,
             codigoCliente = this.codigoCliente,
+            cnpjEmpresa = cnpjEmpresa,
+            customerExternalId = this.codigoCliente,
+            dteres = this.dataPedido.toLocalDate(),
             cpfCnpj = this.cpfCnpj,
             numeroPedido = this.numeroPedido,
             dataPedido = this.dataPedido,

@@ -1,7 +1,7 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.FinCreIngestionDto
-import br.com.vercel.emerionloadservice.client.dto.FinCrpIngestionDto
+import br.com.vercel.emerionloadservice.api.model.FinCreIngestionDto
+import br.com.vercel.emerionloadservice.api.model.FinCrpIngestionDto
 import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.model.FinCrp
 

@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.client.dto.FinCreIngestionDto
+import br.com.vercel.emerionloadservice.api.model.FinCreIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.FinCreIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.FinCreService

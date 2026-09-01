@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.client.dto.PedlibIngestionDto
+import br.com.vercel.emerionloadservice.api.model.PedlibIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.PedlibIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.PedlibService

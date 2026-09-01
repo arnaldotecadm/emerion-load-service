@@ -1,7 +1,7 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.Pedlb2IngestionDto
-import br.com.vercel.emerionloadservice.client.dto.PedlibIngestionDto
+import br.com.vercel.emerionloadservice.api.model.Pedlb2IngestionDto
+import br.com.vercel.emerionloadservice.api.model.PedlibIngestionDto
 import br.com.vercel.emerionloadservice.model.Pedlb2
 import br.com.vercel.emerionloadservice.model.Pedlib
 

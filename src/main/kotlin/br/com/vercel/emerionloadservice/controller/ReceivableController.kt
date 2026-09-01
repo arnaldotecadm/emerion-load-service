@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.client.dto.ReceivableIngestionDto
+import br.com.vercel.emerionloadservice.api.model.ReceivableIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ReceivableIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.ReceivableService

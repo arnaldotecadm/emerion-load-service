@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.InvoiceIngestionDto
+import br.com.vercel.emerionloadservice.api.model.InvoiceIngestionDto
 import br.com.vercel.emerionloadservice.model.Invoice
 
 object InvoiceIngestionMapper {

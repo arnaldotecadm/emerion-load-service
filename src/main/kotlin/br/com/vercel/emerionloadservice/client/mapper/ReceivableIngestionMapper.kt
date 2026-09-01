@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.ReceivableIngestionDto
+import br.com.vercel.emerionloadservice.api.model.ReceivableIngestionDto
 import br.com.vercel.emerionloadservice.model.Receivable
 
 object ReceivableIngestionMapper {

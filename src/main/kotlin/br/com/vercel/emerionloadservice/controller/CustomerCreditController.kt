@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.client.dto.CustomerCreditIngestionDto
+import br.com.vercel.emerionloadservice.api.model.CustomerCreditIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.CustomerCreditService

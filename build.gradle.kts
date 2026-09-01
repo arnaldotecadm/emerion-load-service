@@ -5,6 +5,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.7"
     id("org.sonarqube") version "7.4.0.8496"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
+    id("org.openapi.generator") version "7.17.0"
     jacoco
 }
 
@@ -51,6 +52,56 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict", "-Xannotation-default-target=param-property")
+    }
+}
+
+openApiGenerate {
+    generatorName.set("kotlin")
+    inputSpec.set("$projectDir/src/main/resources/openapi.yaml")
+    outputDir.set("$buildDir/generated/openapi")
+    modelPackage.set("br.com.vercel.emerionloadservice.api.model")
+    globalProperties.set(
+        mapOf(
+            "apis" to "false",
+            "models" to "",
+            "supportingFiles" to "false",
+        ),
+    )
+    configOptions.set(
+        mapOf(
+            "library" to "jvm-spring-webclient",
+            "dateLibrary" to "java8-localdatetime",
+            "serializationLibrary" to "jackson",
+            "useBeanValidation" to "false",
+        ),
+    )
+    typeMappings.set(
+        mapOf(
+            "DateTime" to "Instant",
+            "date-time-local" to "LocalDateTime",
+        ),
+    )
+    importMappings.set(
+        mapOf(
+            "Instant" to "java.time.Instant",
+            "LocalDateTime" to "java.time.LocalDateTime",
+        ),
+    )
+}
+
+sourceSets {
+    main {
+        kotlin.srcDir("$buildDir/generated/openapi/src/main/kotlin")
+    }
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(tasks.named("openApiGenerate"))
+}
+
+gradle.projectsEvaluated {
+    tasks.named<org.jlleitschuh.gradle.ktlint.tasks.KtLintCheckTask>("runKtlintCheckOverMainSourceSet") {
+        setSource("src/main/kotlin")
     }
 }
 

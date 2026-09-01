@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.IcmsIngestionDto
+import br.com.vercel.emerionloadservice.api.model.IcmsIngestionDto
 import br.com.vercel.emerionloadservice.model.Icms
 
 object IcmsIngestionMapper {

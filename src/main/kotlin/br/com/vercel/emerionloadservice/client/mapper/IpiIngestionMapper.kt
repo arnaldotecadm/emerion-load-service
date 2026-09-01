@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.client.mapper
 
-import br.com.vercel.emerionloadservice.client.dto.IpiIngestionDto
+import br.com.vercel.emerionloadservice.api.model.IpiIngestionDto
 import br.com.vercel.emerionloadservice.model.Ipi
 
 object IpiIngestionMapper {

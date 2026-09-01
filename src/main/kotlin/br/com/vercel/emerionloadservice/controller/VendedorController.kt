@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.client.dto.VendedorIngestionDto
+import br.com.vercel.emerionloadservice.api.model.VendedorIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.VendedorService
