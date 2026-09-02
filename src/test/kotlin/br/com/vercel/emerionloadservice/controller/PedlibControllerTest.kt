@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.PedlibService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -41,6 +43,22 @@ class PedlibControllerTest {
     fun `should return an empty pedlib page`() {
         mockMvc.perform(get("/pedlib/all")).andExpect(status().isOk).andExpect(jsonPath("$.content").isEmpty)
         verify(pedlibServiceMock).getAllPedlib(any())
+    }
+
+    @Test
+    fun `should return a populated pedlib page with the retailer identity`() {
+        val pedlib = mock<Pedlib>()
+        whenever(pedlib.codigoEmpresa).thenReturn(1)
+        whenever(pedlib.numeroPedido).thenReturn("123")
+        whenever(pedlib.numeroLiberacao).thenReturn(1)
+        whenever(pedlib.detalhes).thenReturn(emptyList())
+        whenever(pedlibServiceMock.getAllPedlib(any())).thenReturn(PageImpl(listOf(pedlib)))
+
+        mockMvc
+            .perform(get("/pedlib/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].numeroPedido").value("123"))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

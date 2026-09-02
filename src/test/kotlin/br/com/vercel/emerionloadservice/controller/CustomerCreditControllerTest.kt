@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.CustomerCreditService
 import org.junit.jupiter.api.BeforeEach
@@ -11,12 +12,14 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.time.Instant
 
 @WebMvcTest(CustomerCreditController::class)
 class CustomerCreditControllerTest {
@@ -40,6 +43,28 @@ class CustomerCreditControllerTest {
     fun `should return an empty customer credit page`() {
         mockMvc.perform(get("/customer-credit/all")).andExpect(status().isOk).andExpect(jsonPath("$.content").isEmpty)
         verify(customerCreditServiceMock).getAllCredits(any())
+    }
+
+    @Test
+    fun `should return a populated customer credit page with the retailer identity`() {
+        val credit =
+            CustomerCredit(
+                codCli = 42L,
+                sequencia = "1",
+                data = Instant.parse("2026-01-02T00:00:00Z"),
+                dataPedido = null,
+                valorUtilizado = 0.0,
+                valorTotal = 100.0,
+                saldo = 100.0,
+                situacao = "ABERTO",
+            )
+        whenever(customerCreditServiceMock.getAllCredits(any())).thenReturn(PageImpl(listOf(credit)))
+
+        mockMvc
+            .perform(get("/customer-credit/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].customerExternalId").value(42))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

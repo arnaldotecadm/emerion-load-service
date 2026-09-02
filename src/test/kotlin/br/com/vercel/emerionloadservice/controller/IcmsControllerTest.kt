@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.IcmsService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -45,6 +47,20 @@ class IcmsControllerTest {
             .andExpect(jsonPath("$.content").isEmpty)
 
         verify(icmsServiceMock).getAllIcms(any())
+    }
+
+    @Test
+    fun `should return a populated icms page with the retailer identity`() {
+        val icms = mock<Icms>()
+        whenever(icms.codigoIcms).thenReturn("001")
+        whenever(icms.tipoIcms).thenReturn("N")
+        whenever(icmsServiceMock.getAllIcms(any())).thenReturn(PageImpl(listOf(icms)))
+
+        mockMvc
+            .perform(get("/icms/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].codigoIcms").value("001"))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

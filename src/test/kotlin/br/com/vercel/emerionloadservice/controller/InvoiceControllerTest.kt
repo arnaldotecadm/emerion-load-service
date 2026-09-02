@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Invoice
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.InvoiceService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -41,6 +43,22 @@ class InvoiceControllerTest {
     fun `should return an empty invoice page`() {
         mockMvc.perform(get("/invoice/all")).andExpect(status().isOk).andExpect(jsonPath("$.content").isEmpty)
         verify(invoiceServiceMock).getAllInvoices(any())
+    }
+
+    @Test
+    fun `should return a populated invoice page with customer and retailer identities`() {
+        val invoice = mock<Invoice>()
+        whenever(invoice.codEmp).thenReturn(1)
+        whenever(invoice.codCli).thenReturn(42L)
+        whenever(invoice.numres).thenReturn("ORDER-42")
+        whenever(invoice.dteres).thenReturn(LocalDate.of(2026, 1, 2))
+        whenever(invoiceServiceMock.getAllInvoices(any())).thenReturn(PageImpl(listOf(invoice)))
+
+        mockMvc
+            .perform(get("/invoice/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].customerExternalId").value(42))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

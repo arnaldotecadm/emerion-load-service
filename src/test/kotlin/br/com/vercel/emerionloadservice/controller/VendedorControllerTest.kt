@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Vendedor
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.VendedorService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -43,6 +45,20 @@ class VendedorControllerTest {
             .andExpect(jsonPath("$.content").isArray)
             .andExpect(jsonPath("$.content").isEmpty)
         verify(vendedorServiceMock).getAllVendedores(any())
+    }
+
+    @Test
+    fun `should return a populated vendedor page with the retailer identity`() {
+        val vendedor = mock<Vendedor>()
+        whenever(vendedor.id).thenReturn(42L)
+        whenever(vendedor.nome).thenReturn("Vendedor")
+        whenever(vendedorServiceMock.getAllVendedores(any())).thenReturn(PageImpl(listOf(vendedor)))
+
+        mockMvc
+            .perform(get("/vendedor/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].externalId").value(42))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

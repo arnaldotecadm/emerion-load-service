@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.CustomerService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -45,6 +47,23 @@ class CustomerControllerTest {
             .andExpect(jsonPath("$.content").isEmpty)
 
         verify(customerServiceMock).getAllCustomers(any())
+    }
+
+    @Test
+    fun `should return a populated customer page with the retailer identity`() {
+        val customer = mock<Customer>()
+        whenever(customer.id).thenReturn(42L)
+        whenever(customer.nomeFantasia).thenReturn("Cliente")
+        whenever(customer.razaoSocial).thenReturn("Cliente Ltda")
+        whenever(customer.cpfCnpj).thenReturn("12345678000199")
+        whenever(customer.bloqueado).thenReturn(false)
+        whenever(customerServiceMock.getAllCustomers(any())).thenReturn(PageImpl(listOf(customer)))
+
+        mockMvc
+            .perform(get("/customer/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].externalId").value(42))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

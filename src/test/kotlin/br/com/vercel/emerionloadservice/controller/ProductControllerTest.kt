@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Product
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.ProductService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -41,6 +43,22 @@ class ProductControllerTest {
     fun `should return an empty product page`() {
         mockMvc.perform(get("/product/all")).andExpect(status().isOk).andExpect(jsonPath("$.content").isEmpty)
         verify(productServiceMock).getAllProducts(any())
+    }
+
+    @Test
+    fun `should return a populated product page with the retailer identity`() {
+        val product = mock<Product>()
+        whenever(product.codGru).thenReturn("001")
+        whenever(product.codSub).thenReturn("0002")
+        whenever(product.codPro).thenReturn("00003")
+        whenever(product.nome).thenReturn("Produto")
+        whenever(productServiceMock.getAllProducts(any())).thenReturn(PageImpl(listOf(product)))
+
+        mockMvc
+            .perform(get("/product/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].externalId").value("001.0002.00003"))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test

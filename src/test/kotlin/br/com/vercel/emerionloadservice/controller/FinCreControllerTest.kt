@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.FinCreService
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +12,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.web.servlet.MockMvc
@@ -45,6 +47,21 @@ class FinCreControllerTest {
             .andExpect(jsonPath("$.content").isEmpty)
 
         verify(finCreServiceMock).getAllFinCre(any())
+    }
+
+    @Test
+    fun `should return a populated fincre page with the retailer identity`() {
+        val finCre = mock<FinCre>()
+        whenever(finCre.codigoEmpresa).thenReturn(1)
+        whenever(finCre.documento).thenReturn("123")
+        whenever(finCre.parcelas).thenReturn(emptyList())
+        whenever(finCreServiceMock.getAllFinCre(any())).thenReturn(PageImpl(listOf(finCre)))
+
+        mockMvc
+            .perform(get("/fincre/all"))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.content[0].documento").value("123"))
+            .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test
