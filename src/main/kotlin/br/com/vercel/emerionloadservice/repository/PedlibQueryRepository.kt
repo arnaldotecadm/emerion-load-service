@@ -96,12 +96,13 @@ class PedlibQueryRepository(
             order by lb2.seqlb2
             """.trimIndent()
         val details =
-            jdbcTemplate.query(
-                detailsQuery,
-                { rs, _ -> mapDetail(rs) },
-                numres,
-                header.numeroLiberacao,
-            )
+            jdbcTemplate
+                .query(
+                    detailsQuery,
+                    { rs, _ -> mapDetail(rs) },
+                    numres,
+                    header.numeroLiberacao,
+                ).toList()
 
         return header.copy(detalhes = details)
     }
@@ -118,13 +119,15 @@ class PedlibQueryRepository(
     private fun findDetails(headers: List<Pedlib>): List<Pedlb2> {
         val numresList = headers.joinToString(",") { it.numeroPedido }
         val details =
-            jdbcTemplate.query(
-                """
-                $BASE_QUERY_PEDLB2
-                where lb2.numres in ($numresList)
-                order by lb2.codemp, lb2.dteres, lb2.numres, lb2.seqlib, lb2.seqlb2
-                """.trimIndent(),
-            ) { rs, _ -> mapDetail(rs) }
+            jdbcTemplate
+                .query(
+                    """
+                    $BASE_QUERY_PEDLB2
+                    where lb2.numres in ($numresList)
+                    order by lb2.codemp, lb2.dteres, lb2.numres, lb2.seqlib, lb2.seqlb2
+                    """.trimIndent(),
+                ) { rs, _ -> mapDetail(rs) }
+                .toList()
 
         val headerKeys = headers.map(::toKey).toSet()
         return details.filter { toKey(it) in headerKeys }

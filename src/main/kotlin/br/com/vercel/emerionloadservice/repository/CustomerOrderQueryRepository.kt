@@ -1,9 +1,7 @@
 package br.com.vercel.emerionloadservice.repository
 
 import br.com.vercel.emerionloadservice.model.CustomerOrder
-import br.com.vercel.emerionloadservice.repository.mapper.CustomerOrderMapper.toModel
-import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjection
-import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjectionImpl
+import br.com.vercel.emerionloadservice.model.CustomerOrderItem
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -104,11 +102,11 @@ class CustomerOrderQueryRepository(
             headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido) }.toSet()
         val itemsByOrderKey =
             findItems(headers.map { it.numeroPedido }, headerKeys)
-                .groupBy { OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres) }
+                .groupBy { OrderBusinessKey(it.codEmp, it.dteres, it.numres) }
         val content =
             headers.map { header ->
                 val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
-                header.copy(itens = itemsByOrderKey[orderKey].orEmpty().map { it.toModel() })
+                header.copy(itens = itemsByOrderKey[orderKey].orEmpty())
             }
 
         return PageImpl(content, pageable, total)
@@ -127,7 +125,7 @@ class CustomerOrderQueryRepository(
                 setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)),
             )
 
-        return header.copy(itens = itemsByOrderKey.map { it.toModel() })
+        return header.copy(itens = itemsByOrderKey)
     }
 
     private fun findHeadersPaged(pageable: Pageable): List<CustomerOrder> {
@@ -142,7 +140,7 @@ class CustomerOrderQueryRepository(
     private fun findItems(
         numresList: List<String>,
         headerKeys: Set<OrderBusinessKey>,
-    ): List<CustomerOrderItemProjection> {
+    ): List<CustomerOrderItem> {
         // Values come from a prior query result (never user input), so they are safe to
         // inline as a literal IN list; Firebird 1.5 native queries can't bind IN (:list).
         val idList = numresList.joinToString(",") { "'$it'" }
@@ -225,9 +223,9 @@ class CustomerOrderQueryRepository(
 
         return jdbcTemplate
             .query(query) { rs, _ ->
-                CustomerOrderItemProjectionImpl(
+                CustomerOrderItem(
                     codEmp = rs.getInt("codEmp"),
-                    dteres = rs.getTimestamp("dteres").toLocalDateTime(),
+                    dteres = rs.getTimestamp("dteres").toLocalDateTime().toLocalDate(),
                     numres = rs.getString("numres"),
                     codGru = rs.getString("codGru"),
                     codSub = rs.getString("codSub"),
@@ -295,7 +293,7 @@ class CustomerOrderQueryRepository(
                     descontoItemValor = rs.getBigDecimal("descontoItemValor")?.toDouble(),
                     descontoItemTotal = rs.getBigDecimal("descontoItemTotal")?.toDouble(),
                 )
-            }.filter { headerKeys.contains(OrderBusinessKey(it.codEmp, it.dteres.toLocalDate(), it.numres)) }
+            }.filter { headerKeys.contains(OrderBusinessKey(it.codEmp, it.dteres, it.numres)) }
     }
 
     // The bundled Jaybird driver (2.2.15) predates JDBC 4.1's getObject(column, Class),

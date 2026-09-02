@@ -29,24 +29,22 @@ dependencies {
     implementation(libs.spring.boot.starter.webmvc)
     implementation(libs.kotlin.reflect)
     implementation(libs.jackson.module.kotlin)
-
     implementation(libs.jaybird.legacy)
     implementation(libs.hibernate.community.dialects)
 
     testImplementation(libs.spring.boot.starter.webmvc.test)
     testImplementation(libs.kotlin.test.junit5)
-    testRuntimeOnly(libs.junit.platform.launcher)
-
     testImplementation(libs.spring.boot.starter.test)
     testImplementation(libs.testcontainers.junit.jupiter)
     testImplementation(libs.testcontainers.jdbc)
     testImplementation(libs.jaybird)
     testImplementation(libs.testcontainers.core)
     testImplementation(libs.firebird.testcontainers.java)
-
     testImplementation(libs.flyway.core)
     testImplementation(libs.flyway.firebird)
     testImplementation(libs.mockito.kotlin)
+
+    testRuntimeOnly(libs.junit.platform.launcher)
 }
 
 kotlin {

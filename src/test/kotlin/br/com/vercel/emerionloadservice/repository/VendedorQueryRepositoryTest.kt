@@ -4,7 +4,6 @@ import br.com.vercel.emerionloadservice.service.VendedorService
 import br.com.vercel.emerionloadservice.utils.FirebirdIntegrationTest
 import br.com.vercel.emerionloadservice.utils.TestDataBuilder
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -12,7 +11,6 @@ import org.springframework.data.domain.PageRequest
 import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.assertEquals
 
-@Disabled
 @Testcontainers
 @SpringBootTest
 class VendedorQueryRepositoryTest : FirebirdIntegrationTest() {
