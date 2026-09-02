@@ -18,19 +18,19 @@ private const val BASE_QUERY_IPI = """
         ipi.clsipi          as ncmIPI,
         ipi.COD_ENQ         as codigoEnquadramentoLegal,
         ipi.cstipi          as cstIpi,
-        sip.nomsip          as descricaoSituacaoTributariaIpi,
+        sip.nomsip          as descricaoSituacaoIpi,
         ipi.peripi          as aliquotaIpi,
         ipi.basipi          as percentualBaseCalculoIpi,
         ipi.FLG_SINEIF20    as flgSineif20,
         ipi.codtxf          as codigoTextoFiscal,
         ipi.cstpis          as cstPis,
-        pis.nompis          as descricaoSituacaoTributariaPis,
+        pis.nompis          as descricaoSituacaoPis,
         ipi.ALIQ_PIS        as aliquotaPis,
-        ipi.FLG_DESC_ZF_PIS as incluiDescontoSuframaPis,
+        ipi.FLG_DESC_ZF_PIS as incluiDescontoPis,
         ipi.cstcof          as cstCofins,
-        cof.nomcof          as descricaoSituacaoTributariaCofins,
+        cof.nomcof          as descricaoSituacaoCofins,
         ipi.ALIQ_COF        as aliquotaCofins,
-        ipi.FLG_DESC_ZF_COF as incluiDescontoSuframaCofins
+        ipi.FLG_DESC_ZF_COF as incluiDescontoCofins
     from estipi ipi
     left join estsip sip on sip.signfe = ipi.cstipi and sip.tipsip = ipi.tipipi
     left join estpis pis on pis.signfe = ipi.cstpis
@@ -81,18 +81,18 @@ class IpiQueryRepository(
             ncmIpi = rs.getString("ncmIPI"),
             codigoEnquadramentoLegal = rs.getString("codigoEnquadramentoLegal"),
             cstIpi = rs.getString("cstIpi"),
-            descricaoSituacaoTributariaIpi = rs.getString("descricaoSituacaoTributariaIpi"),
+            descricaoSituacaoTributariaIpi = rs.getString("descricaoSituacaoIpi"),
             aliquotaIpi = rs.getBigDecimal("aliquotaIpi")?.toDouble(),
             percentualBaseCalculoIpi = rs.getBigDecimal("percentualBaseCalculoIpi")?.toDouble(),
             flgSineif20 = rs.getString("flgSineif20"),
             codigoTextoFiscal = rs.getString("codigoTextoFiscal"),
             cstPis = rs.getString("cstPis"),
-            descricaoSituacaoTributariaPis = rs.getString("descricaoSituacaoTributariaPis"),
+            descricaoSituacaoTributariaPis = rs.getString("descricaoSituacaoPis"),
             aliquotaPis = rs.getBigDecimal("aliquotaPis")?.toDouble(),
-            incluiDescontoSuframaPis = rs.getString("incluiDescontoSuframaPis"),
+            incluiDescontoSuframaPis = rs.getString("incluiDescontoPis"),
             cstCofins = rs.getString("cstCofins"),
-            descricaoSituacaoTributariaCofins = rs.getString("descricaoSituacaoTributariaCofins"),
+            descricaoSituacaoTributariaCofins = rs.getString("descricaoSituacaoCofins"),
             aliquotaCofins = rs.getBigDecimal("aliquotaCofins")?.toDouble(),
-            incluiDescontoSuframaCofins = rs.getString("incluiDescontoSuframaCofins"),
+            incluiDescontoSuframaCofins = rs.getString("incluiDescontoCofins"),
         )
 }

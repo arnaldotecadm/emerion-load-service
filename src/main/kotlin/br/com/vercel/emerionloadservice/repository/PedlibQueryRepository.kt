@@ -110,7 +110,7 @@ class PedlibQueryRepository(
     private fun findHeadersPaged(pageable: Pageable): List<Pedlib> {
         val query =
             FirebirdPagination.applyFirstSkip(
-                "$BASE_QUERY_PEDLIB order by lib.numres desc, lib.seqlib",
+                "$BASE_QUERY_PEDLIB order by lib.numres desc, lib.seqlib, lib.codemp, lib.dteres",
                 pageable,
             )
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }

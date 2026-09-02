@@ -123,7 +123,7 @@ class FinCreQueryRepository(
     private fun findHeadersPaged(pageable: Pageable): List<FinCre> {
         val pagedQuery =
             FirebirdPagination.applyFirstSkip(
-                "$BASE_QUERY_FINCRE order by cre.numcre desc ",
+                "$BASE_QUERY_FINCRE order by cre.numcre desc, cre.codemp, cre.dtecre",
                 pageable,
             )
         return jdbcTemplate.query(pagedQuery) { rs, _ -> mapHeader(rs) }

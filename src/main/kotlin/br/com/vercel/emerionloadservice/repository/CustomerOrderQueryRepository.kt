@@ -15,7 +15,7 @@ private const val BASE_QUERY_PEDRES = """
     select
         ped.codemp            as codigoEmpresa,
         ped.codcli            as codigoCliente,
-        ped.cgccli           as cpfCnpj,
+        cli.cgccli           as cpfCnpj,
         ped.numres            as numeroPedido,
         ped.dteres            as dataPedido,
         ped.sitres            as statusPedido,
@@ -39,6 +39,8 @@ private const val BASE_QUERY_PEDRES = """
         reg.nomregtrib      as nomeRegimeTributario,
         ped.codpfa            as codigoPadraoFaturamento
     from pedres ped
+    left join fincli cli
+        on cli.codcli = ped.codcli
     left join finregtrib reg
         on reg.numregtrib = ped.regtrb
 """
@@ -72,16 +74,16 @@ class CustomerOrderQueryRepository(
             statusPedido = rs.getString("statusPedido"),
             totalPedidoComImpostos = rs.getDouble("totalPedidoComImpostos"),
             totalPedidoSemImpostos = rs.getDouble("totalPedidoSemImpostos"),
-            totalIpi = rs.getDouble("totalIpi"),
-            totalIcms = rs.getDouble("totalIcms"),
-            totalPis = rs.getDouble("totalPis"),
-            totalCofins = rs.getDouble("totalCofins"),
-            totalSubstituicaoTributaria = rs.getDouble("totalSubstituicaoTributaria"),
-            totalDescontoIncondicional = rs.getDouble("totalDescontoIncondicional"),
+            totalIpi = rs.getBigDecimal("totalIpi")?.toDouble(),
+            totalIcms = rs.getBigDecimal("totalIcms")?.toDouble(),
+            totalPis = rs.getBigDecimal("totalPis")?.toDouble(),
+            totalCofins = rs.getBigDecimal("totalCofins")?.toDouble(),
+            totalSubstituicaoTributaria = rs.getBigDecimal("totalSubstituicaoTributaria")?.toDouble(),
+            totalDescontoIncondicional = rs.getBigDecimal("totalDescontoIncondicional")?.toDouble(),
             totalFrete = rs.getBigDecimal("totalFrete")?.toDouble(),
             totalSeguro = rs.getBigDecimal("totalSeguro")?.toDouble(),
             totalOutrasDespesas = rs.getBigDecimal("totalOutrasDespesas")?.toDouble(),
-            vendedorExternalId = rs.getLong("vendedorExternalId"),
+            vendedorExternalId = rs.getLong("vendedorExternalId").takeIf { !rs.wasNull() },
             dataEntregaPrevista = rs.getTimestamp("dataEntregaPrevista")?.toLocalDateTime(),
             codigoTransportadora = rs.getString("codigoTransportadora"),
             pedidoAnterior = rs.getString("pedidoAnterior"),
@@ -131,7 +133,7 @@ class CustomerOrderQueryRepository(
     private fun findHeadersPaged(pageable: Pageable): List<CustomerOrder> {
         val query =
             FirebirdPagination.applyFirstSkip(
-                "$BASE_QUERY_PEDRES order by ped.dteres desc",
+                "$BASE_QUERY_PEDRES order by ped.dteres desc, ped.codemp, ped.numres",
                 pageable,
             )
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }

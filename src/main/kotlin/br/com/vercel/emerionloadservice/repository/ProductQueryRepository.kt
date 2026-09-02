@@ -48,7 +48,7 @@ const val BASE_QUERY_ESTPRO = """
                 qte.qtdqte          as estoqueAtual,
                 qte.qtdrma          as estoqueRMA,
                 
-                pro.simpro          as similar,
+                pro.simpro          as similarValue,
                 pro.qtdvol          as quantidadeVolumes,
                 pro.qtdemb          as quantidadeEmbalagem,
                 pro.locpro          as localizacao,
@@ -122,7 +122,7 @@ class ProductQueryRepository(
             estoqueAdquirido = rs.getBigDecimal("estoqueAdquirido"),
             estoqueAtual = rs.getBigDecimal("estoqueAtual"),
             estoqueRMA = rs.getBigDecimal("estoqueRMA"),
-            similar = rs.getString("similar"),
+            similar = rs.getString("similarValue"),
             quantidadeVolumes = rs.getBigDecimal("quantidadeVolumes"),
             quantidadeEmbalagem = rs.getBigDecimal("quantidadeEmbalagem"),
             localizacao = rs.getString("localizacao"),
