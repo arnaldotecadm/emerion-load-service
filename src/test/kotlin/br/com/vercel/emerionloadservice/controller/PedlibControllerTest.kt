@@ -1,6 +1,5 @@
 package br.com.vercel.emerionloadservice.controller
 
-import br.com.vercel.emerionloadservice.model.Pedlb2
 import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.PedlibService
