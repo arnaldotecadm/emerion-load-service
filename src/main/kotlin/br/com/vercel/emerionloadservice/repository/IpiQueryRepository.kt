@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.IpiProjectionImpl
+import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -47,7 +47,7 @@ private const val BASE_QUERY_IPI = """
 class IpiQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
-    fun findAllPaged(pageable: Pageable): Page<IpiProjectionImpl> {
+    fun findAllPaged(pageable: Pageable): Page<Ipi> {
         val total = jdbcTemplate.queryForObject<Long>("select count(*) from estipi") ?: 0L
 
         val pagedQuery =
@@ -64,7 +64,7 @@ class IpiQueryRepository(
     fun findByKey(
         codipi: String,
         tipipi: String,
-    ): IpiProjectionImpl? {
+    ): Ipi? {
         // Values come from path variables (caller-controlled strings), so we use
         // a PreparedStatement via JdbcTemplate to avoid SQL injection.
         val query = "$BASE_QUERY_IPI where ipi.codipi = ? and ipi.tipipi = ?"
@@ -73,7 +73,7 @@ class IpiQueryRepository(
     }
 
     private fun mapRow(rs: java.sql.ResultSet) =
-        IpiProjectionImpl(
+        Ipi(
             flgAtivo = rs.getString("flgAtivo"),
             codigoIpi = rs.getString("codigoIpi"),
             tipoIpi = rs.getString("tipoIpi"),

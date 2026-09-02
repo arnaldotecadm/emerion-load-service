@@ -1,7 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.CustomerCreditProjection
-import br.com.vercel.emerionloadservice.repository.projection.CustomerCreditProjectionImpl
+import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -22,7 +21,7 @@ import org.springframework.stereotype.Repository
 class CustomerCreditQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
-    fun findAllPaged(pageable: Pageable): Page<CustomerCreditProjection> {
+    fun findAllPaged(pageable: Pageable): Page<CustomerCredit> {
         val baseQuery =
             """
             select
@@ -40,9 +39,9 @@ class CustomerCreditQueryRepository(
 
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
 
-        val content: List<CustomerCreditProjection> =
+        val content: List<CustomerCredit> =
             jdbcTemplate.query(pagedQuery) { rs, _ ->
-                CustomerCreditProjectionImpl(
+                CustomerCredit(
                     codCli = rs.getLong("codCli"),
                     sequencia = rs.getString("sequencia"),
                     data = rs.getTimestamp("data").toInstant(),

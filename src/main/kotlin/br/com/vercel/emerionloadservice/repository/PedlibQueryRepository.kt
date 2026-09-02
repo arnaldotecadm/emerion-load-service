@@ -1,9 +1,7 @@
 package br.com.vercel.emerionloadservice.repository
 
+import br.com.vercel.emerionloadservice.model.Pedlb2
 import br.com.vercel.emerionloadservice.model.Pedlib
-import br.com.vercel.emerionloadservice.repository.mapper.PedlibMapper.toModel
-import br.com.vercel.emerionloadservice.repository.projection.Pedlb2ProjectionImpl
-import br.com.vercel.emerionloadservice.repository.projection.PedlibProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -78,7 +76,7 @@ class PedlibQueryRepository(
         val detailsByKey = findDetails(headers).groupBy { toKey(it) }
         val content =
             headers.map { header ->
-                header.toModel(detailsByKey[toKey(header)].orEmpty())
+                header.copy(detalhes = detailsByKey[toKey(header)].orEmpty())
             }
 
         return PageImpl(content, pageable, total)
@@ -105,10 +103,10 @@ class PedlibQueryRepository(
                 header.numeroLiberacao,
             )
 
-        return header.toModel(details)
+        return header.copy(detalhes = details)
     }
 
-    private fun findHeadersPaged(pageable: Pageable): List<PedlibProjectionImpl> {
+    private fun findHeadersPaged(pageable: Pageable): List<Pedlib> {
         val query =
             FirebirdPagination.applyFirstSkip(
                 "$BASE_QUERY_PEDLIB order by lib.numres desc, lib.seqlib",
@@ -117,7 +115,7 @@ class PedlibQueryRepository(
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
     }
 
-    private fun findDetails(headers: List<PedlibProjectionImpl>): List<Pedlb2ProjectionImpl> {
+    private fun findDetails(headers: List<Pedlib>): List<Pedlb2> {
         val numresList = headers.joinToString(",") { it.numeroPedido }
         val details =
             jdbcTemplate.query(
@@ -133,12 +131,12 @@ class PedlibQueryRepository(
     }
 
     private fun mapHeader(rs: ResultSet) =
-        PedlibProjectionImpl(
+        Pedlib(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
-            dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
+            dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime()?.toLocalDate(),
             numeroPedido = rs.getString("numeroPedido"),
             numeroLiberacao = rs.getInt("numeroLiberacao"),
-            dataLiberacao = rs.getTimestamp("dataLiberacao")?.toLocalDateTime(),
+            dataLiberacao = rs.getTimestamp("dataLiberacao")?.toLocalDateTime()?.toLocalDate(),
             horaLiberacao = rs.getString("horaLiberacao"),
             codigoCliente = rs.getLong("codigoCliente").takeIf { !rs.wasNull() },
             quantidadeSeparada = rs.getInt("quantidadeSeparada").takeIf { !rs.wasNull() },
@@ -148,10 +146,11 @@ class PedlibQueryRepository(
             codigoVendedor = rs.getLong("codigoVendedor").takeIf { !rs.wasNull() },
             comissaoLiberacao = rs.getBigDecimal("comissaoLiberacao")?.toDouble(),
             totalCusto = rs.getBigDecimal("totalCusto")?.toDouble(),
+            detalhes = emptyList(),
         )
 
     private fun mapDetail(rs: ResultSet) =
-        Pedlb2ProjectionImpl(
+        Pedlb2(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
             numeroPedido = rs.getString("numeroPedido"),
@@ -175,15 +174,15 @@ class PedlibQueryRepository(
             custoPraticado = rs.getBigDecimal("custoPraticado")?.toDouble(),
         )
 
-    private fun toKey(header: PedlibProjectionImpl) =
+    private fun toKey(header: Pedlib) =
         PedlibKey(
             header.codigoEmpresa,
-            header.dataPedido?.toLocalDate(),
+            header.dataPedido,
             header.numeroPedido,
             header.numeroLiberacao,
         )
 
-    private fun toKey(detail: Pedlb2ProjectionImpl) =
+    private fun toKey(detail: Pedlb2) =
         PedlibKey(
             detail.codigoEmpresa,
             detail.dataPedido?.toLocalDate(),

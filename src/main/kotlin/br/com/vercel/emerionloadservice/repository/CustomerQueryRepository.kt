@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.CustomerProjectionImpl
+import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -105,18 +105,18 @@ const val BASE_QUERY = """
 class CustomerQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
-    private fun resultSetToModel(rs: ResultSet): CustomerProjectionImpl =
-        CustomerProjectionImpl(
+    private fun resultSetToModel(rs: ResultSet): Customer =
+        Customer(
             id = rs.getLong("id"),
             nomeFantasia = rs.getString("nomeFantasia"),
             razaoSocial = rs.getString("razaoSocial"),
             cpfCnpj = rs.getString("cpfCnpj"),
             inscricaoEstadual = rs.getString("inscricaoEstadual"),
             regimeTributario = rs.getString("regimeTributario"),
-            bloqueado = rs.getInt("bloqueado"),
-            dataNascimento = rs.getTimestamp("dataNascimento")?.toLocalDateTime(),
-            dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime(),
-            dataUltimaAtualizacao = rs.getTimestamp("dataUltimaAtualizacao")?.toLocalDateTime(),
+            bloqueado = rs.getInt("bloqueado") == 1,
+            dataNascimento = rs.getTimestamp("dataNascimento")?.toLocalDateTime()?.toLocalDate(),
+            dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime()?.toLocalDate(),
+            dataUltimaAtualizacao = rs.getTimestamp("dataUltimaAtualizacao")?.toLocalDateTime()?.toLocalDate(),
             email1 = rs.getString("email1"),
             email2 = rs.getString("email2"),
             website = rs.getString("website"),
@@ -179,14 +179,14 @@ class CustomerQueryRepository(
             entregaCelular = rs.getString("entregaCelular"),
         )
 
-    fun findAllPaged(pageable: Pageable): Page<CustomerProjectionImpl> {
+    fun findAllPaged(pageable: Pageable): Page<Customer> {
         val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY.plus(" order by cli.codcli"), pageable)
-        val content: List<CustomerProjectionImpl> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
+        val content: List<Customer> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
         val total = jdbcTemplate.queryForObject<Long>("select count(*) from fincli") ?: 0L
         return PageImpl(content, pageable, total)
     }
 
-    fun getCustomerByCodCli(codCli: Long): CustomerProjectionImpl? {
+    fun getCustomerByCodCli(codCli: Long): Customer? {
         val query =
             """
             $BASE_QUERY

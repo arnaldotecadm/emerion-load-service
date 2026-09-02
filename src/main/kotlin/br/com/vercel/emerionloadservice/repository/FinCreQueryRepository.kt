@@ -2,7 +2,6 @@ package br.com.vercel.emerionloadservice.repository
 
 import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.repository.mapper.FinCreMapper.toModel
-import br.com.vercel.emerionloadservice.repository.projection.FinCreProjectionImpl
 import br.com.vercel.emerionloadservice.repository.projection.FinCrpProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
@@ -90,7 +89,9 @@ class FinCreQueryRepository(
 
         val content =
             headers.map { header ->
-                header.toModel(parcelasByKey[toKey(header)].orEmpty())
+                header.copy(
+                    parcelas = parcelasByKey[toKey(header)].orEmpty().map { it.toModel() },
+                )
             }
 
         return PageImpl(content, pageable, total)
@@ -116,10 +117,10 @@ class FinCreQueryRepository(
                 documento,
             )
 
-        return header.toModel(parcelas)
+        return header.copy(parcelas = parcelas.map { it.toModel() })
     }
 
-    private fun findHeadersPaged(pageable: Pageable): List<FinCreProjectionImpl> {
+    private fun findHeadersPaged(pageable: Pageable): List<FinCre> {
         val pagedQuery =
             FirebirdPagination.applyFirstSkip(
                 "$BASE_QUERY_FINCRE order by cre.numcre desc ",
@@ -131,7 +132,7 @@ class FinCreQueryRepository(
     // Parcelas for a page of headers fetched in one query using an IN list.
     // Values come from a prior query result (never user input), so they are safe to
     // inline as a literal IN list; Firebird 1.5 native queries can't bind IN (:list).
-    private fun findParcelas(headers: List<FinCreProjectionImpl>): List<FinCrpProjectionImpl> {
+    private fun findParcelas(headers: List<FinCre>): List<FinCrpProjectionImpl> {
         val numcreList = headers.joinToString(",") { "'${it.documento}'" }
         val query =
             """
@@ -143,9 +144,9 @@ class FinCreQueryRepository(
     }
 
     private fun mapHeader(rs: ResultSet) =
-        FinCreProjectionImpl(
+        FinCre(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
-            dataEmissao = rs.getTimestamp("dataEmissao")?.toLocalDateTime(),
+            dataEmissao = rs.getTimestamp("dataEmissao")?.toLocalDateTime()?.toLocalDate(),
             documento = rs.getBigDecimal("documento").toLong().toString(),
             codigoCondicaoRecebimento = rs.getString("codigoCondicaoRecebimento"),
             nomeCondicaoRecebimento = rs.getString("nomeCondicaoRecebimento"),
@@ -158,6 +159,7 @@ class FinCreQueryRepository(
             nomeVendedor = rs.getString("nomeVendedor"),
             codigoTipoDocumento = rs.getString("codigoTipoDocumento"),
             nomeTipoDocumento = rs.getString("nomeTipoDocumento"),
+            parcelas = emptyList(),
         )
 
     private fun mapParcela(rs: ResultSet) =
@@ -180,7 +182,7 @@ class FinCreQueryRepository(
             flagPago = rs.getString("flagPago"),
         )
 
-    private fun toKey(h: FinCreProjectionImpl) = FinCreKey(h.codigoEmpresa, h.dataEmissao?.toLocalDate(), h.documento)
+    private fun toKey(h: FinCre) = FinCreKey(h.codigoEmpresa, h.dataEmissao, h.documento)
 
     private fun toKey(p: FinCrpProjectionImpl) = FinCreKey(p.codigoEmpresa, p.dataEmissao?.toLocalDate(), p.documento)
 }

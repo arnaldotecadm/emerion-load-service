@@ -1,7 +1,7 @@
 package br.com.vercel.emerionloadservice.repository
 
 import br.com.vercel.emerionloadservice.data.DummyEntity
-import br.com.vercel.emerionloadservice.repository.projection.CustomerCreditProjection
+import br.com.vercel.emerionloadservice.model.CustomerCredit
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
@@ -25,5 +25,5 @@ interface CustomerCreditRepository : PagingAndSortingRepository<DummyEntity, Lon
             order by cde.seqcde
         """,
     )
-    fun getCreditsByCodCli(codCli: Long): List<CustomerCreditProjection>
+    fun getCreditsByCodCli(codCli: Long): List<CustomerCredit>
 }

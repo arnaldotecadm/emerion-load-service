@@ -1,40 +1,9 @@
 package br.com.vercel.emerionloadservice.repository.mapper
 
-import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.CustomerOrderItem
-import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeaderProjectionImpl
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjection
 
 object CustomerOrderMapper {
-    fun CustomerOrderHeaderProjectionImpl.toModel(items: List<CustomerOrderItemProjection>): CustomerOrder =
-        CustomerOrder(
-            codigoEmpresa = this.codigoEmpresa,
-            codigoCliente = this.codigoCliente,
-            cpfCnpj = this.cpfCnpj,
-            numeroPedido = this.numeroPedido,
-            dataPedido = this.dataPedido,
-            statusPedido = this.statusPedido,
-            totalPedidoComImpostos = this.totalPedidoComImpostos,
-            totalPedidoSemImpostos = this.totalPedidoSemImpostos,
-            totalIpi = this.totalIpi,
-            totalIcms = this.totalIcms,
-            totalPis = this.totalPis,
-            totalCofins = this.totalCofins,
-            totalSubstituicaoTributaria = this.totalSubstituicaoTributaria,
-            totalDescontoIncondicional = this.totalDescontoIncondicional,
-            totalFrete = this.totalFrete,
-            totalSeguro = this.totalSeguro,
-            totalOutrasDespesas = this.totalOutrasDespesas,
-            vendedorExternalId = this.vendedorExternalId,
-            dataEntregaPrevista = this.dataEntregaPrevista,
-            codigoTransportadora = this.codigoTransportadora,
-            pedidoAnterior = this.pedidoAnterior,
-            regimeTributario = this.regimeTributario,
-            nomeRegimeTributario = this.nomeRegimeTributario,
-            codigoPadraoFaturamento = this.codigoPadraoFaturamento,
-            itens = items.toModel(),
-        )
-
     fun List<CustomerOrderItemProjection>.toModel(): List<CustomerOrderItem> = this.map { it.toModel() }
 
     fun CustomerOrderItemProjection.toModel(): CustomerOrderItem =

@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.ProductProjectionImpl
+import br.com.vercel.emerionloadservice.model.Product
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -89,7 +89,7 @@ class ProductQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
     private fun resultSetToModel(rs: ResultSet) =
-        ProductProjectionImpl(
+        Product(
             codGru = rs.getString("codGru"),
             codSub = rs.getString("codSub"),
             codPro = rs.getString("codPro"),
@@ -106,7 +106,7 @@ class ProductQueryRepository(
             unidadeEntrada = rs.getString("unidadeEntrada"),
             pesoLiquido = rs.getBigDecimal("pesoLiquido"),
             pesoBruto = rs.getBigDecimal("pesoBruto"),
-            descontinuado = rs.getInt("descontinuado"),
+            descontinuado = rs.getInt("descontinuado") == 1,
             codigoBarras = rs.getString("codigoBarras"),
             codigoBarrasProprio = rs.getString("codigoBarrasProprio"),
             preco = rs.getBigDecimal("preco"),
@@ -141,9 +141,9 @@ class ProductQueryRepository(
             observacao = rs.getString("observacao"),
         )
 
-    fun findAllPaged(pageable: Pageable): Page<ProductProjectionImpl> {
+    fun findAllPaged(pageable: Pageable): Page<Product> {
         val pagedQuery = FirebirdPagination.applyFirstSkip(BASE_QUERY_ESTPRO.plus(" order by pro.codgru, pro.codsub, pro.codpro"), pageable)
-        val content: List<ProductProjectionImpl> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
+        val content: List<Product> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
         val total = jdbcTemplate.queryForObject<Long>("select count(*) from estpro") ?: 0L
         return PageImpl(content, pageable, total)
     }
@@ -152,7 +152,7 @@ class ProductQueryRepository(
         codGru: String,
         codSub: String,
         codPro: String,
-    ): ProductProjectionImpl? {
+    ): Product? {
         val query =
             """
             $BASE_QUERY_ESTPRO

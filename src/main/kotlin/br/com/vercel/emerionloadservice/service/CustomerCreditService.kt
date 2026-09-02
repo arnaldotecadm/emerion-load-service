@@ -4,7 +4,6 @@ import br.com.vercel.emerionloadservice.client.IngestionServiceClient
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.repository.CustomerCreditQueryRepository
 import br.com.vercel.emerionloadservice.repository.CustomerCreditRepository
-import br.com.vercel.emerionloadservice.repository.mapper.CustomerCreditMapper.toModel
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -15,9 +14,9 @@ class CustomerCreditService(
     private val customerCreditQueryRepository: CustomerCreditQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient,
 ) {
-    fun getAllCredits(pageable: Pageable): Page<CustomerCredit> = customerCreditQueryRepository.findAllPaged(pageable).toModel()
+    fun getAllCredits(pageable: Pageable): Page<CustomerCredit> = customerCreditQueryRepository.findAllPaged(pageable)
 
-    fun getCreditsByCodCli(codCli: Long): List<CustomerCredit> = customerCreditRepository.getCreditsByCodCli(codCli).toModel()
+    fun getCreditsByCodCli(codCli: Long): List<CustomerCredit> = customerCreditRepository.getCreditsByCodCli(codCli)
 
     fun sendCreditsToIngestion(codCli: Long) {
         val credits = getCreditsByCodCli(codCli)

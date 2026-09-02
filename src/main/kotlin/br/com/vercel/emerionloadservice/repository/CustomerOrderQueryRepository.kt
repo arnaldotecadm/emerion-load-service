@@ -2,7 +2,6 @@ package br.com.vercel.emerionloadservice.repository
 
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.repository.mapper.CustomerOrderMapper.toModel
-import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderHeaderProjectionImpl
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjection
 import br.com.vercel.emerionloadservice.repository.projection.CustomerOrderItemProjectionImpl
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
@@ -66,7 +65,7 @@ class CustomerOrderQueryRepository(
     )
 
     private fun mapHeader(rs: ResultSet) =
-        CustomerOrderHeaderProjectionImpl(
+        CustomerOrder(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             codigoCliente = rs.getLong("codigoCliente"),
             cpfCnpj = rs.getString("cpfCnpj"),
@@ -91,6 +90,7 @@ class CustomerOrderQueryRepository(
             regimeTributario = rs.getString("regimeTributario"),
             nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
             codigoPadraoFaturamento = rs.getString("codigoPadraoFaturamento"),
+            itens = emptyList(),
         )
 
     fun findAllPaged(pageable: Pageable): Page<CustomerOrder> {
@@ -108,7 +108,7 @@ class CustomerOrderQueryRepository(
         val content =
             headers.map { header ->
                 val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
-                header.toModel(itemsByOrderKey[orderKey].orEmpty())
+                header.copy(itens = itemsByOrderKey[orderKey].orEmpty().map { it.toModel() })
             }
 
         return PageImpl(content, pageable, total)
@@ -127,10 +127,10 @@ class CustomerOrderQueryRepository(
                 setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)),
             )
 
-        return header.toModel(itemsByOrderKey)
+        return header.copy(itens = itemsByOrderKey.map { it.toModel() })
     }
 
-    private fun findHeadersPaged(pageable: Pageable): List<CustomerOrderHeaderProjectionImpl> {
+    private fun findHeadersPaged(pageable: Pageable): List<CustomerOrder> {
         val query =
             FirebirdPagination.applyFirstSkip(
                 "$BASE_QUERY_PEDRES order by ped.dteres desc",

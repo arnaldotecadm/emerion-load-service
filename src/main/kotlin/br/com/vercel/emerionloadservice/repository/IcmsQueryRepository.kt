@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.IcmsProjectionImpl
+import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -35,7 +35,7 @@ class IcmsQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
     private fun resultsetToModel(rs: ResultSet) =
-        IcmsProjectionImpl(
+        Icms(
             codigoIcms = rs.getString("codigoIcms"),
             tipoIcms = rs.getString("tipoIcms"),
             nomeIcms = rs.getString("nomeIcms"),
@@ -47,7 +47,7 @@ class IcmsQueryRepository(
             situacaoTributariaIcms = rs.getString("situacaoTributariaIcms"),
         )
 
-    fun findAllPaged(pageable: Pageable): Page<IcmsProjectionImpl> {
+    fun findAllPaged(pageable: Pageable): Page<Icms> {
         val total = jdbcTemplate.queryForObject<Long>("select count(*) from esticm") ?: 0L
 
         val pagedQuery =
@@ -67,7 +67,7 @@ class IcmsQueryRepository(
     fun findByKey(
         codicm: String,
         tipicm: String,
-    ): IcmsProjectionImpl? {
+    ): Icms? {
         // Values come from path variables (caller-controlled strings), so we use
         // a PreparedStatement via JdbcTemplate to avoid SQL injection.
         val query = "$BASE_QUERY_ICMS where icms.codicm = ? and icms.tipicm = ?"
