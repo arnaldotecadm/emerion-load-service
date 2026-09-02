@@ -31,7 +31,7 @@ class VendedorServiceTest {
     lateinit var vendedorService: VendedorService
 
     @Test
-    fun getAllVendedores() {
+    fun `should return mapped vendedores from the repository page`() {
         val pageImpl =
             PageImpl(
                 List(10) { index -> Utils.buildVendedorProjection(id = 100L + index, nome = "Vendedor ${index + 1}") },
@@ -65,7 +65,7 @@ class VendedorServiceTest {
     }
 
     @Test
-    fun sendVendedorToIngestion() {
+    fun `should send the resolved vendedor to ingestion`() {
         whenever { vendedorQueryRepositoryMock.findByCodVen(1L) }.thenReturn(
             Utils.buildVendedorProjection(
                 id = 1L,
