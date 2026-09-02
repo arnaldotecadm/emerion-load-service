@@ -1,0 +1,43 @@
+[versions]
+jaybird-legacy = "2.2.15"
+jaybird = "6.0.6"
+testcontainers = "1.21.4"
+testcontainers-core = "2.0.5"
+firebird-testcontainers = "2.0.0"
+flyway = "13.4.0"
+mockito-kotlin = "6.3.0"
+
+[libraries]
+# Spring Boot
+spring-boot-starter-webmvc = { module = "org.springframework.boot:spring-boot-starter-webmvc" }
+spring-boot-starter-data-jpa = { module = "org.springframework.boot:spring-boot-starter-data-jpa" }
+spring-boot-starter-webmvc-test = { module = "org.springframework.boot:spring-boot-starter-webmvc-test" }
+spring-boot-starter-test = { module = "org.springframework.boot:spring-boot-starter-test" }
+
+# Kotlin
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+kotlin-test-junit5 = { module = "org.jetbrains.kotlin:kotlin-test-junit5" }
+
+# Jackson
+jackson-module-kotlin = { module = "tools.jackson.module:jackson-module-kotlin" }
+
+# Firebird / Hibernate
+jaybird-legacy = { module = "org.firebirdsql.jdbc:jaybird", version.ref = "jaybird-legacy" }
+jaybird = { module = "org.firebirdsql.jdbc:jaybird", version.ref = "jaybird" }
+hibernate-community-dialects = { module = "org.hibernate.orm:hibernate-community-dialects" }
+
+# JUnit
+junit-platform-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+
+# Testcontainers
+testcontainers-junit-jupiter = { module = "org.testcontainers:junit-jupiter", version.ref = "testcontainers" }
+testcontainers-jdbc = { module = "org.testcontainers:jdbc", version.ref = "testcontainers" }
+testcontainers-core = { module = "org.testcontainers:testcontainers", version.ref = "testcontainers-core" }
+firebird-testcontainers-java = { module = "org.firebirdsql:firebird-testcontainers-java", version.ref = "firebird-testcontainers" }
+
+# Flyway
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flyway" }
+flyway-firebird = { module = "org.flywaydb:flyway-firebird", version.ref = "flyway" }
+
+# Mockito
+mockito-kotlin = { module = "org.mockito.kotlin:mockito-kotlin", version.ref = "mockito-kotlin" }

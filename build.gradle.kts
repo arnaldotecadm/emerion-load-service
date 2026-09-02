@@ -25,28 +25,28 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-webmvc")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-    implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("tools.jackson.module:jackson-module-kotlin")
+    implementation(libs.spring.boot.starter.data.jpa)
+    implementation(libs.spring.boot.starter.webmvc)
+    implementation(libs.kotlin.reflect)
+    implementation(libs.jackson.module.kotlin)
 
-    implementation("org.firebirdsql.jdbc:jaybird:2.2.15")
-    implementation("org.hibernate.orm:hibernate-community-dialects")
+    implementation(libs.jaybird.legacy)
+    implementation(libs.hibernate.community.dialects)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation(libs.spring.boot.starter.webmvc.test)
+    testImplementation(libs.kotlin.test.junit5)
+    testRuntimeOnly(libs.junit.platform.launcher)
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
-    testImplementation("org.testcontainers:jdbc:1.21.4")
-    testImplementation("org.firebirdsql.jdbc:jaybird:6.0.6")
-    testImplementation("org.testcontainers:testcontainers:2.0.5")
-    testImplementation("org.firebirdsql:firebird-testcontainers-java:2.0.0")
+    testImplementation(libs.spring.boot.starter.test)
+    testImplementation(libs.testcontainers.junit.jupiter)
+    testImplementation(libs.testcontainers.jdbc)
+    testImplementation(libs.jaybird)
+    testImplementation(libs.testcontainers.core)
+    testImplementation(libs.firebird.testcontainers.java)
 
-    testImplementation("org.flywaydb:flyway-core:13.4.0")
-    testImplementation("org.flywaydb:flyway-firebird:13.4.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:6.3.0")
+    testImplementation(libs.flyway.core)
+    testImplementation(libs.flyway.firebird)
+    testImplementation(libs.mockito.kotlin)
 }
 
 kotlin {
@@ -114,7 +114,7 @@ sonar {
         property("sonar.projectKey", "emerion-service")
         property("sonar.projectName", "Emerion Service")
         property("sonar.host.url", "http://localhost:9000")
-        property("sonar.token", "sqa_9eaa30e260643ad5a6d963c501bc9cfcf5bd031f")
+        property("sonar.token", System.getenv("SONAR_TOKEN"))
     }
 }
 

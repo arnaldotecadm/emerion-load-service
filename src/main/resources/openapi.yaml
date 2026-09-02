@@ -1,0 +1,2058 @@
+openapi: 3.0.3
+info:
+  title: Emerion Load Service API
+  version: 1.0.0
+paths:
+  /customer/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCustomerIngestionDto'
+          description: Successful response
+      operationId: getCustomerAll
+  /customer/{codCli}:
+    get:
+      parameters:
+      - name: codCli
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerIngestionDto'
+          description: Successful response
+      operationId: getCustomerCodcli
+  /customer/{codCli}/send:
+    post:
+      parameters:
+      - name: codCli
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful response
+      operationId: postCustomerCodcliSend
+  /customer-credit/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCustomerCreditIngestionDto'
+          description: Successful response
+      operationId: getCustomer_CreditAll
+  /customer-credit/{codCli}:
+    get:
+      parameters:
+      - name: codCli
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomerCreditIngestionDto'
+          description: Successful response
+      operationId: getCustomer_CreditCodcli
+  /customer-credit/{codCli}/send:
+    post:
+      parameters:
+      - name: codCli
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful response
+      operationId: postCustomer_CreditCodcliSend
+  /customer-order/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCustomerOrderIngestionDto'
+          description: Successful response
+      operationId: getCustomer_OrderAll
+  /customer-order/{numres}:
+    get:
+      parameters:
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerOrderIngestionDto'
+          description: Successful response
+      operationId: getCustomer_OrderNumres
+  /customer-order/{numres}/send:
+    post:
+      parameters:
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postCustomer_OrderNumresSend
+  /fincre/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageFinCreIngestionDto'
+          description: Successful response
+      operationId: getFincreAll
+  /fincre/{documento}:
+    get:
+      parameters:
+      - name: documento
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FinCreIngestionDto'
+          description: Successful response
+      operationId: getFincreDocumento
+  /fincre/{documento}/send:
+    post:
+      parameters:
+      - name: documento
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postFincreDocumentoSend
+  /icms/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageIcmsIngestionDto'
+          description: Successful response
+      operationId: getIcmsAll
+  /icms/{codicm}/{tipicm}:
+    get:
+      parameters:
+      - name: codicm
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: tipicm
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IcmsIngestionDto'
+          description: Successful response
+      operationId: getIcmsCodicmTipicm
+  /icms/{codicm}/{tipicm}/send:
+    post:
+      parameters:
+      - name: codicm
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: tipicm
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postIcmsCodicmTipicmSend
+  /invoice/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageInvoiceIngestionDto'
+          description: Successful response
+      operationId: getInvoiceAll
+  /invoice/{codEmp}/{dteres}/{numres}:
+    get:
+      parameters:
+      - name: codEmp
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dteres
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/InvoiceIngestionDto'
+          description: Successful response
+      operationId: getInvoiceCodempDteresNumres
+  /invoice/{codEmp}/{dteres}/{numres}/send:
+    post:
+      parameters:
+      - name: codEmp
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: dteres
+        in: path
+        required: true
+        schema:
+          type: string
+          format: date
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postInvoiceCodempDteresNumresSend
+  /ipi/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageIpiIngestionDto'
+          description: Successful response
+      operationId: getIpiAll
+  /ipi/{codipi}/{tipipi}:
+    get:
+      parameters:
+      - name: codipi
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: tipipi
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpiIngestionDto'
+          description: Successful response
+      operationId: getIpiCodipiTipipi
+  /ipi/{codipi}/{tipipi}/send:
+    post:
+      parameters:
+      - name: codipi
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: tipipi
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postIpiCodipiTipipiSend
+  /pedlib/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePedlibIngestionDto'
+          description: Successful response
+      operationId: getPedlibAll
+  /pedlib/{numres}:
+    get:
+      parameters:
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PedlibIngestionDto'
+          description: Successful response
+      operationId: getPedlibNumres
+  /pedlib/{numres}/send:
+    post:
+      parameters:
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postPedlibNumresSend
+  /product/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageProductIngestionDto'
+          description: Successful response
+      operationId: getProductAll
+  /product/{id}:
+    get:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductIngestionDto'
+          description: Successful response
+      operationId: getProductId
+  /product/{id}/send:
+    post:
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postProductIdSend
+  /receivable/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageReceivableIngestionDto'
+          description: Successful response
+      operationId: getReceivableAll
+  /receivable/{codCli}:
+    get:
+      parameters:
+      - name: codCli
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ReceivableIngestionDto'
+          description: Successful response
+      operationId: getReceivableCodcli
+  /receivable/{codCli}/send:
+    post:
+      parameters:
+      - name: codCli
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful response
+      operationId: postReceivableCodcliSend
+  /vendedor/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageVendedorIngestionDto'
+          description: Successful response
+      operationId: getVendedorAll
+  /vendedor/{codVen}:
+    get:
+      parameters:
+      - name: codVen
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendedorIngestionDto'
+          description: Successful response
+      operationId: getVendedorCodven
+  /vendedor/{codVen}/send:
+    post:
+      parameters:
+      - name: codVen
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful response
+      operationId: postVendedorCodvenSend
+components:
+  schemas:
+    CustomerCreditIngestionDto:
+      type: object
+      properties:
+        customerExternalId:
+          type: integer
+          format: int64
+        cnpjEmpresa:
+          type: string
+        sequencia:
+          type: string
+        data:
+          type: string
+          format: date-time
+        dataPedido:
+          type: string
+          format: date-time-local
+        valorUtilizado:
+          type: number
+          format: double
+        valorTotal:
+          type: number
+          format: double
+        saldo:
+          type: number
+          format: double
+        situacao:
+          type: string
+        tipo:
+          type: string
+      required:
+      - customerExternalId
+      - cnpjEmpresa
+      - data
+      - valorUtilizado
+      - valorTotal
+      - saldo
+      - tipo
+    CustomerIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: integer
+          format: int64
+        cnpjEmpresa:
+          type: string
+        nomeFantasia:
+          type: string
+        razaoSocial:
+          type: string
+        cpfCnpj:
+          type: string
+        inscricaoEstadual:
+          type: string
+        regimeTributario:
+          type: string
+        bloqueado:
+          type: boolean
+        dataNascimento:
+          type: string
+          format: date
+        dataCadastro:
+          type: string
+          format: date
+        dataUltimaAtualizacao:
+          type: string
+          format: date
+        email1:
+          type: string
+        email2:
+          type: string
+        website:
+          type: string
+        limiteCredito:
+          type: number
+        observacoes:
+          type: string
+        cnae:
+          type: string
+        vendedorExternalId:
+          type: integer
+          format: int64
+        nomeVendedor:
+          type: string
+        codigoTipoCliente:
+          type: string
+        codigoGrupoCliente:
+          type: string
+        codigoCategoriaCliente:
+          type: string
+        uf:
+          type: string
+        macroRegiao:
+          type: string
+        microRegiao:
+          type: string
+        setor:
+          type: string
+        faturamentoCep:
+          type: string
+        faturamentoTipoEndereco:
+          type: string
+        faturamentoEndereco:
+          type: string
+        faturamentoNumero:
+          type: string
+        faturamentoComplemento:
+          type: string
+        faturamentoBairro:
+          type: string
+        faturamentoCidade:
+          type: string
+        faturamentoUf:
+          type: string
+        faturamentoDDDTelefone:
+          type: string
+        faturamentoTelefone:
+          type: string
+        faturamentoDDDFax:
+          type: string
+        faturamentoFax:
+          type: string
+        faturamentoContato:
+          type: string
+        faturamentoDDDCelular:
+          type: string
+        faturamentoCelular:
+          type: string
+        cobrancaCep:
+          type: string
+        cobrancaTipoEndereco:
+          type: string
+        cobrancaEndereco:
+          type: string
+        cobrancaNumero:
+          type: string
+        cobrancaComplemento:
+          type: string
+        cobrancaBairro:
+          type: string
+        cobrancaCidade:
+          type: string
+        cobrancaUf:
+          type: string
+        cobrancaDDDTelefone:
+          type: string
+        cobrancaTelefone:
+          type: string
+        cobrancaDDDFax:
+          type: string
+        cobrancaFax:
+          type: string
+        cobrancaContato:
+          type: string
+        cobrancaDDDCelular:
+          type: string
+        cobrancaCelular:
+          type: string
+        entregaCep:
+          type: string
+        entregaTipoEndereco:
+          type: string
+        entregaEndereco:
+          type: string
+        entregaNumero:
+          type: string
+        entregaComplemento:
+          type: string
+        entregaBairro:
+          type: string
+        entregaCidade:
+          type: string
+        entregaUf:
+          type: string
+        entregaDDDTelefone:
+          type: string
+        entregaTelefone:
+          type: string
+        entregaDDDFax:
+          type: string
+        entregaFax:
+          type: string
+        entregaContato:
+          type: string
+        entregaDDDCelular:
+          type: string
+        entregaCelular:
+          type: string
+      required:
+      - externalId
+      - cnpjEmpresa
+      - nomeFantasia
+      - razaoSocial
+      - cpfCnpj
+      - bloqueado
+    CustomerOrderIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        codigoEmpresa:
+          type: integer
+          format: int32
+        codigoCliente:
+          type: integer
+          format: int64
+        cpfCnpj:
+          type: string
+        numeroPedido:
+          type: string
+        dataPedido:
+          type: string
+          format: date-time-local
+        statusPedido:
+          type: string
+        totalPedidoComImpostos:
+          type: number
+          format: double
+        totalPedidoSemImpostos:
+          type: number
+          format: double
+        totalIpi:
+          type: number
+          format: double
+        totalIcms:
+          type: number
+          format: double
+        totalPis:
+          type: number
+          format: double
+        totalCofins:
+          type: number
+          format: double
+        totalSubstituicaoTributaria:
+          type: number
+          format: double
+        totalDescontoIncondicional:
+          type: number
+          format: double
+        totalFrete:
+          type: number
+          format: double
+        totalSeguro:
+          type: number
+          format: double
+        totalOutrasDespesas:
+          type: number
+          format: double
+        vendedorExternalId:
+          type: integer
+          format: int64
+        dataEntregaPrevista:
+          type: string
+          format: date-time-local
+        codigoTransportadora:
+          type: string
+        pedidoAnterior:
+          type: string
+        regimeTributario:
+          type: string
+        nomeRegimeTributario:
+          type: string
+        codigoPadraoFaturamento:
+          type: string
+        itens:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerOrderItemIngestionDto'
+        cnpjEmpresa:
+          type: string
+        customerExternalId:
+          type: integer
+          format: int64
+        dteres:
+          type: string
+          format: date
+      required:
+      - externalId
+      - codigoEmpresa
+      - codigoCliente
+      - numeroPedido
+      - dataPedido
+      - totalPedidoComImpostos
+      - totalPedidoSemImpostos
+      - itens
+      - cnpjEmpresa
+      - customerExternalId
+      - dteres
+    CustomerOrderItemIngestionDto:
+      type: object
+      properties:
+        codEmp:
+          type: integer
+          format: int32
+        dteres:
+          type: string
+          format: date
+        numres:
+          type: string
+        produto:
+          type: string
+        descricao:
+          type: string
+        quantidade:
+          type: number
+          format: double
+        valorUnitario:
+          type: number
+          format: double
+        valorTotal:
+          type: number
+          format: double
+        seqRe2:
+          type: integer
+          format: int32
+        codClp:
+          type: string
+        codSt1:
+          type: string
+        codUnd:
+          type: string
+        vluRe2:
+          type: number
+          format: double
+        dscRe2:
+          type: number
+          format: double
+        dsrRe2:
+          type: number
+          format: double
+        icmsAliquota:
+          type: number
+          format: double
+        icmsBase:
+          type: number
+          format: double
+        icmsValor:
+          type: number
+          format: double
+        icmsReducaoBase:
+          type: number
+          format: double
+        icmsSubstituicaoBase:
+          type: number
+          format: double
+        icmsSubstituicaoValor:
+          type: number
+          format: double
+        icmsSubstituicaoAliquota:
+          type: number
+          format: double
+        icmsSubstituicaoMargem:
+          type: number
+          format: double
+        icmsSubstituicaoReducaoBase:
+          type: number
+          format: double
+        ipiAliquota:
+          type: number
+          format: double
+        ipiBase:
+          type: number
+          format: double
+        ipiValor:
+          type: number
+          format: double
+        ipiClassificacao:
+          type: string
+        ipiCst:
+          type: string
+        pisBase:
+          type: number
+          format: double
+        pisAliquota:
+          type: number
+          format: double
+        pisValor:
+          type: number
+          format: double
+        pisCst:
+          type: string
+        cofinsBase:
+          type: number
+          format: double
+        cofinsAliquota:
+          type: number
+          format: double
+        cofinsValor:
+          type: number
+          format: double
+        cofinsCst:
+          type: string
+        descontoValor:
+          type: number
+          format: double
+        freteValor:
+          type: number
+          format: double
+        seguroValor:
+          type: number
+          format: double
+        outrasDespesasValor:
+          type: number
+          format: double
+        totalItemTributado:
+          type: number
+          format: double
+        totRen:
+          type: number
+          format: double
+        totGe2:
+          type: number
+          format: double
+        observacao:
+          type: string
+        pedidoCompraCliente:
+          type: string
+        itemPedidoCompraCliente:
+          type: integer
+          format: int32
+        nroRe2:
+          type: integer
+          format: int32
+        flgVal:
+          type: string
+        flgPac:
+          type: string
+        flgLib:
+          type: string
+        codCfo:
+          type: string
+        codcor:
+          type: string
+        codtam:
+          type: string
+        descricaoNFe:
+          type: string
+        pesoLiquido:
+          type: number
+          format: double
+        pesoBruto:
+          type: number
+          format: double
+        referencia:
+          type: string
+        quantidadeFaturada:
+          type: number
+          format: double
+        quantidadeSeparada:
+          type: number
+          format: double
+        custoTotal:
+          type: number
+          format: double
+        lucroValor:
+          type: number
+          format: double
+        lucroPorcentagem:
+          type: number
+          format: double
+        saldoQuantidade:
+          type: number
+          format: double
+        descontoItemValor:
+          type: number
+          format: double
+        descontoItemTotal:
+          type: number
+          format: double
+      required:
+      - codEmp
+      - dteres
+      - numres
+      - produto
+      - quantidade
+      - valorUnitario
+      - valorTotal
+      - seqRe2
+    FinCreIngestionDto:
+      type: object
+      properties:
+        cnpjEmpresa:
+          type: string
+        codigoEmpresa:
+          type: integer
+          format: int32
+        dataEmissao:
+          type: string
+          format: date
+        documento:
+          type: string
+        codigoCondicaoRecebimento:
+          type: string
+        nomeCondicaoRecebimento:
+          type: string
+        nomeEmpresa:
+          type: string
+        codigoComissao:
+          type: string
+        percentualComissao:
+          type: number
+          format: double
+        codigoCliente:
+          type: integer
+          format: int64
+        nomeCliente:
+          type: string
+        codigoVendedor:
+          type: integer
+          format: int64
+        nomeVendedor:
+          type: string
+        codigoTipoDocumento:
+          type: string
+        nomeTipoDocumento:
+          type: string
+        parcelas:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinCrpIngestionDto'
+      required:
+      - cnpjEmpresa
+      - codigoEmpresa
+      - documento
+      - parcelas
+    FinCrpIngestionDto:
+      type: object
+      properties:
+        numeroParcela:
+          type: integer
+          format: int32
+        flagIncobravel:
+          type: string
+        dataIncobravel:
+          type: string
+          format: date
+        dataVencimento:
+          type: string
+          format: date
+        prazoEmDias:
+          type: integer
+          format: int32
+        valorParcela:
+          type: number
+          format: double
+        numeroBancario:
+          type: string
+        codigoBanco:
+          type: string
+        nomeBanco:
+          type: string
+        observacoes:
+          type: string
+        flagCartaAnuencia:
+          type: string
+        dataCartaAnuencia:
+          type: string
+          format: date
+        flagPago:
+          type: string
+    IcmsIngestionDto:
+      type: object
+      properties:
+        cnpjEmpresa:
+          type: string
+        codigoIcms:
+          type: string
+        tipoIcms:
+          type: string
+        nomeIcms:
+          type: string
+        ufEmitente:
+          type: string
+        codigoRegimeTributario:
+          type: string
+        aliquotaIcms:
+          type: number
+          format: double
+        percentualReducaoValorImposto:
+          type: number
+          format: double
+        percentualBaseCalculoIcms:
+          type: number
+          format: double
+        situacaoTributariaIcms:
+          type: string
+      required:
+      - cnpjEmpresa
+      - codigoIcms
+      - tipoIcms
+    InvoiceIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        cnpjEmpresa:
+          type: string
+        codEmp:
+          type: integer
+          format: int32
+        customerExternalId:
+          type: integer
+          format: int64
+        numres:
+          type: string
+        dteres:
+          type: string
+          format: date
+        nronfs:
+          type: string
+        dataFaturamento:
+          type: string
+          format: date
+        totalFaturado:
+          type: number
+          format: double
+      required:
+      - externalId
+      - cnpjEmpresa
+      - codEmp
+      - numres
+      - dteres
+    IpiIngestionDto:
+      type: object
+      properties:
+        cnpjEmpresa:
+          type: string
+        flgAtivo:
+          type: string
+        codigoIpi:
+          type: string
+        tipoIpi:
+          type: string
+        nomeIpi:
+          type: string
+        ncmIpi:
+          type: string
+        codigoEnquadramentoLegal:
+          type: string
+        cstIpi:
+          type: string
+        descricaoSituacaoTributariaIpi:
+          type: string
+        aliquotaIpi:
+          type: number
+          format: double
+        percentualBaseCalculoIpi:
+          type: number
+          format: double
+        flgSineif20:
+          type: string
+        codigoTextoFiscal:
+          type: string
+        cstPis:
+          type: string
+        descricaoSituacaoTributariaPis:
+          type: string
+        aliquotaPis:
+          type: number
+          format: double
+        incluiDescontoSuframaPis:
+          type: string
+        cstCofins:
+          type: string
+        descricaoSituacaoTributariaCofins:
+          type: string
+        aliquotaCofins:
+          type: number
+          format: double
+        incluiDescontoSuframaCofins:
+          type: string
+      required:
+      - cnpjEmpresa
+      - codigoIpi
+      - tipoIpi
+    Pedlb2IngestionDto:
+      type: object
+      properties:
+        numeroSequenciaLiberacao:
+          type: integer
+          format: int32
+        classificacaoItem:
+          type: string
+        codigoGrupo:
+          type: string
+        codigoSubGrupo:
+          type: string
+        codigoProduto:
+          type: string
+        descricaoItemLiberacao:
+          type: string
+        quantidadeNoPedido:
+          type: number
+          format: double
+        totalSeparado:
+          type: number
+          format: double
+        quantidadeRestante:
+          type: number
+          format: double
+        totalValorLiquido:
+          type: number
+          format: double
+        totalValorBruto:
+          type: number
+          format: double
+        percentualDesconto:
+          type: number
+          format: double
+        totalCusto:
+          type: number
+          format: double
+        percentualDeAcrescimo:
+          type: number
+          format: double
+        precoVendaItem:
+          type: number
+          format: double
+        precoPraticado:
+          type: number
+          format: double
+        custoPraticado:
+          type: number
+          format: double
+      required:
+      - numeroSequenciaLiberacao
+    PedlibIngestionDto:
+      type: object
+      properties:
+        cnpjEmpresa:
+          type: string
+        codigoEmpresa:
+          type: integer
+          format: int32
+        dataPedido:
+          type: string
+          format: date
+        numeroPedido:
+          type: string
+        numeroLiberacao:
+          type: integer
+          format: int32
+        dataLiberacao:
+          type: string
+          format: date
+        horaLiberacao:
+          type: string
+        codigoCliente:
+          type: integer
+          format: int64
+        quantidadeSeparada:
+          type: integer
+          format: int32
+        totalLiberadoSemImpostos:
+          type: number
+          format: double
+        totalLiberadoComImpostos:
+          type: number
+          format: double
+        situacaoLiberacao:
+          type: string
+        codigoVendedor:
+          type: integer
+          format: int64
+        comissaoLiberacao:
+          type: number
+          format: double
+        totalCusto:
+          type: number
+          format: double
+        detalhes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pedlb2IngestionDto'
+      required:
+      - cnpjEmpresa
+      - codigoEmpresa
+      - numeroPedido
+      - numeroLiberacao
+      - detalhes
+    ProductIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        cnpjEmpresa:
+          type: string
+        nome:
+          type: string
+        descricaoReduzida:
+          type: string
+        referenciaInterna:
+          type: string
+        ncm:
+          type: string
+        cest:
+          type: string
+        origemProduto:
+          type: string
+        categoria:
+          type: string
+        tipo:
+          type: string
+        marca:
+          type: string
+        unidadeEntrada:
+          type: string
+        unidadeSaida:
+          type: string
+        pesoLiquido:
+          type: number
+        pesoBruto:
+          type: number
+        descontinuado:
+          type: boolean
+        codigoBarras:
+          type: string
+        codigoBarrasProprio:
+          type: string
+        preco:
+          type: number
+        preco2:
+          type: number
+        preco3:
+          type: number
+        preco4:
+          type: number
+        preco5:
+          type: number
+        descontoPadrao:
+          type: number
+        estoqueDisponivel:
+          type: number
+        estoqueMinimo:
+          type: number
+        estoqueMaximo:
+          type: number
+        estoqueReservado:
+          type: number
+        estoqueAdquirido:
+          type: number
+        estoqueAtual:
+          type: number
+        estoqueRMA:
+          type: number
+        similar:
+          type: string
+        quantidadeVolumes:
+          type: number
+        quantidadeEmbalagem:
+          type: number
+        localizacao:
+          type: string
+        cubagem:
+          type: number
+        codigoBarrasEmbalagem:
+          type: string
+        ibsCClassTrib:
+          type: string
+        ibsCst:
+          type: string
+        fcpEntrada:
+          type: string
+        fcpSaida:
+          type: string
+        ipiSaida:
+          type: string
+        ipiEntrada:
+          type: string
+        icmSaida:
+          type: string
+        icmEntrada:
+          type: string
+        icmStSaida:
+          type: string
+        icmStEntrada:
+          type: string
+        observacao:
+          type: string
+      required:
+      - externalId
+      - cnpjEmpresa
+      - nome
+    ReceivableIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        cnpjEmpresa:
+          type: string
+        customerExternalId:
+          type: integer
+          format: int64
+        sequencia:
+          type: string
+        dataLancamento:
+          type: string
+          format: date-time
+        dataReferenciaPedido:
+          type: string
+          format: date-time-local
+        valorOriginal:
+          type: number
+          format: double
+        valorUtilizado:
+          type: number
+          format: double
+        saldoAberto:
+          type: number
+          format: double
+        situacao:
+          type: string
+      required:
+      - externalId
+      - cnpjEmpresa
+      - customerExternalId
+      - dataLancamento
+      - valorOriginal
+      - valorUtilizado
+      - saldoAberto
+    VendedorIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: integer
+          format: int64
+        cnpjEmpresa:
+          type: string
+        nome:
+          type: string
+        apelido:
+          type: string
+        cpfCnpj:
+          type: string
+        telefone:
+          type: string
+        celular:
+          type: string
+        email:
+          type: string
+        cidade:
+          type: string
+        uf:
+          type: string
+        situacao:
+          type: string
+        saldo:
+          type: number
+        dataCadastro:
+          type: string
+          format: date
+        metaRepresentacao:
+          type: number
+      required:
+      - externalId
+      - cnpjEmpresa
+      - nome
+    PageCustomerCreditIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerCreditIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageCustomerIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageCustomerOrderIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerOrderIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageCustomerOrderItemIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerOrderItemIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageFinCreIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinCreIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageFinCrpIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/FinCrpIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageIcmsIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/IcmsIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageInvoiceIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageIpiIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/IpiIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PagePedlb2IngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pedlb2IngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PagePedlibIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PedlibIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageProductIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageReceivableIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReceivableIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageVendedorIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendedorIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
