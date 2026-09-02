@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.model.Pedlb2
 import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.PedlibService
@@ -51,7 +52,7 @@ class PedlibControllerTest {
         whenever(pedlib.codigoEmpresa).thenReturn(1)
         whenever(pedlib.numeroPedido).thenReturn("123")
         whenever(pedlib.numeroLiberacao).thenReturn(1)
-        whenever(pedlib.detalhes).thenReturn(emptyList())
+        whenever(pedlib.detalhes).thenReturn(listOf(mock()))
         whenever(pedlibServiceMock.getAllPedlib(any())).thenReturn(PageImpl(listOf(pedlib)))
 
         mockMvc

@@ -54,7 +54,7 @@ class FinCreControllerTest {
         val finCre = mock<FinCre>()
         whenever(finCre.codigoEmpresa).thenReturn(1)
         whenever(finCre.documento).thenReturn("123")
-        whenever(finCre.parcelas).thenReturn(emptyList())
+        whenever(finCre.parcelas).thenReturn(listOf(mock()))
         whenever(finCreServiceMock.getAllFinCre(any())).thenReturn(PageImpl(listOf(finCre)))
 
         mockMvc
