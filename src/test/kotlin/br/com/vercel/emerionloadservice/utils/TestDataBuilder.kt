@@ -300,23 +300,6 @@ class TestDataBuilder(
         )
     }
 
-    fun insertInvoice(
-        codEmp: Int,
-        dataPedido: LocalDate,
-        numeroPedido: Int,
-        numeroNota: String,
-    ) {
-        jdbcTemplate.update(
-            "INSERT INTO FATPED (CODEMP, DTERES, NUMRES, NRONFS, DTAFAT, TOTFAT) VALUES (?, ?, ?, ?, ?, ?)",
-            codEmp,
-            Date.valueOf(dataPedido),
-            numeroPedido,
-            numeroNota,
-            Date.valueOf(dataPedido.plusDays(1)),
-            BigDecimal("120.50"),
-        )
-    }
-
     fun insertCreditMovement(
         codCli: Long,
         sequencia: String,
