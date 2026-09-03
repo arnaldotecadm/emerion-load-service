@@ -10,7 +10,7 @@ object CustomerOrderIngestionMapper {
     // is sent as externalId to keep cross-company and cross-date uniqueness.
     fun CustomerOrder.toIngestionDto(cnpjEmpresa: String): CustomerOrderIngestionDto =
         CustomerOrderIngestionDto(
-            externalId = "${this.codigoEmpresa}.${this.dataPedido}.${this.numeroPedido}",
+            externalId = "${this.codigoEmpresa}.${this.dataPedido.toLocalDate()}.${this.numeroPedido}",
             codigoEmpresa = this.codigoEmpresa,
             codigoCliente = this.codigoCliente,
             cnpjEmpresa = cnpjEmpresa,

@@ -28,8 +28,8 @@ class CustomerCreditRepository(
                 CustomerCredit(
                     codCli = rs.getLong("codCli"),
                     sequencia = rs.getString("sequencia"),
-                    data = rs.getTimestamp("data").toInstant(),
-                    dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
+                    data = rs.getTimestamp("data")?.toLocalDateTime()?.toLocalDate() ?: throw IllegalStateException("data cannot be null"),
+                    dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime()?.toLocalDate(),
                     valorUtilizado = rs.getDouble("valorUtilizado"),
                     valorTotal = rs.getDouble("valorTotal"),
                     saldo = rs.getDouble("saldo"),

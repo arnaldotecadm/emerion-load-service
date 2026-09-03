@@ -274,83 +274,6 @@ paths:
         '200':
           description: Successful response
       operationId: postIcmsCodicmTipicmSend
-  /invoice/all:
-    get:
-      parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 0
-      - name: size
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 40
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PageInvoiceIngestionDto'
-          description: Successful response
-      operationId: getInvoiceAll
-  /invoice/{codEmp}/{dteres}/{numres}:
-    get:
-      parameters:
-      - name: codEmp
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: dteres
-        in: path
-        required: true
-        schema:
-          type: string
-          format: date
-      - name: numres
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/InvoiceIngestionDto'
-          description: Successful response
-      operationId: getInvoiceCodempDteresNumres
-  /invoice/{codEmp}/{dteres}/{numres}/send:
-    post:
-      parameters:
-      - name: codEmp
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int32
-      - name: dteres
-        in: path
-        required: true
-        schema:
-          type: string
-          format: date
-      - name: numres
-        in: path
-        required: true
-        schema:
-          type: string
-      responses:
-        '200':
-          description: Successful response
-      operationId: postInvoiceCodempDteresNumresSend
   /ipi/all:
     get:
       parameters:
@@ -514,61 +437,6 @@ paths:
         '200':
           description: Successful response
       operationId: postProductIdSend
-  /receivable/all:
-    get:
-      parameters:
-      - name: page
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 0
-      - name: size
-        in: query
-        schema:
-          type: integer
-          format: int32
-          default: 40
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/PageReceivableIngestionDto'
-          description: Successful response
-      operationId: getReceivableAll
-  /receivable/{codCli}:
-    get:
-      parameters:
-      - name: codCli
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ReceivableIngestionDto'
-          description: Successful response
-      operationId: getReceivableCodcli
-  /receivable/{codCli}/send:
-    post:
-      parameters:
-      - name: codCli
-        in: path
-        required: true
-        schema:
-          type: integer
-          format: int64
-      responses:
-        '200':
-          description: Successful response
-      operationId: postReceivableCodcliSend
   /vendedor/all:
     get:
       parameters:
@@ -636,10 +504,10 @@ components:
           type: string
         data:
           type: string
-          format: date-time
+          format: date
         dataPedido:
           type: string
-          format: date-time-local
+          format: date
         valorUtilizado:
           type: number
           format: double
@@ -1213,38 +1081,6 @@ components:
       - cnpjEmpresa
       - codigoIcms
       - tipoIcms
-    InvoiceIngestionDto:
-      type: object
-      properties:
-        externalId:
-          type: string
-        cnpjEmpresa:
-          type: string
-        codEmp:
-          type: integer
-          format: int32
-        customerExternalId:
-          type: integer
-          format: int64
-        numres:
-          type: string
-        dteres:
-          type: string
-          format: date
-        nronfs:
-          type: string
-        dataFaturamento:
-          type: string
-          format: date
-        totalFaturado:
-          type: number
-          format: double
-      required:
-      - externalId
-      - cnpjEmpresa
-      - codEmp
-      - numres
-      - dteres
     IpiIngestionDto:
       type: object
       properties:
@@ -1506,43 +1342,6 @@ components:
       - externalId
       - cnpjEmpresa
       - nome
-    ReceivableIngestionDto:
-      type: object
-      properties:
-        externalId:
-          type: string
-        cnpjEmpresa:
-          type: string
-        customerExternalId:
-          type: integer
-          format: int64
-        sequencia:
-          type: string
-        dataLancamento:
-          type: string
-          format: date-time
-        dataReferenciaPedido:
-          type: string
-          format: date-time-local
-        valorOriginal:
-          type: number
-          format: double
-        valorUtilizado:
-          type: number
-          format: double
-        saldoAberto:
-          type: number
-          format: double
-        situacao:
-          type: string
-      required:
-      - externalId
-      - cnpjEmpresa
-      - customerExternalId
-      - dataLancamento
-      - valorOriginal
-      - valorUtilizado
-      - saldoAberto
     VendedorIngestionDto:
       type: object
       properties:
@@ -1818,40 +1617,6 @@ components:
           type: boolean
         empty:
           type: boolean
-    PageInvoiceIngestionDto:
-      type: object
-      required:
-      - content
-      - totalElements
-      - totalPages
-      - size
-      - number
-      - first
-      - last
-      - empty
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/InvoiceIngestionDto'
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        number:
-          type: integer
-          format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
-        empty:
-          type: boolean
     PageIpiIngestionDto:
       type: object
       required:
@@ -1970,40 +1735,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ProductIngestionDto'
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        number:
-          type: integer
-          format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
-        empty:
-          type: boolean
-    PageReceivableIngestionDto:
-      type: object
-      required:
-      - content
-      - totalElements
-      - totalPages
-      - size
-      - number
-      - first
-      - last
-      - empty
-      properties:
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/ReceivableIngestionDto'
         totalElements:
           type: integer
           format: int64

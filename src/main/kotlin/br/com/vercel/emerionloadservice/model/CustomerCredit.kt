@@ -1,13 +1,12 @@
 package br.com.vercel.emerionloadservice.model
 
-import java.time.Instant
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 data class CustomerCredit(
     val codCli: Long,
     val sequencia: String?,
-    val data: Instant,
-    val dataPedido: LocalDateTime?,
+    val data: LocalDate,
+    val dataPedido: LocalDate?,
     val valorUtilizado: Double,
     val valorTotal: Double,
     val saldo: Double,

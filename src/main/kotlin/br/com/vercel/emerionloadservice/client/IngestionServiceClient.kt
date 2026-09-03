@@ -5,22 +5,18 @@ import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.to
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.FinCreIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toIngestionDto
-import br.com.vercel.emerionloadservice.client.mapper.InvoiceIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.PedlibIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.ProductIngestionMapper.toIngestionDto
-import br.com.vercel.emerionloadservice.client.mapper.ReceivableIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.model.Icms
-import br.com.vercel.emerionloadservice.model.Invoice
 import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.model.Product
-import br.com.vercel.emerionloadservice.model.Receivable
 import br.com.vercel.emerionloadservice.model.Vendedor
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import org.slf4j.LoggerFactory
@@ -42,8 +38,6 @@ class IngestionServiceClient(
     @Value($$"${ingestion-service.endpoints.customer-credit}") private val customerCreditEndpoint: String,
     @Value($$"${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String,
     @Value($$"${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String,
-    @Value($$"${ingestion-service.endpoints.invoice}") private val invoiceEndpoint: String,
-    @Value($$"${ingestion-service.endpoints.receivable}") private val receivableEndpoint: String,
     @Value($$"${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
     @Value($$"${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
     @Value($$"${ingestion-service.endpoints.fin-cre}") private val finCreEndpoint: String,
@@ -161,49 +155,6 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Vendedor {} sent successfully to ingestion service", dto.externalId)
-    }
-
-    fun sendInvoices(invoices: List<Invoice>) {
-        if (invoices.isEmpty()) return
-
-        val url = "$baseUrl$invoiceEndpoint"
-        val dtos = invoices.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
-        val orderExternalId = dtos.first().run { "$codEmp-$dteres-$numres" }
-
-        logger.info("Sending {} invoice(s) of order {} to ingestion service at {}", dtos.size, orderExternalId, url)
-        sendToIngestion("invoice", orderExternalId) {
-            restClient
-                .post()
-                .uri(url)
-                .body(dtos)
-                .retrieve()
-                .toBodilessEntity()
-        }
-        logger.info("Invoice(s) of order {} sent successfully to ingestion service", orderExternalId)
-    }
-
-    fun sendReceivables(receivables: List<Receivable>) {
-        if (receivables.isEmpty()) return
-
-        val url = "$baseUrl$receivableEndpoint"
-        val dtos = receivables.toIngestionDto(companyProvider.getCompanyCnpj())
-        val customerExternalId = dtos.first().customerExternalId
-
-        logger.info(
-            "Sending {} receivable(s) of customer {} to ingestion service at {}",
-            dtos.size,
-            customerExternalId,
-            url,
-        )
-        sendToIngestion("receivable", customerExternalId) {
-            restClient
-                .post()
-                .uri(url)
-                .body(dtos)
-                .retrieve()
-                .toBodilessEntity()
-        }
-        logger.info("Receivable(s) of customer {} sent successfully to ingestion service", customerExternalId)
     }
 
     fun sendIcms(icms: Icms) {

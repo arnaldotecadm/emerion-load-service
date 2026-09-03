@@ -19,7 +19,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
-import java.time.Instant
+import java.time.LocalDate
 
 @WebMvcTest(CustomerCreditController::class)
 class CustomerCreditControllerTest {
@@ -51,7 +51,7 @@ class CustomerCreditControllerTest {
             CustomerCredit(
                 codCli = 42L,
                 sequencia = "1",
-                data = Instant.parse("2026-01-02T00:00:00Z"),
+                data = LocalDate.parse("2026-01-02"),
                 dataPedido = null,
                 valorUtilizado = 0.0,
                 valorTotal = 100.0,
