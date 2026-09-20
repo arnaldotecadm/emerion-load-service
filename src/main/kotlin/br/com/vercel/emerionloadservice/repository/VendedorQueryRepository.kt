@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
-import br.com.vercel.emerionloadservice.repository.projection.VendedorProjectionImpl
+import br.com.vercel.emerionloadservice.model.Vendedor
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -36,8 +36,8 @@ private const val BASE_QUERY_VENDEDOR = """
 class VendedorQueryRepository(
     private val jdbcTemplate: JdbcTemplate,
 ) {
-    private fun resultsetToModel(rs: java.sql.ResultSet): VendedorProjectionImpl =
-        VendedorProjectionImpl(
+    private fun resultsetToModel(rs: java.sql.ResultSet): Vendedor =
+        Vendedor(
             id = rs.getLong("id"),
             nome = rs.getString("nome"),
             apelido = rs.getString("apelido"),
@@ -49,26 +49,39 @@ class VendedorQueryRepository(
             uf = rs.getString("uf"),
             situacao = rs.getString("situacao"),
             saldo = rs.getBigDecimal("saldo"),
-            dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime(),
+            dataCadastro = rs.getTimestamp("dataCadastro")?.toLocalDateTime()?.toLocalDate(),
             metaRepresentacao = rs.getBigDecimal("metaRepresentacao"),
         )
 
-    fun findAllPaged(pageable: Pageable): Page<VendedorProjectionImpl> {
+    fun findAllPaged(pageable: Pageable): Page<Vendedor> {
         val baseQuery = "$BASE_QUERY_VENDEDOR order by ven.codven"
-
         val pagedQuery = FirebirdPagination.applyFirstSkip(baseQuery, pageable)
-
-        val content: List<VendedorProjectionImpl> =
-            jdbcTemplate.query(pagedQuery) { rs, _ ->
-                resultsetToModel(rs)
-            }
-
-        val total = jdbcTemplate.queryForObject<Long>("select count(*) from finven")!!
-
+        val content: List<Vendedor> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultsetToModel(rs) }
+        val total = jdbcTemplate.queryForObject<Long>("select count(1) from finven")!!
         return PageImpl(content, pageable, total)
     }
 
-    fun findByCodVen(codVen: Long): VendedorProjectionImpl? {
+    fun findAllToWebService(pageable: Pageable): Page<Vendedor> {
+        val pagedQuery =
+            FirebirdPagination.applyFirstSkip(
+                """
+                $BASE_QUERY_VENDEDOR
+                where coalesce(SENT_TO_WEBSERVICE, 0) = 0
+                order by ven.codven desc
+                """.trimIndent(),
+                pageable,
+            )
+        val content: List<Vendedor> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultsetToModel(rs) }
+        val total = jdbcTemplate.queryForObject<Long>("select count(1) from finven") ?: 0L
+        return PageImpl(content, pageable, total)
+    }
+
+    fun updateSentToWebService(codVenList: String) {
+        val updateQuery = "update finven set SENT_TO_WEBSERVICE = 1 where codven in ($codVenList)"
+        jdbcTemplate.update(updateQuery)
+    }
+
+    fun findByCodVen(codVen: Long): Vendedor? {
         val query = "$BASE_QUERY_VENDEDOR where ven.codven = ?"
 
         return jdbcTemplate

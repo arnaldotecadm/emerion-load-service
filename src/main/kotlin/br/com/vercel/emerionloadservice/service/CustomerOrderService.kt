@@ -3,6 +3,7 @@ package br.com.vercel.emerionloadservice.service
 import br.com.vercel.emerionloadservice.client.IngestionServiceClient
 import br.com.vercel.emerionloadservice.model.CustomerOrder
 import br.com.vercel.emerionloadservice.repository.CustomerOrderQueryRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -14,7 +15,29 @@ class CustomerOrderService(
     private val customerOrderQueryRepository: CustomerOrderQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient,
 ) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     fun getAllOrders(pageable: Pageable): Page<CustomerOrder> = customerOrderQueryRepository.findAllPaged(pageable)
+
+    fun processRecordsToWebservice(pageable: Pageable?) {
+        val customers = customerOrderQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
+        val listOfUpdated =
+            customers
+                .map {
+                    try {
+                        ingestionServiceClient.sendCustomerOrder(it)
+                        it.numeroPedido to true
+                    } catch (e: Exception) {
+                        logger.error("Error while sending customer ${it.numeroPedido}", e)
+                        it.numeroPedido to false
+                    }
+                }.filter { it.second }
+                .toList()
+                .joinToString(separator = ", ") { it.first }
+        if (listOfUpdated.isNotEmpty()) {
+            customerOrderQueryRepository.updateSentToWebService(listOfUpdated)
+        }
+    }
 
     fun getOrderByNumres(numres: String): CustomerOrder =
         customerOrderQueryRepository.findByKey(numres)

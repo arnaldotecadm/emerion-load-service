@@ -1,6 +1,7 @@
 package br.com.vercel.emerionloadservice.repository
 
 import br.com.vercel.emerionloadservice.model.Product
+import br.com.vercel.emerionloadservice.model.ProductKey
 import br.com.vercel.emerionloadservice.repository.support.FirebirdPagination
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -146,6 +147,42 @@ class ProductQueryRepository(
         val content: List<Product> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
         val total = jdbcTemplate.queryForObject<Long>("select count(*) from estpro") ?: 0L
         return PageImpl(content, pageable, total)
+    }
+
+    fun findAllToWebService(pageable: Pageable): Page<Product> {
+        val pagedQuery =
+            FirebirdPagination.applyFirstSkip(
+                """
+                $BASE_QUERY_ESTPRO
+                where coalesce(SENT_TO_WEBSERVICE, 0) = 0
+                order by pro.codgru desc, pro.codsub desc, pro.codpro desc
+                """.trimIndent(),
+                pageable,
+            )
+        val content: List<Product> = jdbcTemplate.query(pagedQuery) { rs, _ -> resultSetToModel(rs) }
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from estpro") ?: 0L
+        return PageImpl(content, pageable, total)
+    }
+
+    fun updateSentToWebService(products: List<ProductKey>) {
+        val updateQuery =
+            """
+            UPDATE estpro pro
+            SET SENT_TO_WEBSERVICE = 1
+            WHERE pro.codgru = ?
+              AND pro.codsub = ?
+              AND pro.codpro = ?
+            """.trimIndent()
+
+        jdbcTemplate.batchUpdate(
+            updateQuery,
+            products,
+            100,
+        ) { ps, product ->
+            ps.setString(1, product.codgru)
+            ps.setString(2, product.codsub)
+            ps.setString(3, product.codpro)
+        }
     }
 
     fun getProductByCodGruCodSubCodPro(

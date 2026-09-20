@@ -2,7 +2,9 @@ package br.com.vercel.emerionloadservice.service
 
 import br.com.vercel.emerionloadservice.client.IngestionServiceClient
 import br.com.vercel.emerionloadservice.model.Product
+import br.com.vercel.emerionloadservice.model.ProductKey
 import br.com.vercel.emerionloadservice.repository.ProductQueryRepository
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
@@ -14,6 +16,8 @@ class ProductService(
     private val productQueryRepository: ProductQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient,
 ) {
+    private val logger = LoggerFactory.getLogger(this::class.java)
+
     fun getAllProducts(pageable: Pageable): Page<Product> = productQueryRepository.findAllPaged(pageable)
 
     fun getProductById(id: String): Product {
@@ -25,6 +29,27 @@ class ProductService(
     fun sendProductToIngestion(id: String) {
         val product = getProductById(id)
         ingestionServiceClient.sendProduct(product)
+    }
+
+    fun processRecordsToWebservice(pageable: Pageable?) {
+        val products = productQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
+        val listOfUpdated =
+            products
+                .map {
+                    try {
+                        ingestionServiceClient.sendProduct(it)
+                        ProductKey(it.codGru, it.codSub, it.codPro) to true
+                    } catch (e: Exception) {
+                        logger.error("Error while sending product ${it.id}", e)
+                        ProductKey(it.codGru, it.codSub, it.codPro) to false
+                    }
+                }.filter { it.second }
+                .map { it.first }
+                .toList()
+
+        if (listOfUpdated.isNotEmpty()) {
+            productQueryRepository.updateSentToWebService(listOfUpdated)
+        }
     }
 
     private fun parseId(id: String): Triple<String, String, String> {

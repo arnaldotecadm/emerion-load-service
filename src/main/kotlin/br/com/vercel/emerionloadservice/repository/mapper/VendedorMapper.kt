@@ -1,13 +1,12 @@
 package br.com.vercel.emerionloadservice.repository.mapper
 
 import br.com.vercel.emerionloadservice.model.Vendedor
-import br.com.vercel.emerionloadservice.repository.projection.VendedorProjectionImpl
 import org.springframework.data.domain.Page
 
 object VendedorMapper {
-    fun Page<VendedorProjectionImpl>.toModel(): Page<Vendedor> = this.map { it.toModel() }
+    fun Page<Vendedor>.toModel(): Page<Vendedor> = this.map { it.toModel() }
 
-    fun VendedorProjectionImpl.toModel(): Vendedor =
+    fun Vendedor.toModel(): Vendedor =
         Vendedor(
             id = this.id,
             nome = this.nome.trim(),
@@ -20,7 +19,7 @@ object VendedorMapper {
             uf = this.uf?.trim(),
             situacao = this.situacao?.trim(),
             saldo = this.saldo,
-            dataCadastro = this.dataCadastro?.toLocalDate(),
+            dataCadastro = this.dataCadastro,
             metaRepresentacao = this.metaRepresentacao,
         )
 }

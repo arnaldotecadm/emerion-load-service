@@ -69,7 +69,7 @@ class IngestionServiceClient(
             )
         }
 
-    fun sendCustomer(customer: Customer) {
+    fun sendCustomer(customer: Customer): Boolean {
         val url = "$baseUrl$customerEndpoint"
         val dto = customer.toIngestionDto(companyProvider.getCompanyCnpj())
 
@@ -83,9 +83,10 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Customer {} sent successfully to ingestion service", dto.externalId)
+        return true
     }
 
-    fun sendProduct(product: Product) {
+    fun sendProduct(product: Product): Boolean {
         val url = "$baseUrl$productEndpoint"
         val dto = product.toIngestionDto(companyProvider.getCompanyCnpj())
 
@@ -99,6 +100,7 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Product {} sent successfully to ingestion service", dto.externalId)
+        return true
     }
 
     fun sendCustomerCredits(credits: List<CustomerCredit>) {
@@ -125,7 +127,7 @@ class IngestionServiceClient(
         logger.info("Credit(s) of customer {} sent successfully to ingestion service", customerExternalId)
     }
 
-    fun sendCustomerOrder(order: CustomerOrder) {
+    fun sendCustomerOrder(order: CustomerOrder): Boolean {
         val url = "$baseUrl$customerOrderEndpoint"
         val dto = order.toIngestionDto(companyProvider.getCompanyCnpj())
 
@@ -139,9 +141,10 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Order {} sent successfully to ingestion service", dto.externalId)
+        return true
     }
 
-    fun sendVendedor(vendedor: Vendedor) {
+    fun sendVendedor(vendedor: Vendedor): Boolean {
         val url = "$baseUrl$vendedorEndpoint"
         val dto = vendedor.toIngestionDto(companyProvider.getCompanyCnpj())
 
@@ -155,6 +158,7 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Vendedor {} sent successfully to ingestion service", dto.externalId)
+        return true
     }
 
     fun sendIcms(icms: Icms) {

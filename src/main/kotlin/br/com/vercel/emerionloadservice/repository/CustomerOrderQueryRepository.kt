@@ -114,6 +114,32 @@ class CustomerOrderQueryRepository(
         return PageImpl(content, pageable, total)
     }
 
+    fun findAllToWebService(pageable: Pageable): Page<CustomerOrder> {
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from pedres") ?: 0L
+        val headers = findHeadersToWebService(pageable)
+        if (headers.isEmpty()) {
+            return PageImpl(emptyList(), pageable, total)
+        }
+
+        val headerKeys =
+            headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido) }.toSet()
+        val itemsByOrderKey =
+            findItems(headers.map { it.numeroPedido }, headerKeys)
+                .groupBy { OrderBusinessKey(it.codEmp, it.dteres, it.numres) }
+        val content =
+            headers.map { header ->
+                val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
+                header.copy(itens = itemsByOrderKey[orderKey].orEmpty())
+            }
+
+        return PageImpl(content, pageable, total)
+    }
+
+    fun updateSentToWebService(numresList: String) {
+        val updateQuery = "update pedres set SENT_TO_WEBSERVICE = 1 where numres in ($numresList)"
+        jdbcTemplate.update(updateQuery)
+    }
+
     fun findByKey(numres: String): CustomerOrder? {
         val headerQuery = "$BASE_QUERY_PEDRES where ped.numres = ?"
         val header =
@@ -134,6 +160,19 @@ class CustomerOrderQueryRepository(
         val query =
             FirebirdPagination.applyFirstSkip(
                 "$BASE_QUERY_PEDRES order by ped.dteres desc, ped.codemp, ped.numres",
+                pageable,
+            )
+        return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
+    }
+
+    private fun findHeadersToWebService(pageable: Pageable): List<CustomerOrder> {
+        val query =
+            FirebirdPagination.applyFirstSkip(
+                """
+                $BASE_QUERY_PEDRES
+                where coalesce(ped.SENT_TO_WEBSERVICE, 0) = 0
+                order by ped.dteres desc, ped.codemp, ped.numres
+                """.trimIndent(),
                 pageable,
             )
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
