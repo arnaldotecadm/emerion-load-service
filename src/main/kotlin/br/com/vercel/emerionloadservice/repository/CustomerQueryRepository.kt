@@ -191,7 +191,7 @@ class CustomerQueryRepository(
             FirebirdPagination.applyFirstSkip(
                 """
                 $BASE_QUERY
-                where coalesce(SENT_TO_WEBSERVICE, 0) = 0
+                where coalesce(cli.SENT_TO_WEBSERVICE, 0) = 0
                 order by cli.codcli desc
                 """.trimIndent(),
                 pageable,

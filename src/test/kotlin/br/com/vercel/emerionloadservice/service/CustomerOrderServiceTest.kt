@@ -24,6 +24,9 @@ import org.springframework.web.server.ResponseStatusException
 @ExtendWith(MockitoExtension::class)
 class CustomerOrderServiceTest {
     @MockitoBean
+    val chunkServiceMock: ChunkService = mock()
+
+    @MockitoBean
     val customerOrderQueryRepositoryMock: CustomerOrderQueryRepository = mock()
 
     @MockitoBean
@@ -65,6 +68,6 @@ class CustomerOrderServiceTest {
 
         customerOrderService.sendOrderToIngestion("ORDER-42")
 
-        verify(ingestionServiceClientMock).sendCustomerOrder(order)
+        verify(ingestionServiceClientMock).sendCustomerOrder(listOf(order))
     }
 }

@@ -14,28 +14,61 @@ import org.springframework.web.server.ResponseStatusException
 class CustomerOrderService(
     private val customerOrderQueryRepository: CustomerOrderQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient,
+    private val chunkService: ChunkService,
 ) {
+    val ordersWithProblem = mutableListOf<String>()
     private val logger = LoggerFactory.getLogger(this::class.java)
 
     fun getAllOrders(pageable: Pageable): Page<CustomerOrder> = customerOrderQueryRepository.findAllPaged(pageable)
 
     fun processRecordsToWebservice(pageable: Pageable?) {
         val customers = customerOrderQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
+
+        val fromDatabase = customers.content
+        logger.info("Orders with problem: $ordersWithProblem")
+        logger.info("Retrieved from database ${fromDatabase.size} customer orders to send to ingestion service")
+        val fromDatabaseFilteredOut = fromDatabase.filter { it.numeroPedido !in ordersWithProblem }
+        logger.info("Filtered out ${fromDatabase.size - fromDatabaseFilteredOut.size} customer orders that had problems in previous attempts")
+        val batches = chunkService.chunkByJsonSizePerNumber(fromDatabaseFilteredOut, 25)
         val listOfUpdated =
-            customers
+            batches
+                .asSequence()
                 .map {
                     try {
                         ingestionServiceClient.sendCustomerOrder(it)
-                        it.numeroPedido to true
+                        it.map { customer -> customer.numeroPedido } to true
                     } catch (e: Exception) {
-                        logger.error("Error while sending customer ${it.numeroPedido}", e)
-                        it.numeroPedido to false
+                        logger.error(
+                            "Error while sending customer order ${it.map { customer -> customer.numeroPedido }}: {}",
+                            e.message
+                        )
+                        it.map { customer -> customer.numeroPedido } to false
                     }
                 }.filter { it.second }
+                .flatMap { it.first }
                 .toList()
-                .joinToString(separator = ", ") { it.first }
+                .joinToString(separator = ", ") { it }
         if (listOfUpdated.isNotEmpty()) {
-            customerOrderQueryRepository.updateSentToWebService(listOfUpdated)
+            try {
+                customerOrderQueryRepository.updateSentToWebService(listOfUpdated)
+            } catch (e: Exception) {
+                logger.error(
+                    "Error while updating sent_to_web_service for customer orders $listOfUpdated: {}",
+                    e.message
+                )
+                logger.info("Updating item by item so we can isolate the problem")
+                listOfUpdated.split(", ").forEach { numres ->
+                    try {
+                        customerOrderQueryRepository.updateSentToWebService(numres)
+                    } catch (e: Exception) {
+                        logger.error(
+                            "Error while updating sent_to_web_service for customer order $numres: {}",
+                            e.message
+                        )
+                        ordersWithProblem.add(numres)
+                    }
+                }
+            }
         }
     }
 
@@ -45,6 +78,6 @@ class CustomerOrderService(
 
     fun sendOrderToIngestion(numres: String) {
         val order = getOrderByNumres(numres)
-        ingestionServiceClient.sendCustomerOrder(order)
+        ingestionServiceClient.sendCustomerOrder(listOf(order))
     }
 }

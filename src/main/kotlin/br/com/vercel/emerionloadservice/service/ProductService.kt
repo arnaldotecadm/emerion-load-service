@@ -15,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException
 class ProductService(
     private val productQueryRepository: ProductQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient,
+    private val chunkService: ChunkService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -28,23 +29,36 @@ class ProductService(
 
     fun sendProductToIngestion(id: String) {
         val product = getProductById(id)
-        ingestionServiceClient.sendProduct(product)
+        ingestionServiceClient.sendProduct(listOf(product))
     }
 
     fun processRecordsToWebservice(pageable: Pageable?) {
         val products = productQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
+        val batches = chunkService.chunkByJsonSize(products.content)
+
         val listOfUpdated =
-            products
+            batches
                 .map {
                     try {
                         ingestionServiceClient.sendProduct(it)
-                        ProductKey(it.codGru, it.codSub, it.codPro) to true
+                        it.map { prod -> ProductKey(prod.codGru, prod.codSub, prod.codPro) } to true
                     } catch (e: Exception) {
-                        logger.error("Error while sending product ${it.id}", e)
-                        ProductKey(it.codGru, it.codSub, it.codPro) to false
+                        logger.error(
+                            "Error while sending product ${
+                                it.map { prod ->
+                                    ProductKey(
+                                        prod.codGru,
+                                        prod.codSub,
+                                        prod.codPro,
+                                    )
+                                }
+                            }",
+                            e,
+                        )
+                        it.map { prod -> ProductKey(prod.codGru, prod.codSub, prod.codPro) } to false
                     }
                 }.filter { it.second }
-                .map { it.first }
+                .flatMap { it.first }
                 .toList()
 
         if (listOfUpdated.isNotEmpty()) {

@@ -14,6 +14,7 @@ import org.springframework.web.server.ResponseStatusException
 class CustomerService(
     private val customerQueryRepository: CustomerQueryRepository,
     private val ingestionServiceClient: IngestionServiceClient,
+    private val chunkService: ChunkService,
 ) {
     private val logger = LoggerFactory.getLogger(this::class.java)
 
@@ -21,19 +22,21 @@ class CustomerService(
 
     fun processRecordsToWebservice(pageable: Pageable?) {
         val customers = customerQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
+        val batches = chunkService.chunkByJsonSize(customers.content)
         val listOfUpdated =
-            customers
-                .map {
+            batches
+                .map { batch ->
                     try {
-                        ingestionServiceClient.sendCustomer(it)
-                        it.id to true
+                        ingestionServiceClient.sendCustomer(batch)
+                        batch.map { it.id } to true
                     } catch (e: Exception) {
-                        logger.error("Error while sending customer ${it.id}", e)
-                        it.id to false
+                        logger.error("Error while sending customer ${batch.map { it.id }}", e)
+                        batch.map { it.id } to false
                     }
                 }.filter { it.second }
+                .flatMap { it.first }
                 .toList()
-                .joinToString(separator = ", ") { it.first.toString() }
+                .joinToString(separator = ", ") { it.toString() }
         if (listOfUpdated.isNotEmpty()) {
             customerQueryRepository.updateSentToWebService(listOfUpdated)
         }
@@ -45,6 +48,6 @@ class CustomerService(
 
     fun sendCustomerToIngestion(codCli: Long): Boolean {
         val customer = getCustomerByCodCli(codCli)
-        return ingestionServiceClient.sendCustomer(customer)
+        return ingestionServiceClient.sendCustomer(listOf(customer))
     }
 }

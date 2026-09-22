@@ -17,6 +17,7 @@ import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.model.Ipi
 import br.com.vercel.emerionloadservice.model.Pedlib
 import br.com.vercel.emerionloadservice.model.Product
+import br.com.vercel.emerionloadservice.model.RequestBatch
 import br.com.vercel.emerionloadservice.model.Vendedor
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import org.slf4j.LoggerFactory
@@ -27,6 +28,7 @@ import org.springframework.web.client.RestClient
 import org.springframework.web.client.RestClientException
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.server.ResponseStatusException
+import java.util.UUID
 
 @Component
 class IngestionServiceClient(
@@ -69,37 +71,38 @@ class IngestionServiceClient(
             )
         }
 
-    fun sendCustomer(customer: Customer): Boolean {
+    fun sendCustomer(customer: List<Customer>): Boolean {
         val url = "$baseUrl$customerEndpoint"
-        val dto = customer.toIngestionDto(companyProvider.getCompanyCnpj())
+        val dto = customer.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
-        logger.info("Sending customer {} to ingestion service at {}", dto.externalId, url)
-        sendToIngestion("customer", dto.externalId) {
+        logger.info("Sending customer {} to ingestion service at {}", dto.map { it.externalId }, url)
+        sendToIngestion("customer", dto.map { it.externalId }) {
             restClient
                 .post()
                 .uri(url)
-                .body(dto)
+                .body(RequestBatch(batchId = UUID.randomUUID().toString(), items = dto))
                 .retrieve()
                 .toBodilessEntity()
         }
-        logger.info("Customer {} sent successfully to ingestion service", dto.externalId)
+        logger.info("Customer {} sent successfully to ingestion service", dto.map { it.externalId })
         return true
     }
 
-    fun sendProduct(product: Product): Boolean {
+    fun sendProduct(productList: List<Product>): Boolean {
         val url = "$baseUrl$productEndpoint"
-        val dto = product.toIngestionDto(companyProvider.getCompanyCnpj())
+        val dto = productList.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
-        logger.info("Sending product {} to ingestion service at {}", dto.externalId, url)
-        sendToIngestion("product", dto.externalId) {
+        logger.info("Sending product {} to ingestion service at {}", dto.hashCode(), url)
+        sendToIngestion("product", dto.hashCode()) {
             restClient
                 .post()
                 .uri(url)
-                .body(dto)
-                .retrieve()
+                .body(
+                    RequestBatch(batchId = UUID.randomUUID().toString(), items = dto),
+                ).retrieve()
                 .toBodilessEntity()
         }
-        logger.info("Product {} sent successfully to ingestion service", dto.externalId)
+        logger.info("Product {} sent successfully to ingestion service", dto.hashCode())
         return true
     }
 
@@ -127,37 +130,36 @@ class IngestionServiceClient(
         logger.info("Credit(s) of customer {} sent successfully to ingestion service", customerExternalId)
     }
 
-    fun sendCustomerOrder(order: CustomerOrder): Boolean {
+    fun sendCustomerOrder(orderList: List<CustomerOrder>): Boolean {
         val url = "$baseUrl$customerOrderEndpoint"
-        val dto = order.toIngestionDto(companyProvider.getCompanyCnpj())
+        val dto = orderList.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
-        logger.info("Sending order {} ({} item(s)) to ingestion service at {}", dto.externalId, dto.itens.size, url)
-        sendToIngestion("customer order", dto.externalId) {
+        sendToIngestion("customer order", dto.hashCode()) {
             restClient
                 .post()
                 .uri(url)
-                .body(dto)
+                .body(RequestBatch(batchId = UUID.randomUUID().toString(), items = dto))
                 .retrieve()
                 .toBodilessEntity()
         }
-        logger.info("Order {} sent successfully to ingestion service", dto.externalId)
+        logger.info("Customer order batch of size {} sent successfully to ingestion service", dto.size)
         return true
     }
 
-    fun sendVendedor(vendedor: Vendedor): Boolean {
+    fun sendVendedor(vendedor: List<Vendedor>): Boolean {
         val url = "$baseUrl$vendedorEndpoint"
-        val dto = vendedor.toIngestionDto(companyProvider.getCompanyCnpj())
+        val dto = vendedor.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
-        logger.info("Sending vendedor {} to ingestion service at {}", dto.externalId, url)
-        sendToIngestion("vendedor", dto.externalId) {
+        logger.info("Sending vendedor {} to ingestion service at {}", dto.hashCode(), url)
+        sendToIngestion("vendedor", dto.hashCode()) {
             restClient
                 .post()
                 .uri(url)
-                .body(dto)
+                .body(RequestBatch(batchId = UUID.randomUUID().toString(), items = dto))
                 .retrieve()
                 .toBodilessEntity()
         }
-        logger.info("Vendedor {} sent successfully to ingestion service", dto.externalId)
+        logger.info("Vendedor {} sent successfully to ingestion service", dto.hashCode())
         return true
     }
 

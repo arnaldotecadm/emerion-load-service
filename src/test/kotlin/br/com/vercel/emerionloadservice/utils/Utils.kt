@@ -1,6 +1,6 @@
 package br.com.vercel.emerionloadservice.utils
 
-import br.com.vercel.emerionloadservice.repository.projection.VendedorProjectionImpl
+import br.com.vercel.emerionloadservice.model.Vendedor
 
 object Utils {
     fun buildVendedorProjection(
@@ -11,8 +11,8 @@ object Utils {
         telefone: String? = "(11) 1234-5678",
         celular: String? = "(11) 91234-5678",
         email: String? = "vendedor@example.com",
-    ): VendedorProjectionImpl =
-        VendedorProjectionImpl(
+    ): Vendedor =
+        Vendedor(
             id = id,
             nome = nome,
             apelido = apelido,
