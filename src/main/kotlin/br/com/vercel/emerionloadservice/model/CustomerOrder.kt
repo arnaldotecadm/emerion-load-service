@@ -9,6 +9,7 @@ data class CustomerOrder(
     val numeroPedido: String,
     val dataPedido: LocalDateTime,
     val statusPedido: String?,
+    val ufPedido: String?,
     val totalPedidoComImpostos: Double,
     val totalPedidoSemImpostos: Double,
     val totalIpi: Double?,

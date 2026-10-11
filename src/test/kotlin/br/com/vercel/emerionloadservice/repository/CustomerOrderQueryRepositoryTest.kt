@@ -61,6 +61,7 @@ class CustomerOrderQueryRepositoryTest : FirebirdIntegrationTest() {
         assertEquals("11111111000111", order.cpfCnpj)
         assertEquals(orderDate, order.dataPedido.toLocalDate())
         assertEquals("ABERTO", order.statusPedido)
+        assertEquals("PR", order.ufPedido)
         assertEquals(120.0, order.totalPedidoComImpostos)
         assertEquals(5.0, order.totalIpi)
         assertEquals(null, order.vendedorExternalId)

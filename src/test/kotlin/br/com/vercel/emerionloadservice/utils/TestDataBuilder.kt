@@ -184,20 +184,22 @@ class TestDataBuilder(
         numeroPedido: Int,
         codCli: Long,
         vendedorExternalId: Long? = 99,
+        ufPedido: String? = "PR",
     ) {
         jdbcTemplate.update(
             """
             INSERT INTO PEDRES (
-                CODEMP, DTERES, NUMRES, CODCLI, SITRES, TOTGER, TOTRES, TOTIPI, TOTICM,
+                CODEMP, DTERES, NUMRES, CODCLI, SITRES, UFERES, TOTGER, TOTRES, TOTIPI, TOTICM,
                 TOTPIS, TOTCOF, TOTSUB, TOTDESCINC, TOTFRT, TOTSEG, TOTOUTDESP, CODVEN,
                 CODATD, DTFRES, CODTRA, PEDANT, REGTRB, CODPFA
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent(),
             codEmp,
             Date.valueOf(dataPedido),
             numeroPedido,
             codCli,
             "ABERTO",
+            ufPedido,
             BigDecimal("120.00"),
             BigDecimal("100.00"),
             BigDecimal("5.00"),

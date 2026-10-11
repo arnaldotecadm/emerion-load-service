@@ -20,6 +20,7 @@ object CustomerOrderIngestionMapper {
             numeroPedido = this.numeroPedido,
             dataPedido = this.dataPedido,
             statusPedido = this.statusPedido,
+            ufPedido = this.ufPedido,
             totalPedidoComImpostos = this.totalPedidoComImpostos,
             totalPedidoSemImpostos = this.totalPedidoSemImpostos,
             totalIpi = this.totalIpi,

@@ -757,6 +757,8 @@ components:
           format: date-time-local
         statusPedido:
           type: string
+        ufPedido:
+          type: string
         totalPedidoComImpostos:
           type: number
           format: double
