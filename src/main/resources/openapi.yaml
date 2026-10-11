@@ -162,6 +162,57 @@ paths:
         '200':
           description: Successful response
       operationId: postCustomer_OrderNumresSend
+  /customer-quotation/all:
+    get:
+      parameters:
+      - name: page
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        schema:
+          type: integer
+          format: int32
+          default: 40
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageCustomerQuotationIngestionDto'
+          description: Successful response
+      operationId: getCustomer_QuotationAll
+  /customer-quotation/{numres}:
+    get:
+      parameters:
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerQuotationIngestionDto'
+          description: Successful response
+      operationId: getCustomer_QuotationNumres
+  /customer-quotation/{numres}/send:
+    post:
+      parameters:
+      - name: numres
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful response
+      operationId: postCustomer_QuotationNumresSend
   /fincre/all:
     get:
       parameters:
@@ -779,6 +830,90 @@ components:
       - cnpjEmpresa
       - customerExternalId
       - dteres
+    CustomerQuotationIngestionDto:
+      type: object
+      properties:
+        externalId:
+          type: string
+        codigoEmpresa:
+          type: integer
+          format: int32
+        codigoCliente:
+          type: integer
+          format: int64
+        cpfCnpj:
+          type: string
+        cnpjEmpresa:
+          type: string
+        customerExternalId:
+          type: integer
+          format: int64
+        dteres:
+          type: string
+          format: date
+        numeroPedido:
+          type: string
+        dataPedido:
+          type: string
+          format: date
+        statusPedido:
+          type: string
+        totalPedidoComImpostos:
+          type: number
+          format: double
+        totalPedidoSemImpostos:
+          type: number
+          format: double
+        totalIpi:
+          type: number
+          format: double
+        totalIcms:
+          type: number
+          format: double
+        totalPis:
+          type: number
+          format: double
+        totalCofins:
+          type: number
+          format: double
+        totalSubstituicaoTributaria:
+          type: number
+          format: double
+        totalDescontoIncondicional:
+          type: number
+          format: double
+        totalFrete:
+          type: number
+          format: double
+        totalSeguro:
+          type: number
+          format: double
+        totalOutrasDespesas:
+          type: number
+          format: double
+        vendedorExternalId:
+          type: integer
+          format: int64
+        atendenteCod:
+          type: integer
+          format: int64
+        regimeTributario:
+          type: string
+        nomeRegimeTributario:
+          type: string
+        codigoPadraoFaturamento:
+          type: string
+      required:
+      - externalId
+      - codigoEmpresa
+      - codigoCliente
+      - cnpjEmpresa
+      - customerExternalId
+      - dteres
+      - numeroPedido
+      - dataPedido
+      - totalPedidoComImpostos
+      - totalPedidoSemImpostos
     CustomerOrderItemIngestionDto:
       type: object
       properties:
@@ -1288,6 +1423,12 @@ components:
           type: number
         preco5:
           type: number
+        custoUltimaCompra:
+          type: number
+        custoPonderado:
+          type: number
+        markup:
+          type: number
         descontoPadrao:
           type: number
         estoqueDisponivel:
@@ -1463,6 +1604,40 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomerOrderIngestionDto'
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageCustomerQuotationIngestionDto:
+      type: object
+      required:
+      - content
+      - totalElements
+      - totalPages
+      - size
+      - number
+      - first
+      - last
+      - empty
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerQuotationIngestionDto'
         totalElements:
           type: integer
           format: int64

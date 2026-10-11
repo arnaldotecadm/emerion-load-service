@@ -1,6 +1,7 @@
 package br.com.vercel.emerionloadservice.scheduling
 
 import br.com.vercel.emerionloadservice.service.CustomerOrderService
+import br.com.vercel.emerionloadservice.service.CustomerQuotationService
 import br.com.vercel.emerionloadservice.service.CustomerService
 import br.com.vercel.emerionloadservice.service.ProductService
 import br.com.vercel.emerionloadservice.service.VendedorService
@@ -18,6 +19,7 @@ class Scheduler(
     private val customerService: CustomerService,
     private val productService: ProductService,
     private val customerOrderService: CustomerOrderService,
+    private val customerQuotationService: CustomerQuotationService,
     private val vendedorService: VendedorService,
 ) : SchedulingConfigurer {
     private val logger = LoggerFactory.getLogger(this::class.java)
@@ -50,6 +52,13 @@ class Scheduler(
     fun processCustomerOrders() {
         processStream("customer orders") {
             customerOrderService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
+        }
+    }
+
+    @Scheduled(fixedDelayString = "\${scheduling.customer-quotation.fixed-delay-ms:10000}")
+    fun processCustomerQuotations() {
+        processStream("customer quotations") {
+            customerQuotationService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 

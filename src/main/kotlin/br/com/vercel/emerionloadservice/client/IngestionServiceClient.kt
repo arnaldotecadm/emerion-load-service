@@ -3,6 +3,7 @@ package br.com.vercel.emerionloadservice.client
 import br.com.vercel.emerionloadservice.client.mapper.CustomerCreditIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
+import br.com.vercel.emerionloadservice.client.mapper.CustomerQuotationIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.FinCreIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IcmsIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.client.mapper.IpiIngestionMapper.toIngestionDto
@@ -12,6 +13,7 @@ import br.com.vercel.emerionloadservice.client.mapper.VendedorIngestionMapper.to
 import br.com.vercel.emerionloadservice.model.Customer
 import br.com.vercel.emerionloadservice.model.CustomerCredit
 import br.com.vercel.emerionloadservice.model.CustomerOrder
+import br.com.vercel.emerionloadservice.model.CustomerQuotation
 import br.com.vercel.emerionloadservice.model.FinCre
 import br.com.vercel.emerionloadservice.model.Icms
 import br.com.vercel.emerionloadservice.model.Ipi
@@ -39,6 +41,7 @@ class IngestionServiceClient(
     @Value($$"${ingestion-service.endpoints.product}") private val productEndpoint: String,
     @Value($$"${ingestion-service.endpoints.customer-credit}") private val customerCreditEndpoint: String,
     @Value($$"${ingestion-service.endpoints.customer-order}") private val customerOrderEndpoint: String,
+    @Value($$"${ingestion-service.endpoints.customer-quotation}") private val customerQuotationEndpoint: String,
     @Value($$"${ingestion-service.endpoints.vendedor}") private val vendedorEndpoint: String,
     @Value($$"${ingestion-service.endpoints.icms}") private val icmsEndpoint: String,
     @Value($$"${ingestion-service.endpoints.ipi}") private val ipiEndpoint: String,
@@ -143,6 +146,23 @@ class IngestionServiceClient(
                 .toBodilessEntity()
         }
         logger.info("Customer order batch of size {} sent successfully to ingestion service", dto.size)
+        return true
+    }
+
+    fun sendCustomerQuotation(quotationList: List<CustomerQuotation>): Boolean {
+        val url = "$baseUrl$customerQuotationEndpoint"
+        val dto = quotationList.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
+
+        logger.info("Sending customer quotation {} to ingestion service at {}", dto.map { it.externalId }, url)
+        sendToIngestion("customer quotation", dto.map { it.externalId }) {
+            restClient
+                .post()
+                .uri(url)
+                .body(RequestBatch(batchId = UUID.randomUUID().toString(), items = dto))
+                .retrieve()
+                .toBodilessEntity()
+        }
+        logger.info("Customer quotation {} sent successfully to ingestion service", dto.map { it.externalId })
         return true
     }
 

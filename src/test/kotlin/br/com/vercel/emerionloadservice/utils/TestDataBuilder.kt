@@ -16,6 +16,7 @@ class TestDataBuilder(
         listOf(
             "PEDRE2",
             "PEDRES",
+            "PEDCTA",
             "PEDLB2",
             "PEDLIB",
             "FATPED",
@@ -213,6 +214,44 @@ class TestDataBuilder(
             Date.valueOf(dataPedido.plusDays(5)),
             "TRANS-1",
             "ANT-1",
+            1,
+            "PFA-1",
+        )
+    }
+
+    fun insertQuotation(
+        codEmp: Int,
+        dataPedido: LocalDate,
+        numeroPedido: Int,
+        codCli: Long,
+        vendedorExternalId: Long? = 99,
+    ) {
+        jdbcTemplate.update(
+            """
+            INSERT INTO PEDCTA (
+                CODEMP, DTERES, NUMRES, CODCLI, SITCTA, TOTGER, TOTITE, TOTIPI, TOTICM,
+                TOTPIS, TOTCOF, TOTSUB, TOTDESCINC, TOTFRT, TOTSEG, TOTOUTDESP, CODVEN,
+                CODATD, REGTRB, CODPFA
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """.trimIndent(),
+            codEmp,
+            Date.valueOf(dataPedido),
+            numeroPedido,
+            codCli,
+            "ABERTO",
+            BigDecimal("120.00"),
+            BigDecimal("100.00"),
+            BigDecimal("5.00"),
+            BigDecimal("12.00"),
+            BigDecimal("1.65"),
+            BigDecimal("7.60"),
+            BigDecimal("3.00"),
+            BigDecimal("2.00"),
+            BigDecimal("4.00"),
+            BigDecimal("1.00"),
+            BigDecimal("0.50"),
+            vendedorExternalId,
+            7,
             1,
             "PFA-1",
         )

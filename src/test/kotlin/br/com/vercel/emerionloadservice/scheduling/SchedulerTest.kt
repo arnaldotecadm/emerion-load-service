@@ -1,6 +1,7 @@
 package br.com.vercel.emerionloadservice.scheduling
 
 import br.com.vercel.emerionloadservice.service.CustomerOrderService
+import br.com.vercel.emerionloadservice.service.CustomerQuotationService
 import br.com.vercel.emerionloadservice.service.CustomerService
 import br.com.vercel.emerionloadservice.service.ProductService
 import br.com.vercel.emerionloadservice.service.VendedorService
@@ -13,12 +14,14 @@ class SchedulerTest {
     private val customerService: CustomerService = mock()
     private val productService: ProductService = mock()
     private val customerOrderService: CustomerOrderService = mock()
+    private val customerQuotationService: CustomerQuotationService = mock()
     private val vendedorService: VendedorService = mock()
     private val scheduler =
         Scheduler(
             customerService,
             productService,
             customerOrderService,
+            customerQuotationService,
             vendedorService,
         )
 
@@ -28,11 +31,13 @@ class SchedulerTest {
             scheduler.processCustomers()
             scheduler.processProducts()
             scheduler.processCustomerOrders()
+            scheduler.processCustomerQuotations()
             scheduler.processVendedores()
 
             verify(customerService).processRecordsToWebservice(any())
             verify(productService).processRecordsToWebservice(any())
             verify(customerOrderService).processRecordsToWebservice(any())
+            verify(customerQuotationService).processRecordsToWebservice(any())
             verify(vendedorService).processRecordsToWebservice(any())
         } finally {
             scheduler.shutdown()

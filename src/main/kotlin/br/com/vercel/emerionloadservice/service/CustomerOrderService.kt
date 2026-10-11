@@ -25,10 +25,7 @@ class CustomerOrderService(
         val customers = customerOrderQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
 
         val fromDatabase = customers.content
-        logger.info("Orders with problem: $ordersWithProblem")
-        logger.info("Retrieved from database ${fromDatabase.size} customer orders to send to ingestion service")
         val fromDatabaseFilteredOut = fromDatabase.filter { it.numeroPedido !in ordersWithProblem }
-        logger.info("Filtered out ${fromDatabase.size - fromDatabaseFilteredOut.size} customer orders that had problems in previous attempts")
         val batches = chunkService.chunkByJsonSizePerNumber(fromDatabaseFilteredOut, 25)
         val listOfUpdated =
             batches

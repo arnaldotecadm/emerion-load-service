@@ -21,7 +21,7 @@ const val BASE_QUERY_ESTPRO = """
                 pro.refpro          as referenciaInterna,
                 pro.codncm          as ncm,
                 pro.cest            as cest,
-                pro.codst1          as origemProduto,
+                st1.nomst1          as origemProduto,
                 pro.codcat          as categoria,
                 pro.codtip          as tipo,
                 pro.codmrc          as marca,
@@ -35,11 +35,16 @@ const val BASE_QUERY_ESTPRO = """
                 end                 as descontinuado,
                 pro.cbapro          as codigoBarrasProprio,
                 pro.codbar          as codigoBarras,
+                
                 ite.vb1ite          as preco,
                 ite.vb2ite          as preco2,
                 ite.vb3ite          as preco3,
                 ite.vb4ite          as preco4,
                 ite.vb5ite          as preco5,
+                ite.vpfite          as custoUltimaCompra,
+                ite.VPRITE          as custoPonderado,
+                ite.MK1ITE          as markup,
+                
                 pro.idepro          as descontoPadrao,
                 Round(qte.QtdQte-((SELECT QTD_RESERVADA FROM RESERVAS(QTE.CODEMP,QTE.CODCLP,QTE.CODGRU,QTE.CODSUB,QTE.CODPRO))+qte.QtdRma),4) as estoqueDisponivel,
                 qte.qtmqte          as estoqueMinimo,
@@ -68,6 +73,7 @@ const val BASE_QUERY_ESTPRO = """
                 pro.obspro          as observacao
                 
             from estpro pro
+            left join estst1 st1 on st1.codst1 = pro.codst1
             left join estite ite on ite.codclp = pro.codclp
                 and ite.codgru = pro.codgru
                 and ite.codsub = pro.codsub
@@ -115,6 +121,9 @@ class ProductQueryRepository(
             preco3 = rs.getBigDecimal("preco3"),
             preco4 = rs.getBigDecimal("preco4"),
             preco5 = rs.getBigDecimal("preco5"),
+            custoUltimaCompra = rs.getBigDecimal("custoUltimaCompra"),
+            custoPonderado = rs.getBigDecimal("custoPonderado"),
+            markup = rs.getBigDecimal("markup"),
             descontoPadrao = rs.getBigDecimal("descontoPadrao"),
             estoqueDisponivel = rs.getBigDecimal("estoqueDisponivel"),
             estoqueMinimo = rs.getBigDecimal("estoqueMinimo"),
