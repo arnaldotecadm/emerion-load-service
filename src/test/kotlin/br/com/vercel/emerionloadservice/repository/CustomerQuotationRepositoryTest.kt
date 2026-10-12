@@ -31,13 +31,21 @@ class CustomerQuotationRepositoryTest : FirebirdIntegrationTest() {
         testData.insertCustomer(codCli = 1, cpfCnpj = "11111111000111")
         testData.insertRegimeTributario(codigo = 1, nome = "Lucro Presumido")
         testData.insertQuotation(1, LocalDate.of(2024, 1, 1), 1001, 1)
-        testData.insertQuotation(1, LocalDate.of(2024, 1, 2), 1002, 1, vendedorExternalId = null)
+        testData.insertQuotation(
+            1,
+            LocalDate.of(2024, 1, 2),
+            1002,
+            1,
+            vendedorExternalId = null,
+            numeroCotacao = 2002,
+        )
 
         val result = customerQuotationRepository.findAllPaged(PageRequest.of(0, 1))
         val quotation = result.content.single()
 
         assertEquals(2, result.totalElements)
         assertEquals("1002", quotation.numeroPedido)
+        assertEquals(2002, quotation.numeroCotacao)
         assertEquals(1, quotation.codigoCliente)
         assertEquals("11111111000111", quotation.cpfCnpj)
         assertEquals(LocalDate.of(2024, 1, 2), quotation.dataPedido)

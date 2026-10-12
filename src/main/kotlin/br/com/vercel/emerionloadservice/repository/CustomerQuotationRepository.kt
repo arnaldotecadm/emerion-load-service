@@ -9,12 +9,14 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
 import java.sql.ResultSet
+import java.time.LocalDate
 
 private const val BASE_QUERY_QUOTATION = """
     select
         cta.codemp            as codigoEmpresa,
         cta.codcli            as codigoCliente,
-        cli.cgccli           as cpfCnpj,
+        cli.cgccli            as cpfCnpj,
+        cta.numcta            as numeroCotacao,
         cta.numres            as numeroPedido,
         cta.dteres            as dataPedido,
         cta.sitcta            as statusPedido,
@@ -50,8 +52,9 @@ class CustomerQuotationRepository(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             codigoCliente = rs.getLong("codigoCliente"),
             cpfCnpj = rs.getString("cpfCnpj"),
-            numeroPedido = rs.getString("numeroPedido"),
-            dataPedido = rs.getTimestamp("dataPedido").toLocalDateTime().toLocalDate(),
+            numeroCotacao = rs.getInt("numeroCotacao").takeIf { !rs.wasNull() },
+            numeroPedido = rs.getString("numeroPedido") ?: "",
+            dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime()?.toLocalDate() ?: LocalDate.of(1999, 12, 31),
             statusPedido = rs.getString("statusPedido"),
             totalPedidoComImpostos = rs.getDouble("totalPedidoComImpostos"),
             totalPedidoSemImpostos = rs.getDouble("totalPedidoSemImpostos"),
@@ -97,12 +100,12 @@ class CustomerQuotationRepository(
         return PageImpl(content, pageable, total)
     }
 
-    fun updateSentToWebService(numeroPedidoList: List<String>) {
+    fun updateSentToWebService(numeroPedidoList: List<Int>) {
         if (numeroPedidoList.isEmpty()) return
 
         val placeholders = numeroPedidoList.joinToString(", ") { "?" }
         jdbcTemplate.update(
-            "update pedcta set SENT_TO_WEBSERVICE = 1 where numres in ($placeholders)",
+            "update pedcta set SENT_TO_WEBSERVICE = 1 where numcta in ($placeholders)",
             *numeroPedidoList.toTypedArray(),
         )
     }

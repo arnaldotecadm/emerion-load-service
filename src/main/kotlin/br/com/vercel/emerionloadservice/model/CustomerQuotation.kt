@@ -6,6 +6,7 @@ data class CustomerQuotation(
     val codigoEmpresa: Int,
     val codigoCliente: Long,
     val cpfCnpj: String?,
+    val numeroCotacao: Int?,
     val numeroPedido: String,
     val dataPedido: LocalDate,
     val statusPedido: String?,

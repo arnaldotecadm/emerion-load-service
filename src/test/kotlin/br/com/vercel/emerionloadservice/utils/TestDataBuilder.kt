@@ -227,17 +227,19 @@ class TestDataBuilder(
         numeroPedido: Int,
         codCli: Long,
         vendedorExternalId: Long? = 99,
+        numeroCotacao: Int? = null,
     ) {
         jdbcTemplate.update(
             """
             INSERT INTO PEDCTA (
-                CODEMP, DTERES, NUMRES, CODCLI, SITCTA, TOTGER, TOTITE, TOTIPI, TOTICM,
+                CODEMP, DTERES, NUMCTA, NUMRES, CODCLI, SITCTA, TOTGER, TOTITE, TOTIPI, TOTICM,
                 TOTPIS, TOTCOF, TOTSUB, TOTDESCINC, TOTFRT, TOTSEG, TOTOUTDESP, CODVEN,
                 CODATD, REGTRB, CODPFA
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent(),
             codEmp,
             Date.valueOf(dataPedido),
+            numeroCotacao,
             numeroPedido,
             codCli,
             "ABERTO",

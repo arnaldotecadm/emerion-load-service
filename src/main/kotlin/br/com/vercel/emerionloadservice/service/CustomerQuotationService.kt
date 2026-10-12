@@ -21,7 +21,7 @@ class CustomerQuotationService(
         val quotations = customerQuotationRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
         chunkService.chunkByJsonSize(quotations.content).forEach { batch ->
             ingestionServiceClient.sendCustomerQuotation(batch)
-            customerQuotationRepository.updateSentToWebService(batch.map { it.numeroPedido })
+            customerQuotationRepository.updateSentToWebService(batch.map { it.numeroCotacao!! })
         }
     }
 

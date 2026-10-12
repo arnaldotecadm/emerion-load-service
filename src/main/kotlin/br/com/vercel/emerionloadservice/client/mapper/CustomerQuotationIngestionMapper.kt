@@ -13,6 +13,7 @@ object CustomerQuotationIngestionMapper {
             cnpjEmpresa = cnpjEmpresa,
             customerExternalId = codigoCliente,
             dteres = dataPedido,
+            numeroCotacao = numeroCotacao,
             numeroPedido = numeroPedido,
             dataPedido = dataPedido,
             statusPedido = statusPedido,

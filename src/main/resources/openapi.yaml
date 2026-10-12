@@ -853,6 +853,9 @@ components:
         dteres:
           type: string
           format: date
+        numeroCotacao:
+          type: integer
+          format: int32
         numeroPedido:
           type: string
         dataPedido:
