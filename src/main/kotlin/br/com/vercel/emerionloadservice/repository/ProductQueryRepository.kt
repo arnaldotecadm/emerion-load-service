@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.queryForObject
 import org.springframework.stereotype.Repository
+import java.math.BigDecimal
 import java.sql.ResultSet
 
 const val BASE_QUERY_ESTPRO = """
@@ -124,7 +125,7 @@ class ProductQueryRepository(
             custoUltimaCompra = rs.getBigDecimal("custoUltimaCompra"),
             custoPonderado = rs.getBigDecimal("custoPonderado"),
             markup = rs.getBigDecimal("markup"),
-            descontoPadrao = rs.getBigDecimal("descontoPadrao"),
+            descontoPadrao = rs.getString("descontoPadrao")?.toBigDecimalOrNull() ?: BigDecimal.ZERO,
             estoqueDisponivel = rs.getBigDecimal("estoqueDisponivel"),
             estoqueMinimo = rs.getBigDecimal("estoqueMinimo"),
             estoqueMaximo = rs.getBigDecimal("estoqueMaximo"),
