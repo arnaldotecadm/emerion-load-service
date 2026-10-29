@@ -29,14 +29,11 @@ class SchedulerTest {
         )
 
     @Test
-    fun `should process every pending stream with the configured batch size`() {
+    fun `should process every pending stream sequentially`() {
         try {
-            scheduler.processCustomers()
-            scheduler.processProducts()
-            scheduler.processCustomerOrders()
-            scheduler.processCustomerQuotations()
-            scheduler.processVendedores()
-            scheduler.processFinCres()
+            repeat(6) {
+                scheduler.processNextStream()
+            }
 
             verify(customerService).processRecordsToWebservice(any())
             verify(productService).processRecordsToWebservice(any())

@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.scheduling.config.ScheduledTaskRegistrar
 import org.springframework.stereotype.Component
+import java.util.concurrent.atomic.AtomicInteger
 
 @Component
 class Scheduler(
@@ -27,51 +28,60 @@ class Scheduler(
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val taskScheduler =
         ThreadPoolTaskScheduler().apply {
-            poolSize = PROCESSING_STREAMS
+            poolSize = 1
             setThreadNamePrefix("ingestion-scheduler-")
         }
+    private val nextStreamIndex = AtomicInteger()
+    private val streams =
+        listOf(
+            ::processCustomers,
+            ::processProducts,
+            ::processCustomerOrders,
+            ::processCustomerQuotations,
+            ::processVendedores,
+            ::processFinCres,
+        )
 
     override fun configureTasks(taskRegistrar: ScheduledTaskRegistrar) {
         taskScheduler.initialize()
         taskRegistrar.setTaskScheduler(taskScheduler)
     }
 
-    @Scheduled(fixedDelayString = "\${scheduling.customer.fixed-delay-ms:10000}")
+    @Scheduled(fixedDelayString = "\${scheduling.fixed-delay-ms:5000}")
+    fun processNextStream() {
+        streams[nextStreamIndex.getAndUpdate { (it + 1) % streams.size }].invoke()
+    }
+
     fun processCustomers() {
         processStream("customers") {
             customerService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 
-    @Scheduled(fixedDelayString = "\${scheduling.product.fixed-delay-ms:10000}")
     fun processProducts() {
         processStream("products") {
             productService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 
-    @Scheduled(fixedDelayString = "\${scheduling.customer-order.fixed-delay-ms:10000}")
     fun processCustomerOrders() {
         processStream("customer orders") {
             customerOrderService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 
-    @Scheduled(fixedDelayString = "\${scheduling.customer-quotation.fixed-delay-ms:10000}")
     fun processCustomerQuotations() {
         processStream("customer quotations") {
             customerQuotationService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 
-    @Scheduled(fixedDelayString = "\${scheduling.vendedor.fixed-delay-ms:10000}")
     fun processVendedores() {
         processStream("vendedores") {
             vendedorService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 
-    @Scheduled(fixedDelayString = "\${scheduling.fin-cre.fixed-delay-ms:10000}")
     fun processFinCres() {
         processStream("fincre") {
             finCreService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
@@ -97,6 +107,5 @@ class Scheduler(
 
     companion object {
         private const val BATCH_SIZE = 500
-        private const val PROCESSING_STREAMS = 4
     }
 }
