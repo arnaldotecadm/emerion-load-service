@@ -233,6 +233,10 @@ class IngestionServiceClient(
         logger.info("FinCre {} sent successfully to ingestion service", key)
     }
 
+    fun sendFinCre(finCres: List<FinCre>) {
+        finCres.forEach(::sendFinCre)
+    }
+
     fun sendPedlib(pedlib: Pedlib) {
         val url = "$baseUrl$pedlibEndpoint"
         val dto = pedlib.toIngestionDto(companyProvider.getCompanyCnpj())

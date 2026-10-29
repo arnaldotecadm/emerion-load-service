@@ -75,4 +75,20 @@ class FinCreQueryRepositoryTest : FirebirdIntegrationTest() {
         assertNull(finCreQueryRepository.findByKey("999"))
         assertEquals(emptyList(), finCreQueryRepository.findAllPaged(PageRequest.of(1, 10)).content)
     }
+
+    @Test
+    fun `findAllToWebService returns pending credits and marks sent composite keys`() {
+        val firstDate = LocalDate.of(2024, 1, 1)
+        val secondDate = LocalDate.of(2024, 1, 2)
+        testData.insertCustomer(codCli = 1)
+        testData.insertVendedor(codVen = 7, nome = "Vendedor")
+        testData.insertFinCreReferences(1)
+        testData.insertFinCre(1, firstDate, 100, 1, 7)
+        testData.insertFinCre(1, secondDate, 200, 1, 7)
+
+        val pendingCredits = finCreQueryRepository.findAllToWebService(PageRequest.of(0, 10))
+        finCreQueryRepository.updateSentToWebService(listOf(pendingCredits.content.single { it.documento == "100" }))
+
+        assertEquals(listOf("200"), finCreQueryRepository.findAllToWebService(PageRequest.of(0, 10)).content.map { it.documento })
+    }
 }

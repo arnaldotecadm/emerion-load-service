@@ -97,6 +97,48 @@ class FinCreQueryRepository(
         return PageImpl(content, pageable, total)
     }
 
+    fun findAllToWebService(pageable: Pageable): Page<FinCre> {
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from fincre") ?: 0L
+
+        val headers =
+            findHeaders(
+                FirebirdPagination.applyFirstSkip(
+                    """
+                    $BASE_QUERY_FINCRE
+                    where coalesce(cre.SENT_TO_WEBSERVICE, 0) = 0
+                    order by cre.numcre desc, cre.codemp, cre.dtecre
+                    """.trimIndent(),
+                    pageable,
+                ),
+            )
+        if (headers.isEmpty()) return PageImpl(emptyList(), pageable, total)
+
+        val parcelasByKey = findParcelas(headers).groupBy { toKey(it) }
+        val content =
+            headers.map { header ->
+                header.copy(parcelas = parcelasByKey[toKey(header)].orEmpty().map { it.toModel() })
+            }
+
+        return PageImpl(content, pageable, total)
+    }
+
+    fun updateSentToWebService(finCres: List<FinCre>) {
+        val updateQuery =
+            """
+            update fincre
+            set SENT_TO_WEBSERVICE = 1
+            where codemp = ?
+              and dtecre = ?
+              and numcre = ?
+            """.trimIndent()
+
+        jdbcTemplate.batchUpdate(updateQuery, finCres, 100) { ps, finCre ->
+            ps.setInt(1, finCre.codigoEmpresa)
+            ps.setDate(2, finCre.dataEmissao?.let(java.sql.Date::valueOf))
+            ps.setBigDecimal(3, finCre.documento.toBigDecimal())
+        }
+    }
+
     fun findByKey(documento: String): FinCre? {
         val query = "$BASE_QUERY_FINCRE where cre.numcre = ?"
 
@@ -126,8 +168,10 @@ class FinCreQueryRepository(
                 "$BASE_QUERY_FINCRE order by cre.numcre desc, cre.codemp, cre.dtecre",
                 pageable,
             )
-        return jdbcTemplate.query(pagedQuery) { rs, _ -> mapHeader(rs) }
+        return findHeaders(pagedQuery)
     }
+
+    private fun findHeaders(query: String): List<FinCre> = jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
 
     // Parcelas for a page of headers fetched in one query using an IN list.
     // Values come from a prior query result (never user input), so they are safe to

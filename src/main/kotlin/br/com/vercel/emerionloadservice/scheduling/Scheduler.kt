@@ -3,6 +3,7 @@ package br.com.vercel.emerionloadservice.scheduling
 import br.com.vercel.emerionloadservice.service.CustomerOrderService
 import br.com.vercel.emerionloadservice.service.CustomerQuotationService
 import br.com.vercel.emerionloadservice.service.CustomerService
+import br.com.vercel.emerionloadservice.service.FinCreService
 import br.com.vercel.emerionloadservice.service.ProductService
 import br.com.vercel.emerionloadservice.service.VendedorService
 import jakarta.annotation.PreDestroy
@@ -21,6 +22,7 @@ class Scheduler(
     private val customerOrderService: CustomerOrderService,
     private val customerQuotationService: CustomerQuotationService,
     private val vendedorService: VendedorService,
+    private val finCreService: FinCreService,
 ) : SchedulingConfigurer {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val taskScheduler =
@@ -66,6 +68,13 @@ class Scheduler(
     fun processVendedores() {
         processStream("vendedores") {
             vendedorService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
+        }
+    }
+
+    @Scheduled(fixedDelayString = "\${scheduling.fin-cre.fixed-delay-ms:10000}")
+    fun processFinCres() {
+        processStream("fincre") {
+            finCreService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 

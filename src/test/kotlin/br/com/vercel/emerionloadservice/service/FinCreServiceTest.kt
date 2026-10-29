@@ -12,6 +12,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -23,6 +24,9 @@ import org.springframework.web.server.ResponseStatusException
 
 @ExtendWith(MockitoExtension::class)
 class FinCreServiceTest {
+    @MockitoBean
+    val chunkServiceMock: ChunkService = mock()
+
     @MockitoBean
     val finCreQueryRepositoryMock: FinCreQueryRepository = mock()
 
@@ -66,5 +70,33 @@ class FinCreServiceTest {
         finCreService.sendFinCreToIngestion("123")
 
         verify(ingestionServiceClientMock).sendFinCre(finCre)
+    }
+
+    @Test
+    fun `should send pending credits and mark only successfully sent credits`() {
+        val firstCredit = mock<FinCre>()
+        val secondCredit = mock<FinCre>()
+        val pendingCredits = PageImpl(listOf(firstCredit, secondCredit))
+        whenever(finCreQueryRepositoryMock.findAllToWebService(any())).thenReturn(pendingCredits)
+        whenever(chunkServiceMock.chunkByJsonSize(pendingCredits.content)).thenReturn(listOf(pendingCredits.content))
+
+        finCreService.processRecordsToWebservice(Pageable.ofSize(10))
+
+        verify(ingestionServiceClientMock).sendFinCre(pendingCredits.content)
+        verify(finCreQueryRepositoryMock).updateSentToWebService(pendingCredits.content)
+    }
+
+    @Test
+    fun `should not mark failed credit batches as sent`() {
+        val credit = mock<FinCre>()
+        val pendingCredits = PageImpl(listOf(credit))
+        whenever(finCreQueryRepositoryMock.findAllToWebService(any())).thenReturn(pendingCredits)
+        whenever(chunkServiceMock.chunkByJsonSize(pendingCredits.content)).thenReturn(listOf(pendingCredits.content))
+        whenever(ingestionServiceClientMock.sendFinCre(pendingCredits.content)).thenThrow(RuntimeException("ingestion unavailable"))
+
+        finCreService.processRecordsToWebservice(Pageable.ofSize(10))
+
+        verify(ingestionServiceClientMock).sendFinCre(pendingCredits.content)
+        verify(finCreQueryRepositoryMock, never()).updateSentToWebService(any())
     }
 }

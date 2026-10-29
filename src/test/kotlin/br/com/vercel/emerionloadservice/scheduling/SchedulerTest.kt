@@ -3,6 +3,7 @@ package br.com.vercel.emerionloadservice.scheduling
 import br.com.vercel.emerionloadservice.service.CustomerOrderService
 import br.com.vercel.emerionloadservice.service.CustomerQuotationService
 import br.com.vercel.emerionloadservice.service.CustomerService
+import br.com.vercel.emerionloadservice.service.FinCreService
 import br.com.vercel.emerionloadservice.service.ProductService
 import br.com.vercel.emerionloadservice.service.VendedorService
 import org.junit.jupiter.api.Test
@@ -16,6 +17,7 @@ class SchedulerTest {
     private val customerOrderService: CustomerOrderService = mock()
     private val customerQuotationService: CustomerQuotationService = mock()
     private val vendedorService: VendedorService = mock()
+    private val finCreService: FinCreService = mock()
     private val scheduler =
         Scheduler(
             customerService,
@@ -23,6 +25,7 @@ class SchedulerTest {
             customerOrderService,
             customerQuotationService,
             vendedorService,
+            finCreService,
         )
 
     @Test
@@ -33,12 +36,14 @@ class SchedulerTest {
             scheduler.processCustomerOrders()
             scheduler.processCustomerQuotations()
             scheduler.processVendedores()
+            scheduler.processFinCres()
 
             verify(customerService).processRecordsToWebservice(any())
             verify(productService).processRecordsToWebservice(any())
             verify(customerOrderService).processRecordsToWebservice(any())
             verify(customerQuotationService).processRecordsToWebservice(any())
             verify(vendedorService).processRecordsToWebservice(any())
+            verify(finCreService).processRecordsToWebservice(any())
         } finally {
             scheduler.shutdown()
         }
