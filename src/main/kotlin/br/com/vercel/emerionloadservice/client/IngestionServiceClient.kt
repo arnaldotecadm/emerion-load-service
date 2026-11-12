@@ -216,25 +216,20 @@ class IngestionServiceClient(
         logger.info("Ipi {} sent successfully to ingestion service", key)
     }
 
-    fun sendFinCre(finCre: FinCre) {
+    fun sendFinCre(finCre: List<FinCre>) {
         val url = "$baseUrl$finCreEndpoint"
-        val dto = finCre.toIngestionDto(companyProvider.getCompanyCnpj())
-        val key = "${dto.codigoEmpresa}/${dto.dataEmissao}/${dto.documento}"
+        val dto = finCre.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
-        logger.info("Sending fincre {} ({} parcela(s)) to ingestion service at {}", key, dto.parcelas.size, url)
-        sendToIngestion("fincre", key) {
+        logger.info("Sending fincre {} to ingestion service at {}", dto.hashCode(), url)
+        sendToIngestion("fincre", dto.hashCode()) {
             restClient
                 .post()
                 .uri(url)
-                .body(dto)
+                .body(RequestBatch(batchId = UUID.randomUUID().toString(), items = dto))
                 .retrieve()
                 .toBodilessEntity()
         }
-        logger.info("FinCre {} sent successfully to ingestion service", key)
-    }
-
-    fun sendFinCre(finCres: List<FinCre>) {
-        finCres.forEach(::sendFinCre)
+        logger.info("FinCre {} sent successfully to ingestion service", dto.hashCode())
     }
 
     fun sendPedlib(pedlib: Pedlib) {

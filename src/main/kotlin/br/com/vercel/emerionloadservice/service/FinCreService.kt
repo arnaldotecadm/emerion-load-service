@@ -48,6 +48,6 @@ class FinCreService(
 
     fun sendFinCreToIngestion(documento: String) {
         val finCre = getFinCreByKey(documento)
-        ingestionServiceClient.sendFinCre(finCre)
+        ingestionServiceClient.sendFinCre(listOf(finCre))
     }
 }

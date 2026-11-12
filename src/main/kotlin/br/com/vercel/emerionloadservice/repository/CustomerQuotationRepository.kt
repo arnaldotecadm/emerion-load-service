@@ -27,7 +27,7 @@ private const val BASE_QUERY_QUOTATION = """
         cta.totpis            as totalPis,
         cta.totcof            as totalCofins,
         cta.totsub            as totalSubstituicaoTributaria,
-        cta.totdescinc        as totalDescontoIncondicional,
+        coalesce(cta.totdescinc,0)        as totalDescontoIncondicional,
         cta.totfrt            as totalFrete,
         cta.totseg            as totalSeguro,
         cta.totoutdesp        as totalOutrasDespesas,

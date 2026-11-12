@@ -27,7 +27,7 @@ private const val BASE_QUERY_PEDRES = """
         ped.totpis            as totalPis,
         ped.totcof            as totalCofins,
         ped.totsub            as totalSubstituicaoTributaria,
-        ped.totdescinc        as totalDescontoIncondicional,
+        coalesce(ped.totdescinc, 0)        as totalDescontoIncondicional,
         ped.totfrt            as totalFrete,
         ped.totseg            as totalSeguro,
         ped.totoutdesp        as totalOutrasDespesas,
