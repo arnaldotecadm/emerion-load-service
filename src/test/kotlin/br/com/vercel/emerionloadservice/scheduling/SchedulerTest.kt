@@ -4,6 +4,7 @@ import br.com.vercel.emerionloadservice.service.CustomerOrderService
 import br.com.vercel.emerionloadservice.service.CustomerQuotationService
 import br.com.vercel.emerionloadservice.service.CustomerService
 import br.com.vercel.emerionloadservice.service.FinCreService
+import br.com.vercel.emerionloadservice.service.PedlibService
 import br.com.vercel.emerionloadservice.service.ProductService
 import br.com.vercel.emerionloadservice.service.VendedorService
 import org.junit.jupiter.api.Test
@@ -18,6 +19,7 @@ class SchedulerTest {
     private val customerQuotationService: CustomerQuotationService = mock()
     private val vendedorService: VendedorService = mock()
     private val finCreService: FinCreService = mock()
+    private val pedlibService: PedlibService = mock()
     private val scheduler =
         Scheduler(
             customerService,
@@ -26,12 +28,13 @@ class SchedulerTest {
             customerQuotationService,
             vendedorService,
             finCreService,
+            pedlibService,
         )
 
     @Test
     fun `should process every pending stream sequentially`() {
         try {
-            repeat(6) {
+            repeat(7) {
                 scheduler.processNextStream()
             }
 
@@ -41,6 +44,7 @@ class SchedulerTest {
             verify(customerQuotationService).processRecordsToWebservice(any())
             verify(vendedorService).processRecordsToWebservice(any())
             verify(finCreService).processRecordsToWebservice(any())
+            verify(pedlibService).processRecordsToWebservice(any())
         } finally {
             scheduler.shutdown()
         }

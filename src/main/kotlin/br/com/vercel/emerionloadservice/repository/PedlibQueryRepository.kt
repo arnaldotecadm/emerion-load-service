@@ -82,6 +82,33 @@ class PedlibQueryRepository(
         return PageImpl(content, pageable, total)
     }
 
+    fun findAllToWebService(pageable: Pageable): Page<Pedlib> {
+        val total = jdbcTemplate.queryForObject<Long>("select count(*) from pedlib") ?: 0L
+        val headers = findHeadersToWebService(pageable)
+        if (headers.isEmpty()) return PageImpl(emptyList(), pageable, total)
+
+        val detailsByKey = findDetails(headers).groupBy { toKey(it) }
+        val content =
+            headers.map { header ->
+                header.copy(detalhes = detailsByKey[toKey(header)].orEmpty())
+            }
+
+        return PageImpl(content, pageable, total)
+    }
+
+    fun updateSentToWebService(pedlib: Pedlib) {
+        jdbcTemplate.update(
+            """
+            update pedlib
+            set SENT_TO_WEBSERVICE = 1
+            where numres = ?
+                and seqlib = ?
+            """.trimIndent(),
+            pedlib.numeroPedido,
+            pedlib.numeroLiberacao,
+        )
+    }
+
     fun findByKey(numres: String): Pedlib? {
         val headerQuery = "$BASE_QUERY_PEDLIB where lib.numres = ? order by lib.seqlib"
         val header =
@@ -111,6 +138,19 @@ class PedlibQueryRepository(
         val query =
             FirebirdPagination.applyFirstSkip(
                 "$BASE_QUERY_PEDLIB order by lib.numres desc, lib.seqlib, lib.codemp, lib.dteres",
+                pageable,
+            )
+        return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }
+    }
+
+    private fun findHeadersToWebService(pageable: Pageable): List<Pedlib> {
+        val query =
+            FirebirdPagination.applyFirstSkip(
+                """
+                $BASE_QUERY_PEDLIB
+                where coalesce(lib.SENT_TO_WEBSERVICE, 0) = 0
+                order by lib.numres desc, lib.seqlib, lib.codemp, lib.dteres
+                """.trimIndent(),
                 pageable,
             )
         return jdbcTemplate.query(query) { rs, _ -> mapHeader(rs) }

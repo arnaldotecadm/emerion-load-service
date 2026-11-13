@@ -232,20 +232,19 @@ class IngestionServiceClient(
         logger.info("FinCre {} sent successfully to ingestion service", dto.hashCode())
     }
 
-    fun sendPedlib(pedlib: Pedlib) {
+    fun sendPedlib(pedlibList: List<Pedlib>) {
         val url = "$baseUrl$pedlibEndpoint"
-        val dto = pedlib.toIngestionDto(companyProvider.getCompanyCnpj())
-        val key = "${dto.codigoEmpresa}/${dto.dataPedido}/${dto.numeroPedido}/${dto.numeroLiberacao}"
+        val dto = pedlibList.map { it.toIngestionDto(companyProvider.getCompanyCnpj()) }
 
-        logger.info("Sending pedlib {} ({} detail(s)) to ingestion service at {}", key, dto.detalhes.size, url)
-        sendToIngestion("pedlib", key) {
+        logger.info("Sending pedlib {} to ingestion service at {}", dto.hashCode(), url)
+        sendToIngestion("pedlib", dto.hashCode()) {
             restClient
                 .post()
                 .uri(url)
-                .body(dto)
+                .body(RequestBatch(batchId = UUID.randomUUID().toString(), items = dto))
                 .retrieve()
                 .toBodilessEntity()
         }
-        logger.info("Pedlib {} sent successfully to ingestion service", key)
+        logger.info("Pedlib {} sent successfully to ingestion service", dto.hashCode())
     }
 }

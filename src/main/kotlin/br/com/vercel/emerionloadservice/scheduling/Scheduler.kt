@@ -4,6 +4,7 @@ import br.com.vercel.emerionloadservice.service.CustomerOrderService
 import br.com.vercel.emerionloadservice.service.CustomerQuotationService
 import br.com.vercel.emerionloadservice.service.CustomerService
 import br.com.vercel.emerionloadservice.service.FinCreService
+import br.com.vercel.emerionloadservice.service.PedlibService
 import br.com.vercel.emerionloadservice.service.ProductService
 import br.com.vercel.emerionloadservice.service.VendedorService
 import jakarta.annotation.PreDestroy
@@ -24,6 +25,7 @@ class Scheduler(
     private val customerQuotationService: CustomerQuotationService,
     private val vendedorService: VendedorService,
     private val finCreService: FinCreService,
+    private val pedlibService: PedlibService,
 ) : SchedulingConfigurer {
     private val logger = LoggerFactory.getLogger(this::class.java)
     private val taskScheduler =
@@ -40,6 +42,7 @@ class Scheduler(
             ::processCustomerQuotations,
             ::processVendedores,
             ::processFinCres,
+            ::processPedlibs,
         )
 
     override fun configureTasks(taskRegistrar: ScheduledTaskRegistrar) {
@@ -85,6 +88,12 @@ class Scheduler(
     fun processFinCres() {
         processStream("fincre") {
             finCreService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
+        }
+    }
+
+    fun processPedlibs() {
+        processStream("pedlib") {
+            pedlibService.processRecordsToWebservice(Pageable.ofSize(BATCH_SIZE))
         }
     }
 

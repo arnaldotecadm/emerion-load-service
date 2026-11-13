@@ -68,4 +68,19 @@ class PedlibQueryRepositoryTest : FirebirdIntegrationTest() {
         assertNull(pedlibQueryRepository.findByKey("999"))
         assertEquals(emptyList(), pedlibQueryRepository.findAllPaged(PageRequest.of(1, 10)).content)
     }
+
+    @Test
+    fun `findAllToWebService returns only pending releases and marks sent releases`() {
+        val date = LocalDate.of(2024, 3, 4)
+        testData.insertPedlib(1, date, 1001, 1, 1)
+        testData.insertPedlib(1, date, 1002, 1, 1)
+
+        val pendingRelease = pedlibQueryRepository.findAllToWebService(PageRequest.of(0, 10)).content.first()
+        pedlibQueryRepository.updateSentToWebService(pendingRelease)
+
+        assertEquals(
+            listOf("1001"),
+            pedlibQueryRepository.findAllToWebService(PageRequest.of(0, 10)).content.map { it.numeroPedido },
+        )
+    }
 }

@@ -29,6 +29,9 @@ class PedlibServiceTest {
     @MockitoBean
     val ingestionServiceClientMock: IngestionServiceClient = mock()
 
+    @MockitoBean
+    val chunkServiceMock: ChunkService = mock()
+
     @InjectMocks
     lateinit var pedlibService: PedlibService
 
@@ -49,6 +52,18 @@ class PedlibServiceTest {
     }
 
     @Test
+    fun `should send pending pedlibs and mark them as sent`() {
+        val pedlib = mock<Pedlib>()
+        whenever(pedlibQueryRepositoryMock.findAllToWebService(any())).thenReturn(PageImpl(listOf(pedlib)))
+        whenever(chunkServiceMock.chunkByJsonSizePerNumber<Pedlib>(any(), 25)).thenReturn(listOf(listOf(pedlib)))
+
+        pedlibService.processRecordsToWebservice(Pageable.ofSize(10))
+
+        verify(ingestionServiceClientMock).sendPedlib(listOf(pedlib))
+        verify(pedlibQueryRepositoryMock).updateSentToWebService(pedlib)
+    }
+
+    @Test
     fun `should throw not found without sending when pedlib does not exist`() {
         whenever(pedlibQueryRepositoryMock.findByKey("missing")).thenReturn(null)
 
@@ -65,6 +80,6 @@ class PedlibServiceTest {
 
         pedlibService.sendPedlibToIngestion("123")
 
-        verify(ingestionServiceClientMock).sendPedlib(pedlib)
+        verify(ingestionServiceClientMock).sendPedlib(listOf(pedlib))
     }
 }
