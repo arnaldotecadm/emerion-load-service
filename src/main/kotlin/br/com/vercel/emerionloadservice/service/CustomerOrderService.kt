@@ -25,7 +25,7 @@ class CustomerOrderService(
         val customers = customerOrderQueryRepository.findAllToWebService(pageable ?: Pageable.ofSize(500))
 
         val fromDatabase = customers.content
-        val fromDatabaseFilteredOut = fromDatabase.filter { it.numeroPedido !in ordersWithProblem }
+        val fromDatabaseFilteredOut = fromDatabase.filter { it.numeroPedido.toString() !in ordersWithProblem }
         val batches = chunkService.chunkByJsonSizePerNumber(fromDatabaseFilteredOut, 25)
         val listOfUpdated =
             batches
@@ -37,21 +37,21 @@ class CustomerOrderService(
                     } catch (e: Exception) {
                         logger.error(
                             "Error while sending customer order ${it.map { customer -> customer.numeroPedido }}: {}",
-                            e.message
+                            e.message,
                         )
                         it.map { customer -> customer.numeroPedido } to false
                     }
                 }.filter { it.second }
                 .flatMap { it.first }
                 .toList()
-                .joinToString(separator = ", ") { it }
+                .joinToString(separator = ", ") { it.toString() }
         if (listOfUpdated.isNotEmpty()) {
             try {
                 customerOrderQueryRepository.updateSentToWebService(listOfUpdated)
             } catch (e: Exception) {
                 logger.error(
                     "Error while updating sent_to_web_service for customer orders $listOfUpdated: {}",
-                    e.message
+                    e.message,
                 )
                 logger.info("Updating item by item so we can isolate the problem")
                 listOfUpdated.split(", ").forEach { numres ->
@@ -60,7 +60,7 @@ class CustomerOrderService(
                     } catch (e: Exception) {
                         logger.error(
                             "Error while updating sent_to_web_service for customer order $numres: {}",
-                            e.message
+                            e.message,
                         )
                         ordersWithProblem.add(numres)
                     }
@@ -69,11 +69,11 @@ class CustomerOrderService(
         }
     }
 
-    fun getOrderByNumres(numres: String): CustomerOrder =
+    fun getOrderByNumres(numres: Long): CustomerOrder =
         customerOrderQueryRepository.findByKey(numres)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-    fun sendOrderToIngestion(numres: String) {
+    fun sendOrderToIngestion(numres: Long) {
         val order = getOrderByNumres(numres)
         ingestionServiceClient.sendCustomerOrder(listOf(order))
     }

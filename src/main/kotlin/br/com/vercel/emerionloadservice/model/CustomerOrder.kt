@@ -6,7 +6,7 @@ data class CustomerOrder(
     val codigoEmpresa: Int,
     val codigoCliente: Long,
     val cpfCnpj: String?,
-    val numeroPedido: String,
+    val numeroPedido: Long,
     val dataPedido: LocalDateTime,
     val statusPedido: String?,
     val ufPedido: String?,
@@ -28,5 +28,6 @@ data class CustomerOrder(
     val regimeTributario: String?,
     val nomeRegimeTributario: String?,
     val codigoPadraoFaturamento: String?,
+    val tipoPedido: String?,
     val itens: List<CustomerOrderItem>,
 )

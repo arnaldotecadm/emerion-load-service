@@ -38,12 +38,15 @@ private const val BASE_QUERY_PEDRES = """
         ped.pedant            as pedidoAnterior,
         ped.regtrb            as regimeTributario,
         reg.nomregtrib      as nomeRegimeTributario,
-        ped.codpfa            as codigoPadraoFaturamento
+        ped.codpfa            as codigoPadraoFaturamento,
+        tip.nomtip            as tipoPedido
     from pedres ped
     left join fincli cli
         on cli.codcli = ped.codcli
     left join finregtrib reg
         on reg.numregtrib = ped.regtrb
+    left join pedtip tip
+        on tip.codtip = ped.codtip
 """
 
 /**
@@ -70,7 +73,7 @@ class CustomerOrderQueryRepository(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             codigoCliente = rs.getLong("codigoCliente"),
             cpfCnpj = rs.getString("cpfCnpj"),
-            numeroPedido = rs.getString("numeroPedido"),
+            numeroPedido = rs.getLong("numeroPedido"),
             dataPedido = rs.getTimestamp("dataPedido").toLocalDateTime(),
             statusPedido = rs.getString("statusPedido"),
             ufPedido = rs.getString("ufPedido"),
@@ -92,6 +95,7 @@ class CustomerOrderQueryRepository(
             regimeTributario = rs.getString("regimeTributario"),
             nomeRegimeTributario = rs.getString("nomeRegimeTributario"),
             codigoPadraoFaturamento = rs.getString("codigoPadraoFaturamento"),
+            tipoPedido = rs.getString("tipoPedido"),
             itens = emptyList(),
         )
 
@@ -103,13 +107,13 @@ class CustomerOrderQueryRepository(
         }
 
         val headerKeys =
-            headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido) }.toSet()
+            headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido.toString()) }.toSet()
         val itemsByOrderKey =
             findItems(headers.map { it.numeroPedido }, headerKeys)
                 .groupBy { OrderBusinessKey(it.codEmp, it.dteres, it.numres) }
         val content =
             headers.map { header ->
-                val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
+                val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido.toString())
                 header.copy(itens = itemsByOrderKey[orderKey].orEmpty())
             }
 
@@ -124,13 +128,13 @@ class CustomerOrderQueryRepository(
         }
 
         val headerKeys =
-            headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido) }.toSet()
+            headers.map { OrderBusinessKey(it.codigoEmpresa, it.dataPedido.toLocalDate(), it.numeroPedido.toString()) }.toSet()
         val itemsByOrderKey =
             findItems(headers.map { it.numeroPedido }, headerKeys)
                 .groupBy { OrderBusinessKey(it.codEmp, it.dteres, it.numres) }
         val content =
             headers.map { header ->
-                val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)
+                val orderKey = OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido.toString())
                 header.copy(itens = itemsByOrderKey[orderKey].orEmpty())
             }
 
@@ -142,7 +146,7 @@ class CustomerOrderQueryRepository(
         jdbcTemplate.update(updateQuery)
     }
 
-    fun findByKey(numres: String): CustomerOrder? {
+    fun findByKey(numres: Long): CustomerOrder? {
         val headerQuery = "$BASE_QUERY_PEDRES where ped.numres = ?"
         val header =
             jdbcTemplate
@@ -152,7 +156,7 @@ class CustomerOrderQueryRepository(
         val itemsByOrderKey =
             findItems(
                 listOf(numres),
-                setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido)),
+                setOf(OrderBusinessKey(header.codigoEmpresa, header.dataPedido.toLocalDate(), header.numeroPedido.toString())),
             )
 
         return header.copy(itens = itemsByOrderKey)
@@ -181,7 +185,7 @@ class CustomerOrderQueryRepository(
     }
 
     private fun findItems(
-        numresList: List<String>,
+        numresList: List<Long>,
         headerKeys: Set<OrderBusinessKey>,
     ): List<CustomerOrderItem> {
         // Values come from a prior query result (never user input), so they are safe to

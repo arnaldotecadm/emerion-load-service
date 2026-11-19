@@ -36,7 +36,7 @@ class PedlibQueryRepositoryTest : FirebirdIntegrationTest() {
         val release = result.content.single()
 
         assertEquals(2, result.totalElements)
-        assertEquals("1002", release.numeroPedido)
+        assertEquals(1002, release.numeroPedido)
         assertEquals(listOf(1), release.detalhes.map { it.numeroSequenciaLiberacao })
     }
 
@@ -46,7 +46,7 @@ class PedlibQueryRepositoryTest : FirebirdIntegrationTest() {
         testData.insertPedlib(1, orderDate, 1001, 2, 1)
         testData.insertPedlibDetail(1, orderDate, 1001, 2, 3)
 
-        val release = pedlibQueryRepository.findByKey("1001")
+        val release = pedlibQueryRepository.findByKey(1001)
 
         requireNotNull(release)
         assertEquals(orderDate, release.dataPedido)
@@ -65,7 +65,7 @@ class PedlibQueryRepositoryTest : FirebirdIntegrationTest() {
 
     @Test
     fun `findByKey returns null and an out of range page is empty when no release matches`() {
-        assertNull(pedlibQueryRepository.findByKey("999"))
+        assertNull(pedlibQueryRepository.findByKey(999))
         assertEquals(emptyList(), pedlibQueryRepository.findAllPaged(PageRequest.of(1, 10)).content)
     }
 
@@ -79,7 +79,7 @@ class PedlibQueryRepositoryTest : FirebirdIntegrationTest() {
         pedlibQueryRepository.updateSentToWebService(pendingRelease)
 
         assertEquals(
-            listOf("1001"),
+            listOf(1001L),
             pedlibQueryRepository.findAllToWebService(PageRequest.of(0, 10)).content.map { it.numeroPedido },
         )
     }

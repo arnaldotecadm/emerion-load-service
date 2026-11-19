@@ -30,12 +30,12 @@ class CustomerOrderController(
 
     @GetMapping("{numres}")
     fun getOrderByNumres(
-        @PathVariable numres: String,
+        @PathVariable numres: Long,
     ): CustomerOrderIngestionDto = this.customerOrderService.getOrderByNumres(numres).toIngestionDto(companyProvider.getCompanyCnpj())
 
     @PostMapping("{numres}/send")
     fun sendOrderToIngestion(
-        @PathVariable numres: String,
+        @PathVariable numres: Long,
     ): ResponseEntity<Void> {
         this.customerOrderService.sendOrderToIngestion(numres)
         return ResponseEntity.ok().build()

@@ -52,8 +52,8 @@ class CustomerQuotationRepository(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             codigoCliente = rs.getLong("codigoCliente"),
             cpfCnpj = rs.getString("cpfCnpj"),
-            numeroCotacao = rs.getInt("numeroCotacao").takeIf { !rs.wasNull() },
-            numeroPedido = rs.getString("numeroPedido") ?: "",
+            numeroCotacao = rs.getLong("numeroCotacao").takeIf { !rs.wasNull() },
+            numeroPedido = rs.getLong("numeroPedido"),
             dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime()?.toLocalDate() ?: LocalDate.of(1999, 12, 31),
             statusPedido = rs.getString("statusPedido"),
             totalPedidoComImpostos = rs.getDouble("totalPedidoComImpostos"),
@@ -100,7 +100,7 @@ class CustomerQuotationRepository(
         return PageImpl(content, pageable, total)
     }
 
-    fun updateSentToWebService(numeroPedidoList: List<Int>) {
+    fun updateSentToWebService(numeroPedidoList: List<Long>) {
         if (numeroPedidoList.isEmpty()) return
 
         val placeholders = numeroPedidoList.joinToString(", ") { "?" }
@@ -110,7 +110,7 @@ class CustomerQuotationRepository(
         )
     }
 
-    fun findByKey(numeroPedido: String): CustomerQuotation? =
+    fun findByKey(numeroPedido: Long): CustomerQuotation? =
         jdbcTemplate
             .query(
                 "$BASE_QUERY_QUOTATION where cta.numres = ?",

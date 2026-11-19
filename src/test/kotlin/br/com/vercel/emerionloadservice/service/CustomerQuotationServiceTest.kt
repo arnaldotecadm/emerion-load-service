@@ -46,18 +46,18 @@ class CustomerQuotationServiceTest {
     @Test
     fun `should send the resolved quotation to ingestion`() {
         val quotation = mock<CustomerQuotation>()
-        whenever(customerQuotationRepositoryMock.findByKey("QUOTE-42")).thenReturn(quotation)
+        whenever(customerQuotationRepositoryMock.findByKey(42L)).thenReturn(quotation)
 
-        customerQuotationService.sendQuotationToIngestion("QUOTE-42")
+        customerQuotationService.sendQuotationToIngestion(42L)
 
         verify(ingestionServiceClientMock).sendCustomerQuotation(listOf(quotation))
     }
 
     @Test
     fun `should throw not found without sending when quotation does not exist`() {
-        whenever(customerQuotationRepositoryMock.findByKey("missing")).thenReturn(null)
+        whenever(customerQuotationRepositoryMock.findByKey(999L)).thenReturn(null)
 
-        val exception = assertThrows<ResponseStatusException> { customerQuotationService.sendQuotationToIngestion("missing") }
+        val exception = assertThrows<ResponseStatusException> { customerQuotationService.sendQuotationToIngestion(999L) }
 
         assertEquals(HttpStatus.NOT_FOUND, exception.statusCode)
         verifyNoInteractions(ingestionServiceClientMock)

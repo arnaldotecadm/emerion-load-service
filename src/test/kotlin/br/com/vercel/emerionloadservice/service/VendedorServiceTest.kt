@@ -27,6 +27,9 @@ class VendedorServiceTest {
     @MockitoBean
     val ingestionServiceClientMock: IngestionServiceClient = mock()
 
+    @MockitoBean
+    val chunkServiceMock: ChunkService = mock()
+
     @InjectMocks
     lateinit var vendedorService: VendedorService
 

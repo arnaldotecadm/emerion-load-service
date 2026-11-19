@@ -1,5 +1,6 @@
 package br.com.vercel.emerionloadservice.repository
 
+import br.com.vercel.emerionloadservice.client.mapper.CustomerOrderIngestionMapper.toIngestionDto
 import br.com.vercel.emerionloadservice.utils.FirebirdIntegrationTest
 import br.com.vercel.emerionloadservice.utils.TestDataBuilder
 import org.junit.jupiter.api.BeforeEach
@@ -39,7 +40,9 @@ class CustomerOrderQueryRepositoryTest : FirebirdIntegrationTest() {
         val order = result.content.single()
 
         assertEquals(3, result.totalElements)
-        assertEquals(listOf("1002"), result.content.map { it.numeroPedido })
+        assertEquals(listOf(1002L), result.content.map { it.numeroPedido })
+        assertNull(order.tipoPedido)
+        assertNull(order.toIngestionDto("12345678000100").tipoPedido)
         assertEquals(1, order.itens.size)
         assertEquals(1, order.itens.single().seqRe2)
     }
@@ -49,11 +52,12 @@ class CustomerOrderQueryRepositoryTest : FirebirdIntegrationTest() {
         val orderDate = LocalDate.of(2024, 2, 10)
         testData.insertCustomer(codCli = 1, cpfCnpj = "11111111000111")
         testData.insertRegimeTributario(codigo = 1, nome = "Lucro Presumido")
+        testData.insertOrderType(codigo = 2, nome = "Venda")
         testData.insertProduct(codClp = 1, codGru = 10, codSub = 20, codPro = 30)
-        testData.insertOrder(1, orderDate, 1001, 1, vendedorExternalId = null)
+        testData.insertOrder(1, orderDate, 1001, 1, vendedorExternalId = null, tipoPedido = 2)
         testData.insertOrderItem(1, orderDate, 1001, 2)
 
-        val order = customerOrderQueryRepository.findByKey("1001")
+        val order = customerOrderQueryRepository.findByKey(1001L)
 
         requireNotNull(order)
         assertEquals(1, order.codigoEmpresa)
@@ -66,6 +70,8 @@ class CustomerOrderQueryRepositoryTest : FirebirdIntegrationTest() {
         assertEquals(5.0, order.totalIpi)
         assertEquals(null, order.vendedorExternalId)
         assertEquals("Lucro Presumido", order.nomeRegimeTributario)
+        assertEquals("Venda", order.tipoPedido)
+        assertEquals("Venda", order.toIngestionDto("12345678000100").tipoPedido)
         order.itens.single().let { item ->
             assertEquals("10.20.30", item.produto)
             assertEquals("Item 2", item.descricao)
@@ -78,7 +84,7 @@ class CustomerOrderQueryRepositoryTest : FirebirdIntegrationTest() {
 
     @Test
     fun `findByKey returns null and an out of range page is empty when no order matches`() {
-        assertNull(customerOrderQueryRepository.findByKey("999"))
+        assertNull(customerOrderQueryRepository.findByKey(999L))
         assertEquals(emptyList(), customerOrderQueryRepository.findAllPaged(PageRequest.of(1, 1)).content)
     }
 }

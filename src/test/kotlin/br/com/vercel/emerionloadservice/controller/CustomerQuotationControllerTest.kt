@@ -43,7 +43,7 @@ class CustomerQuotationControllerTest {
         val quotation = mock<CustomerQuotation>()
         whenever(quotation.codigoEmpresa).thenReturn(1)
         whenever(quotation.codigoCliente).thenReturn(42L)
-        whenever(quotation.numeroPedido).thenReturn("QUOTE-42")
+        whenever(quotation.numeroPedido).thenReturn(42)
         whenever(quotation.dataPedido).thenReturn(LocalDate.of(2026, 1, 2))
         whenever(quotation.totalPedidoComImpostos).thenReturn(100.0)
         whenever(quotation.totalPedidoSemImpostos).thenReturn(90.0)
@@ -59,9 +59,9 @@ class CustomerQuotationControllerTest {
     @Test
     fun `should send a quotation to ingestion`() {
         mockMvc
-            .perform(post("/customer-quotation/QUOTE-42/send"))
+            .perform(post("/customer-quotation/42/send"))
             .andExpect(status().isOk)
 
-        verify(customerQuotationServiceMock).sendQuotationToIngestion("QUOTE-42")
+        verify(customerQuotationServiceMock).sendQuotationToIngestion(42L)
     }
 }

@@ -49,7 +49,7 @@ class PedlibControllerTest {
     fun `should return a populated pedlib page with the retailer identity`() {
         val pedlib = mock<Pedlib>()
         whenever(pedlib.codigoEmpresa).thenReturn(1)
-        whenever(pedlib.numeroPedido).thenReturn("123")
+        whenever(pedlib.numeroPedido).thenReturn(123)
         whenever(pedlib.numeroLiberacao).thenReturn(1)
         whenever(pedlib.detalhes).thenReturn(listOf(mock()))
         whenever(pedlibServiceMock.getAllPedlib(any())).thenReturn(PageImpl(listOf(pedlib)))
@@ -57,19 +57,19 @@ class PedlibControllerTest {
         mockMvc
             .perform(get("/pedlib/all"))
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.content[0].numeroPedido").value("123"))
+            .andExpect(jsonPath("$.content[0].numeroPedido").value(123))
             .andExpect(jsonPath("$.content[0].cnpjEmpresa").value("12345678901234"))
     }
 
     @Test
     fun `should send pedlib to ingestion`() {
         mockMvc.perform(post("/pedlib/123/send")).andExpect(status().isOk)
-        verify(pedlibServiceMock).sendPedlibToIngestion("123")
+        verify(pedlibServiceMock).sendPedlibToIngestion(123)
     }
 
     @Test
     fun `should return not found when pedlib does not exist`() {
-        whenever(pedlibServiceMock.getPedlibByKey("missing")).thenThrow(ResponseStatusException(HttpStatus.NOT_FOUND))
-        mockMvc.perform(get("/pedlib/missing")).andExpect(status().isNotFound)
+        whenever(pedlibServiceMock.getPedlibByKey(-999)).thenThrow(ResponseStatusException(HttpStatus.NOT_FOUND))
+        mockMvc.perform(get("/pedlib/-999")).andExpect(status().isNotFound)
     }
 }

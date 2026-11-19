@@ -44,8 +44,8 @@ class CustomerQuotationRepositoryTest : FirebirdIntegrationTest() {
         val quotation = result.content.single()
 
         assertEquals(2, result.totalElements)
-        assertEquals("1002", quotation.numeroPedido)
-        assertEquals(2002, quotation.numeroCotacao)
+        assertEquals(1002L, quotation.numeroPedido)
+        assertEquals(2002L, quotation.numeroCotacao)
         assertEquals(1, quotation.codigoCliente)
         assertEquals("11111111000111", quotation.cpfCnpj)
         assertEquals(LocalDate.of(2024, 1, 2), quotation.dataPedido)
@@ -55,6 +55,6 @@ class CustomerQuotationRepositoryTest : FirebirdIntegrationTest() {
 
     @Test
     fun `findByKey returns null when no quotation matches`() {
-        assertNull(customerQuotationRepository.findByKey("999"))
+        assertNull(customerQuotationRepository.findByKey(999L))
     }
 }

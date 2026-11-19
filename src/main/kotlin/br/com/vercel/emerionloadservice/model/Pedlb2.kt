@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 data class Pedlb2(
     val codigoEmpresa: Int,
     val dataPedido: LocalDateTime?,
-    val numeroPedido: String,
+    val numeroPedido: Long,
     val numeroLiberacao: Int,
     val numeroSequenciaLiberacao: Int,
     val classificacaoItem: String?,

@@ -741,7 +741,8 @@ components:
       type: object
       properties:
         externalId:
-          type: string
+          type: integer
+          format: int64
         codigoEmpresa:
           type: integer
           format: int32
@@ -751,7 +752,8 @@ components:
         cpfCnpj:
           type: string
         numeroPedido:
-          type: string
+          type: integer
+          format: int64
         dataPedido:
           type: string
           format: date-time-local
@@ -808,6 +810,9 @@ components:
           type: string
         codigoPadraoFaturamento:
           type: string
+        tipoPedido:
+          type: string
+          description: Order type name from pedtip.nomtip, when available.
         itens:
           type: array
           items:
@@ -836,7 +841,8 @@ components:
       type: object
       properties:
         externalId:
-          type: string
+          type: integer
+          format: int64
         codigoEmpresa:
           type: integer
           format: int32
@@ -855,9 +861,10 @@ components:
           format: date
         numeroCotacao:
           type: integer
-          format: int32
+          format: int64
         numeroPedido:
-          type: string
+          type: integer
+          format: int64
         dataPedido:
           type: string
           format: date
@@ -1336,8 +1343,12 @@ components:
         dataPedido:
           type: string
           format: date
-        numeroPedido:
+        dataFaturamento:
           type: string
+          format: date
+        numeroPedido:
+          type: integer
+          format: int64
         numeroLiberacao:
           type: integer
           format: int32

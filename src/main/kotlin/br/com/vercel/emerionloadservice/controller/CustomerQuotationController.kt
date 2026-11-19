@@ -28,13 +28,13 @@ class CustomerQuotationController(
 
     @GetMapping("{numres}")
     fun getQuotationByNumres(
-        @PathVariable numres: String,
+        @PathVariable numres: Long,
     ): CustomerQuotationIngestionDto =
         customerQuotationService.getQuotationByNumres(numres).toIngestionDto(companyProvider.getCompanyCnpj())
 
     @PostMapping("{numres}/send")
     fun sendQuotationToIngestion(
-        @PathVariable numres: String,
+        @PathVariable numres: Long,
     ): ResponseEntity<Void> {
         customerQuotationService.sendQuotationToIngestion(numres)
         return ResponseEntity.ok().build()

@@ -16,6 +16,7 @@ class TestDataBuilder(
         listOf(
             "PEDRE2",
             "PEDRES",
+            "PEDTIP",
             "PEDCTA",
             "PEDLB2",
             "PEDLIB",
@@ -80,6 +81,13 @@ class TestDataBuilder(
             codigo,
             nome,
         )
+    }
+
+    fun insertOrderType(
+        codigo: Int,
+        nome: String,
+    ) {
+        jdbcTemplate.update("INSERT INTO PEDTIP (CODTIP, NOMTIP) VALUES (?, ?)", codigo, nome)
     }
 
     fun insertCustomer(
@@ -185,14 +193,15 @@ class TestDataBuilder(
         codCli: Long,
         vendedorExternalId: Long? = 99,
         ufPedido: String? = "PR",
+        tipoPedido: Int? = null,
     ) {
         jdbcTemplate.update(
             """
             INSERT INTO PEDRES (
                 CODEMP, DTERES, NUMRES, CODCLI, SITRES, UFERES, TOTGER, TOTRES, TOTIPI, TOTICM,
                 TOTPIS, TOTCOF, TOTSUB, TOTDESCINC, TOTFRT, TOTSEG, TOTOUTDESP, CODVEN,
-                CODATD, DTFRES, CODTRA, PEDANT, REGTRB, CODPFA
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                CODATD, DTFRES, CODTRA, PEDANT, REGTRB, CODPFA, CODTIP
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """.trimIndent(),
             codEmp,
             Date.valueOf(dataPedido),
@@ -218,6 +227,7 @@ class TestDataBuilder(
             "ANT-1",
             1,
             "PFA-1",
+            tipoPedido,
         )
     }
 

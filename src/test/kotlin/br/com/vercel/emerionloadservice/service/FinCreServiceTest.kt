@@ -69,7 +69,7 @@ class FinCreServiceTest {
 
         finCreService.sendFinCreToIngestion("123")
 
-        verify(ingestionServiceClientMock).sendFinCre(finCre)
+        verify(ingestionServiceClientMock).sendFinCre(listOf(finCre))
     }
 
     @Test
@@ -82,8 +82,8 @@ class FinCreServiceTest {
 
         finCreService.processRecordsToWebservice(Pageable.ofSize(10))
 
-        verify(ingestionServiceClientMock).sendFinCre(pendingCredits.content)
-        verify(finCreQueryRepositoryMock).updateSentToWebService(pendingCredits.content)
+        verify(ingestionServiceClientMock).sendFinCre(listOf(firstCredit, secondCredit))
+        verify(finCreQueryRepositoryMock).updateSentToWebService(listOf(firstCredit, secondCredit))
     }
 
     @Test

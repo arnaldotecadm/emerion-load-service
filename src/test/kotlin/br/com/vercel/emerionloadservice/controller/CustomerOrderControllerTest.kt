@@ -1,6 +1,8 @@
 package br.com.vercel.emerionloadservice.controller
 
+import br.com.vercel.emerionloadservice.client.IngestionServiceClient
 import br.com.vercel.emerionloadservice.model.CustomerOrder
+import br.com.vercel.emerionloadservice.service.ChunkService
 import br.com.vercel.emerionloadservice.service.CompanyProvider
 import br.com.vercel.emerionloadservice.service.CustomerOrderService
 import org.junit.jupiter.api.BeforeEach
@@ -32,6 +34,12 @@ class CustomerOrderControllerTest {
     val customerOrderServiceMock: CustomerOrderService = mock()
 
     @MockitoBean
+    val ingestionServiceClientMock: IngestionServiceClient = mock()
+
+    @MockitoBean
+    val chunkServiceMock: ChunkService = mock()
+
+    @MockitoBean
     val companyProviderMock: CompanyProvider = mock()
 
     @BeforeEach
@@ -55,7 +63,7 @@ class CustomerOrderControllerTest {
         val order = mock<CustomerOrder>()
         whenever(order.codigoEmpresa).thenReturn(1)
         whenever(order.codigoCliente).thenReturn(42L)
-        whenever(order.numeroPedido).thenReturn("ORDER-42")
+        whenever(order.numeroPedido).thenReturn(42)
         whenever(order.dataPedido).thenReturn(LocalDateTime.of(2026, 1, 2, 0, 0))
         whenever(order.totalPedidoComImpostos).thenReturn(100.0)
         whenever(order.totalPedidoSemImpostos).thenReturn(90.0)
@@ -72,18 +80,18 @@ class CustomerOrderControllerTest {
     @Test
     fun `should send an order to ingestion`() {
         mockMvc
-            .perform(post("/customer-order/ORDER-42/send"))
+            .perform(post("/customer-order/42/send"))
             .andExpect(status().isOk)
 
-        verify(customerOrderServiceMock).sendOrderToIngestion("ORDER-42")
+        verify(customerOrderServiceMock).sendOrderToIngestion(42)
     }
 
     @Test
     fun `should return not found when the order does not exist`() {
-        whenever(customerOrderServiceMock.getOrderByNumres("missing")).thenThrow(ResponseStatusException(HttpStatus.NOT_FOUND))
+        whenever(customerOrderServiceMock.getOrderByNumres(999)).thenThrow(ResponseStatusException(HttpStatus.NOT_FOUND))
 
         mockMvc
-            .perform(get("/customer-order/missing"))
+            .perform(get("/customer-order/999"))
             .andExpect(status().isNotFound)
     }
 }

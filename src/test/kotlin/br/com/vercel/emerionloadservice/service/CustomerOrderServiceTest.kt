@@ -46,16 +46,16 @@ class CustomerOrderServiceTest {
     @Test
     fun `should return an order by its number`() {
         val order = mock<CustomerOrder>()
-        whenever(customerOrderQueryRepositoryMock.findByKey("ORDER-42")).thenReturn(order)
+        whenever(customerOrderQueryRepositoryMock.findByKey(42L)).thenReturn(order)
 
-        assertSame(order, customerOrderService.getOrderByNumres("ORDER-42"))
+        assertSame(order, customerOrderService.getOrderByNumres(42L))
     }
 
     @Test
     fun `should throw not found without sending when order does not exist`() {
-        whenever(customerOrderQueryRepositoryMock.findByKey("missing")).thenReturn(null)
+        whenever(customerOrderQueryRepositoryMock.findByKey(999L)).thenReturn(null)
 
-        val exception = assertThrows<ResponseStatusException> { customerOrderService.sendOrderToIngestion("missing") }
+        val exception = assertThrows<ResponseStatusException> { customerOrderService.sendOrderToIngestion(999L) }
 
         assertEquals(HttpStatus.NOT_FOUND, exception.statusCode)
         verifyNoInteractions(ingestionServiceClientMock)
@@ -64,9 +64,9 @@ class CustomerOrderServiceTest {
     @Test
     fun `should send the resolved order to ingestion`() {
         val order = mock<CustomerOrder>()
-        whenever(customerOrderQueryRepositoryMock.findByKey("ORDER-42")).thenReturn(order)
+        whenever(customerOrderQueryRepositoryMock.findByKey(42L)).thenReturn(order)
 
-        customerOrderService.sendOrderToIngestion("ORDER-42")
+        customerOrderService.sendOrderToIngestion(42L)
 
         verify(ingestionServiceClientMock).sendCustomerOrder(listOf(order))
     }

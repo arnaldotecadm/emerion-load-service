@@ -15,6 +15,7 @@ private const val BASE_QUERY_PEDLIB = """
     select
         lib.codemp as codigoEmpresa,
         lib.dteres as dataPedido,
+        lib.dtefat as dataFaturamento,
         lib.numres as numeroPedido,
         lib.seqlib as numeroLiberacao,
         lib.dtelib as dataLiberacao,
@@ -64,7 +65,7 @@ class PedlibQueryRepository(
     private data class PedlibKey(
         val codigoEmpresa: Int,
         val dataPedido: java.time.LocalDate?,
-        val numeroPedido: String,
+        val numeroPedido: Long,
         val numeroLiberacao: Int,
     )
 
@@ -109,7 +110,7 @@ class PedlibQueryRepository(
         )
     }
 
-    fun findByKey(numres: String): Pedlib? {
+    fun findByKey(numres: Long): Pedlib? {
         val headerQuery = "$BASE_QUERY_PEDLIB where lib.numres = ? order by lib.seqlib"
         val header =
             jdbcTemplate
@@ -157,7 +158,7 @@ class PedlibQueryRepository(
     }
 
     private fun findDetails(headers: List<Pedlib>): List<Pedlb2> {
-        val numresList = headers.joinToString(",") { it.numeroPedido }
+        val numresList = headers.joinToString(",") { it.numeroPedido.toString() }
         val details =
             jdbcTemplate
                 .query(
@@ -177,7 +178,8 @@ class PedlibQueryRepository(
         Pedlib(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime()?.toLocalDate(),
-            numeroPedido = rs.getString("numeroPedido"),
+            dataFaturamento = rs.getTimestamp("dataFaturamento")?.toLocalDateTime()?.toLocalDate(),
+            numeroPedido = rs.getLong("numeroPedido"),
             numeroLiberacao = rs.getInt("numeroLiberacao"),
             dataLiberacao = rs.getTimestamp("dataLiberacao")?.toLocalDateTime()?.toLocalDate(),
             horaLiberacao = rs.getString("horaLiberacao"),
@@ -196,7 +198,7 @@ class PedlibQueryRepository(
         Pedlb2(
             codigoEmpresa = rs.getInt("codigoEmpresa"),
             dataPedido = rs.getTimestamp("dataPedido")?.toLocalDateTime(),
-            numeroPedido = rs.getString("numeroPedido"),
+            numeroPedido = rs.getLong("numeroPedido"),
             numeroLiberacao = rs.getInt("numeroLiberacao"),
             numeroSequenciaLiberacao = rs.getInt("numeroSequenciaLiberacao"),
             classificacaoItem = rs.getString("classificacaoItem"),

@@ -5,7 +5,8 @@ import java.time.LocalDate
 data class Pedlib(
     val codigoEmpresa: Int,
     val dataPedido: LocalDate?,
-    val numeroPedido: String,
+    val dataFaturamento: LocalDate?,
+    val numeroPedido: Long,
     val numeroLiberacao: Int,
     val dataLiberacao: LocalDate?,
     val horaLiberacao: String?,

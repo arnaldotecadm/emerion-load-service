@@ -30,7 +30,10 @@ class ChunkService(
         return result
     }
 
-    fun <T> chunkByJsonSizePerNumber(items: List<T>, chunkSize: Int): List<List<T>> {
+    fun <T> chunkByJsonSizePerNumber(
+        items: List<T>,
+        chunkSize: Int,
+    ): List<List<T>> {
         val result = mutableListOf<List<T>>()
         var currentBatch = mutableListOf<T>()
         var currentSize = 0

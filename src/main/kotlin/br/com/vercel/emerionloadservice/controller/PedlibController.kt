@@ -27,12 +27,12 @@ class PedlibController(
 
     @GetMapping("{numres}")
     fun getPedlibByKey(
-        @PathVariable numres: String,
+        @PathVariable numres: Long,
     ): PedlibIngestionDto = pedlibService.getPedlibByKey(numres).toIngestionDto(companyProvider.getCompanyCnpj())
 
     @PostMapping("{numres}/send")
     fun sendPedlibToIngestion(
-        @PathVariable numres: String,
+        @PathVariable numres: Long,
     ): ResponseEntity<Void> {
         pedlibService.sendPedlibToIngestion(numres)
         return ResponseEntity.ok().build()

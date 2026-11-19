@@ -39,6 +39,7 @@ object CustomerOrderIngestionMapper {
             regimeTributario = this.regimeTributario,
             nomeRegimeTributario = this.nomeRegimeTributario,
             codigoPadraoFaturamento = this.codigoPadraoFaturamento,
+            tipoPedido = this.tipoPedido,
             itens = this.itens.map { it.toIngestionDto() },
         )
 

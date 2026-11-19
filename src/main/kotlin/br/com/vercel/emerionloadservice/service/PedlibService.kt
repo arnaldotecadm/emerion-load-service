@@ -37,11 +37,11 @@ class PedlibService(
         }
     }
 
-    fun getPedlibByKey(numres: String): Pedlib =
+    fun getPedlibByKey(numres: Long): Pedlib =
         pedlibQueryRepository.findByKey(numres)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-    fun sendPedlibToIngestion(numres: String) {
+    fun sendPedlibToIngestion(numres: Long) {
         ingestionServiceClient.sendPedlib(listOf(getPedlibByKey(numres)))
     }
 }

@@ -28,6 +28,9 @@ class CustomerServiceTest {
     @MockitoBean
     val ingestionServiceClientMock: IngestionServiceClient = mock()
 
+    @MockitoBean
+    val chunkServiceMock: ChunkService = mock()
+
     @InjectMocks
     lateinit var customerService: CustomerService
 
@@ -65,6 +68,6 @@ class CustomerServiceTest {
 
         customerService.sendCustomerToIngestion(42L)
 
-        verify(ingestionServiceClientMock).sendCustomer(customer)
+        verify(ingestionServiceClientMock).sendCustomer(listOf(customer))
     }
 }

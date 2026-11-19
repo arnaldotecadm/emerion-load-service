@@ -12,6 +12,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mockito.mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -46,16 +47,16 @@ class PedlibServiceTest {
     @Test
     fun `should return pedlib by its number`() {
         val pedlib = mock<Pedlib>()
-        whenever(pedlibQueryRepositoryMock.findByKey("123")).thenReturn(pedlib)
+        whenever(pedlibQueryRepositoryMock.findByKey(123L)).thenReturn(pedlib)
 
-        assertSame(pedlib, pedlibService.getPedlibByKey("123"))
+        assertSame(pedlib, pedlibService.getPedlibByKey(123L))
     }
 
     @Test
     fun `should send pending pedlibs and mark them as sent`() {
         val pedlib = mock<Pedlib>()
         whenever(pedlibQueryRepositoryMock.findAllToWebService(any())).thenReturn(PageImpl(listOf(pedlib)))
-        whenever(chunkServiceMock.chunkByJsonSizePerNumber<Pedlib>(any(), 25)).thenReturn(listOf(listOf(pedlib)))
+        whenever(chunkServiceMock.chunkByJsonSizePerNumber<Pedlib>(any(), eq(25))).thenReturn(listOf(listOf(pedlib)))
 
         pedlibService.processRecordsToWebservice(Pageable.ofSize(10))
 
@@ -65,9 +66,9 @@ class PedlibServiceTest {
 
     @Test
     fun `should throw not found without sending when pedlib does not exist`() {
-        whenever(pedlibQueryRepositoryMock.findByKey("missing")).thenReturn(null)
+        whenever(pedlibQueryRepositoryMock.findByKey(999L)).thenReturn(null)
 
-        val exception = assertThrows<ResponseStatusException> { pedlibService.sendPedlibToIngestion("missing") }
+        val exception = assertThrows<ResponseStatusException> { pedlibService.sendPedlibToIngestion(999L) }
 
         assertEquals(HttpStatus.NOT_FOUND, exception.statusCode)
         verifyNoInteractions(ingestionServiceClientMock)
@@ -76,9 +77,9 @@ class PedlibServiceTest {
     @Test
     fun `should send the resolved pedlib to ingestion`() {
         val pedlib = mock<Pedlib>()
-        whenever(pedlibQueryRepositoryMock.findByKey("123")).thenReturn(pedlib)
+        whenever(pedlibQueryRepositoryMock.findByKey(123L)).thenReturn(pedlib)
 
-        pedlibService.sendPedlibToIngestion("123")
+        pedlibService.sendPedlibToIngestion(123L)
 
         verify(ingestionServiceClientMock).sendPedlib(listOf(pedlib))
     }

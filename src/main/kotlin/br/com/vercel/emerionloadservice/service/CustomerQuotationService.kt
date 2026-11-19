@@ -25,11 +25,11 @@ class CustomerQuotationService(
         }
     }
 
-    fun getQuotationByNumres(numres: String): CustomerQuotation =
+    fun getQuotationByNumres(numres: Long): CustomerQuotation =
         customerQuotationRepository.findByKey(numres)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND)
 
-    fun sendQuotationToIngestion(numres: String) {
+    fun sendQuotationToIngestion(numres: Long) {
         ingestionServiceClient.sendCustomerQuotation(listOf(getQuotationByNumres(numres)))
     }
 }
